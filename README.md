@@ -1,0 +1,29 @@
+tailer-swift
+============
+
+tailer-swift is a cross-platform GUI specialization of the popular tail
+utility. Highlights include easy highlighting, filtering and
+regular-expression support.
+
+Installation
+------------
+
+1. Clone this repository.
+2. Type `gradle`.
+
+Requirements
+------------
+
+[Gradle](http://gradle.org) is required to build the code.
+
+  * [Guava](https://code.google.com/p/guava-libraries/)
+
+Building the Code
+-----------------
+
+To build the code, run `gradle`.
+
+License
+-------
+
+This software is licensed under the [MIT License](http://en.wikipedia.org/wiki/MIT_License).
