@@ -23,6 +23,12 @@ Building the Code
 
 To build the code, run `gradle`.
 
+Limitations
+-----------
+
+OS X `WatchService` implementation is currently polling-based and extremely
+slow. Support status can be found [here under "WatchService"](https://wikis.oracle.com/display/OpenJDK/Mac+OS+X+Port+Project+Status).
+
 License
 -------
 
