@@ -12,19 +12,23 @@ public class GuiTailerSwift implements Runnable {
         String lookAndFeel = UIManager.getSystemLookAndFeelClassName();
 
         try {
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+            UIManager.setLookAndFeel(lookAndFeel);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
 
-        JTabbedPane jTabbedPane = new JTabbedPane();
         JPanel panel = new JPanel();
-        JTextField jTextField = new JTextField();
-        jTextField.setText("Hello, world!");
-        panel.add(jTextField);
-        jTabbedPane.add(panel);
+        panel.setPreferredSize(new Dimension(500, 500));
+        JTextArea jTextArea = new JTextArea();
+        jTextArea.setText("Hello, world!");
+        JScrollPane jScrollPane = new JScrollPane(jTextArea);
+        jScrollPane.setPreferredSize(new Dimension(500, 500));
+        panel.add(jScrollPane);
+
+        JTabbedPane jTabbedPane = new JTabbedPane();
+        jTabbedPane.addTab("Default Tab", panel);
 
         mainFrame.add(jTabbedPane);
         mainFrame.pack();
