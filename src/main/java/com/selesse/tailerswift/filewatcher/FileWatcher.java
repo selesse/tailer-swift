@@ -181,12 +181,4 @@ public class FileWatcher implements Runnable {
     public WatchKey getKey() {
         return key;
     }
-
-    public List<String> getBufferedFileContents() {
-        return bufferedFileContents;
-    }
-
-    public void setBufferedFileContents(List<String> bufferedFileContents) {
-        this.bufferedFileContents = bufferedFileContents;
-    }
 }
