@@ -1,6 +1,6 @@
 apply plugin: 'java'
 
-defaultTasks 'clean', 'assemble'
+defaultTasks 'clean', 'check', 'assemble'
 
 sourceCompatibility = 1.7
 version = '1.0.0'
@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-  compile 'com.google.guava:guava:14.0.1'
+  compile 'com.google.guava:guava:15.0'
   testCompile 'junit:junit:4.11'
 }
 
