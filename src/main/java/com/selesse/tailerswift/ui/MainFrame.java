@@ -35,16 +35,19 @@ public class MainFrame extends JFrame {
 
         JButton jButton;
 
-        JPanel panel = new Panel();
-
+        JPanel panel = new JPanel();
 
         jButton = searchFeature.getButton();
-        jButton.setSize(new Dimension(40,20));
-        this.add(jButton, BorderLayout.SOUTH);
+        jButton.setPreferredSize(new Dimension(40,20));
+        //this.add(jButton, BorderLayout.SOUTH);
+        panel.add(jButton);
 
         jButton = filterFeature.getButton();
-        jButton.setSize(new Dimension(40,20));
-        this.add(jButton, BorderLayout.SOUTH);
+        jButton.setPreferredSize(new Dimension(40,20));
+        //this.add(jButton, BorderLayout.SOUTH);
+        panel.add(jButton);
+
+        this.add(panel, BorderLayout.SOUTH);
 
         this.setExtendedState(Frame.MAXIMIZED_BOTH);
         pack();
