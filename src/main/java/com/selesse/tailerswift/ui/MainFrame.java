@@ -1,5 +1,11 @@
 package com.selesse.tailerswift.ui;
 
+import com.selesse.tailerswift.Program;
+import com.selesse.tailerswift.ui.menu.FileMenu;
+import com.selesse.tailerswift.ui.menu.HelpMenu;
+import com.selesse.tailerswift.ui.menu.SettingsMenu;
+import com.selesse.tailerswift.ui.menu.WindowMenu;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -57,5 +63,26 @@ public class MainFrame extends JFrame {
 
     public void addTab(String title, Component content) {
         jTabbedPane.addTab(title, content);
+    }
+
+    private JMenuBar createJMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+
+        FileMenu fileMenu = new FileMenu();
+        WindowMenu windowMenu = new WindowMenu(this);
+        SettingsMenu settingsMenu = new SettingsMenu();
+        HelpMenu helpMenu = new HelpMenu();
+
+        menuBar.add(fileMenu.getJMenu());
+        menuBar.add(settingsMenu.getJMenu());
+        menuBar.add(windowMenu.getJMenu());
+        menuBar.add(helpMenu.getJMenu());
+        return menuBar;
+    }
+
+    public void toggleAlwaysOnTop() {
+        boolean isAlwaysOnTop = Program.getInstance().getSettings().isAlwaysOnTop();
+        this.setAlwaysOnTop(!isAlwaysOnTop);
+        Program.getInstance().getSettings().setAlwaysOnTop(!isAlwaysOnTop);
     }
 }

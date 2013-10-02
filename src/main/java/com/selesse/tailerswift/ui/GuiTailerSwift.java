@@ -1,9 +1,10 @@
 package com.selesse.tailerswift.ui;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class GuiTailerSwift implements Runnable {
+    private JFrame mainFrame;
+
     @Override
     public void run() {
         MainFrame mainFrame = new MainFrame();
@@ -18,4 +19,5 @@ public class GuiTailerSwift implements Runnable {
         }
 
     }
+
 }
