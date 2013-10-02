@@ -1,11 +1,8 @@
 package com.selesse.tailerswift.filewatcher;
 
-import com.google.common.collect.Lists;
-
-import java.io.*;
-import java.nio.charset.Charset;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.*;
-import java.util.List;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -15,9 +12,6 @@ public class FileWatcher implements Runnable {
     private Path observedFile;
     private WatchKey key;
     private FileObserver fileObserver;
-    private List<String> bufferedFileContents;
-    private long bufferedFileSize;
-    private BufferedReader bufferedReader;
 
     public FileWatcher(String filePath) {
         try {
@@ -32,84 +26,7 @@ public class FileWatcher implements Runnable {
         this.observedDirectory = observedFile.getParentFile().toPath();
         registerFilesParentDirectory();
 
-        try {
-            bufferedReader = new BufferedReader(new FileReader(observedFile));
-            bufferedFileContents = Files.readAllLines(observedFile.toPath(), Charset.defaultCharset());
-            bufferedFileSize = Files.size(observedFile.toPath());
-            bufferedReader.close();
-        } catch (FileNotFoundException e) {
-            // we like this, it's easy
-            bufferedFileSize = 0;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        this.fileObserver = new FileObserver() {
-            @Override
-            public synchronized void onModify() {
-                try {
-                    BufferedReader bufferedReader = new BufferedReader(new FileReader(observedFile));
-                    bufferedReader.skip(bufferedFileSize);
-
-                    char[] buffer = new char[1024];
-                    int bytesRead;
-
-                    while ((bytesRead = bufferedReader.read(buffer)) != -1) {
-                        for (int i = 0; i < bytesRead; i++) {
-                            System.out.print(buffer[i]);
-                        }
-                    }
-
-                    bufferedFileContents = Files.readAllLines(observedFile.toPath(), Charset.defaultCharset());
-                    bufferedFileSize = Files.size(observedFile.toPath());
-                    bufferedReader.close();
-                } catch (FileNotFoundException fileNotFoundException) {
-                    // we like this, it's easy
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public synchronized void onCreate() {
-                bufferedFileContents = Lists.newArrayList();
-                bufferedFileSize = 0;
-
-                try {
-                    bufferedReader = new BufferedReader(new FileReader(observedFile));
-                    bufferedFileSize = Files.size(observedFile.toPath());
-
-                    char[] buffer = new char[1024];
-                    int bytesRead;
-
-                    while ((bytesRead = bufferedReader.read(buffer)) != -1) {
-                        for (int i = 0; i < bytesRead; i++) {
-                            System.out.print(buffer[i]);
-                        }
-                    }
-
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                notifyObserver(ENTRY_CREATE);
-            }
-
-            @Override
-            public synchronized void onDelete() {
-            }
-        };
-    }
-
-    private void notifyObserver(WatchEvent.Kind<Path> kind) {
-        if (kind == ENTRY_CREATE) {
-
-        } else if (kind == ENTRY_MODIFY) {
-
-        } else if (kind == ENTRY_DELETE) {
-
-        }
+        this.fileObserver = new FileObserverImpl(observedFile);
     }
 
     private void registerFilesParentDirectory() {
