@@ -1,4 +1,4 @@
-package com.selesse.tailerswift;
+package com.selesse.tailerswift.settings;
 
 import java.io.Serializable;
 

@@ -1,7 +1,7 @@
 package com.selesse.tailerswift.ui.menu;
 
-import com.selesse.tailerswift.OperatingSystem;
-import com.selesse.tailerswift.Program;
+import com.selesse.tailerswift.settings.OperatingSystem;
+import com.selesse.tailerswift.settings.Program;
 
 import javax.swing.*;
 import java.awt.*;

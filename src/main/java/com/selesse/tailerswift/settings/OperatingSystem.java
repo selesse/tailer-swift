@@ -1,4 +1,4 @@
-package com.selesse.tailerswift;
+package com.selesse.tailerswift.settings;
 
 public enum OperatingSystem {
     WINDOWS, MAC, LINUX

@@ -1,5 +1,7 @@
 package com.selesse.tailerswift;
 
+import com.selesse.tailerswift.settings.OperatingSystem;
+import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.ui.GuiTailerSwift;
 
 public class Main {

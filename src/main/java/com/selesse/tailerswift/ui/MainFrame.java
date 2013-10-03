@@ -1,6 +1,6 @@
 package com.selesse.tailerswift.ui;
 
-import com.selesse.tailerswift.Program;
+import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.ui.menu.FileMenu;
 import com.selesse.tailerswift.ui.menu.HelpMenu;
 import com.selesse.tailerswift.ui.menu.SettingsMenu;
@@ -24,17 +24,14 @@ public class MainFrame extends JFrame {
     }
 
     private void initializeGui() {
-        this.setTitle("Tailer Swift");
+        this.setTitle(Program.getInstance().getProgramName());
         this.setLayout(new BorderLayout());
         this.setBackground(null);
+        this.setJMenuBar(createJMenuBar());
 
         //add tabbed pane
         jTabbedPane = new JTabbedPane();
         this.add(jTabbedPane, BorderLayout.CENTER);
-
-        //add menu bar
-        //jMenuBar = createJMenuBar();
-        //this.add(jMenuBar, BorderLayout.NORTH);
 
         searchFeature = new Search();
         filterFeature = new Filter();
@@ -44,7 +41,7 @@ public class MainFrame extends JFrame {
         JPanel panel = new JPanel();
 
         jButton = searchFeature.getButton();
-        jButton.setPreferredSize(new Dimension(40,20));
+        jButton.setPreferredSize(new Dimension(40, 20));
         //this.add(jButton, BorderLayout.SOUTH);
         panel.add(jButton);
 
