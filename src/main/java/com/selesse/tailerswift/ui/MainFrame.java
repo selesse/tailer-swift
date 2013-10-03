@@ -16,8 +16,16 @@ public class MainFrame extends JFrame {
 
     private JTabbedPane jTabbedPane;
     private JMenuBar    jMenuBar;
+    private JPanel      jBottomPanel;
+
+    private JPanel      jFeatureButtonPanel;
+    private JPanel      jFeatureViewPanel;
+
     private Feature     searchFeature;
     private Feature     filterFeature;
+
+    private JButton     searchButton;
+    private JButton     filterButton;
 
     public MainFrame() {
         initializeGui();
@@ -33,22 +41,37 @@ public class MainFrame extends JFrame {
         jTabbedPane = new JTabbedPane();
         this.add(jTabbedPane, BorderLayout.CENTER);
 
-        this.addTab("Thingy", new JLabel("thingyt"));
-        searchFeature = new Search();
-        filterFeature = new Filter();
+        //tab added for testing purposes
+        this.addTab("Thingy", new JLabel("Thingy"));
 
-        JButton jButton;
-        JPanel jFeaturePanel = new JPanel();
+        //add bottom panel
+        jBottomPanel = new JPanel();
+        jBottomPanel.setLayout(new BorderLayout());
+        jBottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        jButton = searchFeature.getButton();
-        jButton.setPreferredSize(new Dimension(40, 20));
-        jFeaturePanel.add(jButton);
+        jFeatureViewPanel = new JPanel();
+        jFeatureButtonPanel = new JPanel();
 
-        jButton = filterFeature.getButton();
-        jButton.setPreferredSize(new Dimension(40, 20));
-        jFeaturePanel.add(jButton);
+        jBottomPanel.add(jFeatureViewPanel, BorderLayout.NORTH);
+        jBottomPanel.add(jFeatureButtonPanel, BorderLayout.SOUTH);
 
-        this.add(jFeaturePanel, BorderLayout.SOUTH);
+        this.add(jBottomPanel, BorderLayout.SOUTH);
+
+        //add features
+        searchFeature = new Feature(new Search());
+        filterFeature = new Feature(new Filter());
+
+        //create buttons
+        searchButton = new JButton("apples");
+        filterButton = new JButton("pears");
+
+        searchButton.addActionListener(new ButtonActionListener(jFeatureViewPanel, searchFeature));
+        filterButton.addActionListener(new ButtonActionListener(jFeatureViewPanel, filterFeature));
+
+        //add buttons
+        jFeatureButtonPanel.add(searchButton);
+        jFeatureButtonPanel.add(filterButton);
+
 
         pack();
         setLocationRelativeTo( null );
@@ -78,5 +101,10 @@ public class MainFrame extends JFrame {
         boolean isAlwaysOnTop = Program.getInstance().getSettings().isAlwaysOnTop();
         this.setAlwaysOnTop(!isAlwaysOnTop);
         Program.getInstance().getSettings().setAlwaysOnTop(!isAlwaysOnTop);
+    }
+
+    public void displayFeature() {
+
+
     }
 }
