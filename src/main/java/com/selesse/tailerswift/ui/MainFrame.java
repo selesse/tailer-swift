@@ -26,30 +26,26 @@ public class MainFrame extends JFrame {
         jTabbedPane = new JTabbedPane();
         this.add(jTabbedPane, BorderLayout.CENTER);
 
+        this.addTab("Thingy", new JLabel("thingyt"));
         //add menu bar
         //jMenuBar = createJMenuBar();
-        //this.add(jMenuBar, BorderLayout.NORTH);
 
         searchFeature = new Search();
         filterFeature = new Filter();
 
         JButton jButton;
-
-        JPanel panel = new JPanel();
+        JPanel jFeaturePanel = new JPanel();
 
         jButton = searchFeature.getButton();
-        jButton.setPreferredSize(new Dimension(40,20));
-        //this.add(jButton, BorderLayout.SOUTH);
-        panel.add(jButton);
+        jButton.setPreferredSize(new Dimension(40, 20));
+        jFeaturePanel.add(jButton);
 
         jButton = filterFeature.getButton();
-        jButton.setPreferredSize(new Dimension(40,20));
-        //this.add(jButton, BorderLayout.SOUTH);
-        panel.add(jButton);
+        jButton.setPreferredSize(new Dimension(40, 20));
+        jFeaturePanel.add(jButton);
 
-        this.add(panel, BorderLayout.SOUTH);
+        this.add(jFeaturePanel, BorderLayout.SOUTH);
 
-        this.setExtendedState(Frame.MAXIMIZED_BOTH);
         pack();
         setLocationRelativeTo( null );
         setVisible( true );
