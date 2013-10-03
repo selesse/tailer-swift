@@ -1,33 +1,37 @@
 package com.selesse.tailerswift.ui;
 
 import javax.swing.*;
+import java.awt.*;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  *
  */
-public class Search implements Feature {
+public class Search implements FeatureContent, Observer {
 
-    private JButton jButton;
-    private boolean isVisible;
+    JComponent mainComponent;
+    String name;
 
     public Search() {
+        name = "Search";
 
-        jButton = new JButton("Search");
-
+        mainComponent = new JLabel("search feature");
     }
 
     @Override
-    public JButton getButton() {
-        return jButton;  //To change body of implemented methods use File | Settings | File Templates.
+    public String getName() {
+        return name;
     }
 
     @Override
-    public boolean isVisible() {
-        return isVisible;
+    public JComponent getComponent() {
+        return mainComponent;
     }
 
     @Override
-    public void setVisible(boolean isVisible) {
-        this.isVisible = isVisible;
+    public void update(Observable observable, Object o) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
+
 }

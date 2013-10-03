@@ -1,14 +1,43 @@
 package com.selesse.tailerswift.ui;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  *
  */
-public interface Feature {
-    public JButton getButton();
+public class Feature {
 
-    public boolean isVisible();
+    private FeatureContent content;
+    private String featureName;
 
-    public void setVisible(boolean isVisible);
+    private JComponent mainPanel;
+
+    private boolean isVisible;
+
+    public Feature(FeatureContent content) {
+        this.content = content;
+
+        this.mainPanel = new JPanel();
+
+        this.featureName = this.content.getName();
+
+        this.mainPanel.add(this.content.getComponent());
+
+        this.isVisible = false;
+     }
+
+
+
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    public void changeVisibility() {
+        isVisible = !isVisible;
+    }
+
+    public Component getComponent() {
+        return mainPanel;
+    }
 }
