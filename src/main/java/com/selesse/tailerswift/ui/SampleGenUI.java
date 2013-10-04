@@ -1,7 +1,6 @@
 package com.selesse.tailerswift.ui;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class SampleGenUI {
     private JPanel genUiPanel;

@@ -2,6 +2,7 @@ package com.selesse.tailerswift.ui.menu;
 
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.settings.Settings;
+import com.selesse.tailerswift.ui.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,10 +12,10 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 public class WindowMenu {
-    private JFrame mainFrame;
+    private MainFrame mainFrame;
     private JMenu jMenu;
 
-    public WindowMenu(JFrame mainFrame) {
+    public WindowMenu(MainFrame mainFrame) {
         this.jMenu = new JMenu("Window");
         this.jMenu.add(createAlwaysOnTopJMenuItem());
         this.mainFrame = mainFrame;
