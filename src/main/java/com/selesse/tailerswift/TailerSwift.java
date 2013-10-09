@@ -2,6 +2,7 @@ package com.selesse.tailerswift;
 
 import com.google.common.collect.Maps;
 import com.selesse.tailerswift.filewatcher.FileWatcher;
+import com.selesse.tailerswift.ui.CliTailerSwift;
 
 import java.nio.file.Path;
 import java.nio.file.WatchKey;
@@ -18,7 +19,7 @@ public class TailerSwift implements Runnable {
 
     @Override
     public void run() {
-        FileWatcher fileWatcher = new FileWatcher(args[0]);
+        FileWatcher fileWatcher = new FileWatcher(new CliTailerSwift(), args[0]);
         keys.put(fileWatcher.getKey(), fileWatcher.getPath());
         fileWatcher.run();
     }

@@ -1,5 +1,7 @@
 package com.selesse.tailerswift.filewatcher;
 
+import com.selesse.tailerswift.ui.UserInterface;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -7,13 +9,14 @@ import java.nio.file.*;
 import static java.nio.file.StandardWatchEventKinds.*;
 
 public class FileWatcher implements Runnable {
+    private UserInterface ui;
     private WatchService watcher;
     private Path observedDirectory;
-    private Path observedFile;
+    private Path observedFilePath;
     private WatchKey key;
     private FileObserver fileObserver;
 
-    public FileWatcher(String filePath) {
+    public FileWatcher(UserInterface ui, String filePath) {
         try {
             watcher = FileSystems.getDefault().newWatchService();
         } catch (IOException e) {
@@ -21,8 +24,9 @@ public class FileWatcher implements Runnable {
             e.printStackTrace();
         }
 
+        this.ui = ui;
         final File observedFile = new File(filePath);
-        this.observedFile = observedFile.toPath();
+        this.observedFilePath = observedFile.toPath();
         this.observedDirectory = observedFile.getParentFile().toPath();
         registerFilesParentDirectory();
 
@@ -40,6 +44,7 @@ public class FileWatcher implements Runnable {
 
     @Override
     public void run() {
+        ui.newFile(observedFilePath, fileObserver.onCreate());
         while (true) {
             WatchKey key;
             try {
@@ -63,7 +68,7 @@ public class FileWatcher implements Runnable {
                 WatchEvent<Path> ev = cast(event);
 
                 // if this is actually the file we're looking at, do something
-                if (ev.context().getFileName().equals(observedFile.getFileName())) {
+                if (ev.context().getFileName().equals(observedFilePath.getFileName())) {
                     performKindBasedAction(ev.kind());
                 }
             }
@@ -78,9 +83,11 @@ public class FileWatcher implements Runnable {
 
     private void performKindBasedAction(WatchEvent.Kind<Path> kind) {
         if (kind == ENTRY_MODIFY) {
-            fileObserver.onModify();
+            String modificationString = fileObserver.onModify();
+            ui.updateFile(observedFilePath, modificationString);
         } else if (kind == ENTRY_CREATE) {
-            fileObserver.onCreate();
+            String modificationString = fileObserver.onCreate();
+            ui.newFile(observedFilePath, modificationString);
         } else if (kind == ENTRY_DELETE) {
             fileObserver.onDelete();
         }

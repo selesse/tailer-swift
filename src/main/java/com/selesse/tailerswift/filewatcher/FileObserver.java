@@ -1,7 +1,7 @@
 package com.selesse.tailerswift.filewatcher;
 
 public interface FileObserver {
-    void onModify();
-    void onCreate();
+    String onModify();
+    String onCreate();
     void onDelete();
 }

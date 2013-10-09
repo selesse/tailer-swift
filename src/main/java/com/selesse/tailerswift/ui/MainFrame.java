@@ -1,5 +1,6 @@
 package com.selesse.tailerswift.ui;
 
+import com.selesse.tailerswift.filewatcher.FileWatcher;
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.ui.menu.FileMenu;
 import com.selesse.tailerswift.ui.menu.HelpMenu;
@@ -8,6 +9,7 @@ import com.selesse.tailerswift.ui.menu.WindowMenu;
 
 import javax.swing.*;
 import java.awt.*;
+import java.nio.file.Path;
 
 public class MainFrame extends JFrame {
 
@@ -23,6 +25,7 @@ public class MainFrame extends JFrame {
 
     private JButton     searchButton;
     private JButton     filterButton;
+    private JTextArea textArea; // ccccombo-breaker
 
     public MainFrame() {
         initializeGui();
@@ -33,6 +36,7 @@ public class MainFrame extends JFrame {
         this.setLayout(new BorderLayout());
         this.setBackground(null);
         this.setJMenuBar(createJMenuBar());
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         //add tabbed pane
         jTabbedPane = new JTabbedPane();
@@ -40,6 +44,11 @@ public class MainFrame extends JFrame {
 
         //tab added for testing purposes
         this.addTab("Thingy", new JLabel("Thingy"));
+        textArea = new JTextArea();
+        textArea.setEditable(false);
+        this.addTab("Thingy2", textArea);
+
+        jTabbedPane.setSelectedIndex(1); // deal with it!
 
         //add bottom panel
         jBottomPanel = new JPanel();
@@ -72,6 +81,20 @@ public class MainFrame extends JFrame {
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
+
+        FileWatcher fileWatcher = new FileWatcher(new UserInterface() {
+            @Override
+            public void updateFile(Path observedFile, String modificationString) {
+                textArea.setText(textArea.getText() + modificationString);
+            }
+
+            @Override
+            public void newFile(Path observedFile, String modificationString) {
+                textArea.setText(modificationString);
+            }
+        }, "./a.txt");
+        Thread thread = new Thread(fileWatcher);
+        thread.start();
     }
 
     public void addTab(String title, Component content) {

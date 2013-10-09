@@ -18,7 +18,9 @@ public class FileObserverImpl implements FileObserver {
     }
 
     @Override
-    public void onModify() {
+    public String onModify() {
+        StringBuilder modificationBuffered = new StringBuilder();
+
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(observedFile));
             bufferedReader.skip(bufferedFileSize);
@@ -28,7 +30,7 @@ public class FileObserverImpl implements FileObserver {
 
             while ((bytesRead = bufferedReader.read(buffer)) != -1) {
                 for (int i = 0; i < bytesRead; i++) {
-                    System.out.print(buffer[i]);
+                    modificationBuffered.append(buffer[i]);
                 }
             }
 
@@ -40,10 +42,14 @@ public class FileObserverImpl implements FileObserver {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return modificationBuffered.toString();
     }
 
     @Override
-    public void onCreate() {
+    public String onCreate() {
+        StringBuilder modificationBuffered = new StringBuilder();
+
         bufferedFileContents = Lists.newArrayList();
         bufferedFileSize = 0;
 
@@ -56,7 +62,7 @@ public class FileObserverImpl implements FileObserver {
 
             while ((bytesRead = bufferedReader.read(buffer)) != -1) {
                 for (int i = 0; i < bytesRead; i++) {
-                    System.out.print(buffer[i]);
+                    modificationBuffered.append(buffer[i]);
                 }
             }
 
@@ -64,6 +70,8 @@ public class FileObserverImpl implements FileObserver {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return modificationBuffered.toString();
     }
 
     @Override
