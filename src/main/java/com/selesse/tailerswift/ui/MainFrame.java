@@ -99,6 +99,11 @@ public class MainFrame extends JFrame {
             public void newFile(Path observedFile, String modificationString) {
                 textArea.setText(modificationString);
             }
+
+            @Override
+            public void deleteFile(Path observedFile) {
+                textArea.setText("");
+            }
         }, "./a.txt");
         Thread thread = new Thread(fileWatcher);
         thread.start();

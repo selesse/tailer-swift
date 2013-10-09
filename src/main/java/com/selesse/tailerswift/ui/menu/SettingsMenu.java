@@ -1,5 +1,7 @@
 package com.selesse.tailerswift.ui.menu;
 
+import com.selesse.tailerswift.ui.displayoptions.DisplayPreferencesFrame;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -9,6 +11,7 @@ import java.awt.event.KeyEvent;
 
 public class SettingsMenu {
     private JMenu jMenu;
+    private DisplayPreferencesFrame displayPreferencesFrame;
 
     public SettingsMenu() {
         this.jMenu = new JMenu("Settings");
@@ -22,7 +25,16 @@ public class SettingsMenu {
         displayOptionsMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO open display preferences
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (displayPreferencesFrame == null) {
+                            displayPreferencesFrame = new DisplayPreferencesFrame();
+                        }
+                        displayPreferencesFrame.focus();
+                    }
+                }
+                );
             }
         });
         return displayOptionsMenuItem;
