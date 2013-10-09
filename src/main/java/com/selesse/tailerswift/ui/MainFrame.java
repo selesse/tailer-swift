@@ -9,9 +9,6 @@ import com.selesse.tailerswift.ui.menu.WindowMenu;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- *
- */
 public class MainFrame extends JFrame {
 
     private JTabbedPane jTabbedPane;
@@ -72,10 +69,9 @@ public class MainFrame extends JFrame {
         jFeatureButtonPanel.add(searchButton);
         jFeatureButtonPanel.add(filterButton);
 
-
         pack();
-        setLocationRelativeTo( null );
-        setVisible( true );
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 
     public void addTab(String title, Component content) {
@@ -104,7 +100,5 @@ public class MainFrame extends JFrame {
     }
 
     public void displayFeature() {
-
-
     }
 }

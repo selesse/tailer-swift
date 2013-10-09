@@ -2,8 +2,8 @@ package com.selesse.tailerswift.settings;
 
 public class Program {
     private OperatingSystem operatingSystem;
-    private static Program instance;
     private Settings settings;
+    private static Program instance;
 
     public static Program getInstance() {
         if (instance == null) {

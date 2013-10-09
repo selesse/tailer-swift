@@ -1,17 +1,12 @@
 package com.selesse.tailerswift.ui;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.Observable;
 import java.util.Observer;
 
-/**
- *
- */
 public class Search implements FeatureContent, Observer {
-
-    JComponent mainComponent;
-    String name;
+    private JComponent mainComponent;
+    private String name;
 
     public Search() {
         name = "Search";
@@ -31,7 +26,5 @@ public class Search implements FeatureContent, Observer {
 
     @Override
     public void update(Observable observable, Object o) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
-
 }
