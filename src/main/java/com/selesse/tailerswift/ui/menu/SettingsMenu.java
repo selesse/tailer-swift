@@ -17,8 +17,8 @@ public class SettingsMenu {
 
     private JMenuItem createDisplayOptionsJMenuItem() {
         JMenuItem displayOptionsMenuItem = new JMenuItem("Display preferences");
-        displayOptionsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.META_MASK |
-                (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())));
+        displayOptionsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         displayOptionsMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

@@ -17,8 +17,7 @@ public class HelpMenu {
 
     private JMenuItem createAboutMenuItem() {
         JMenuItem displayOptionsMenuItem = new JMenuItem("About");
-        displayOptionsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.META_MASK |
-                (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())));
+        displayOptionsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
         displayOptionsMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
