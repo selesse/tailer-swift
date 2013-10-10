@@ -12,4 +12,8 @@ public class CliTailerSwift implements UserInterface {
     public void newFile(Path observedFile, String modificationString) {
         System.out.print(modificationString);
     }
+
+    @Override
+    public void deleteFile(Path observedFile) {
+    }
 }

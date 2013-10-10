@@ -1,6 +1,8 @@
 package com.selesse.tailerswift.ui;
 
+import com.google.common.io.Resources;
 import com.selesse.tailerswift.filewatcher.FileWatcher;
+import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.ui.menu.FileMenu;
 import com.selesse.tailerswift.ui.menu.HelpMenu;
@@ -48,6 +50,11 @@ public class MainFrame extends JFrame {
         textArea.setEditable(false);
         this.addTab("Thingy2", textArea);
 
+        // if we setIconImage in OS X, it throws some command line errors, so let's not try this on a Mac
+        if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
+            this.setIconImage(Toolkit.getDefaultToolkit().getImage(Resources.getResource("icon.png")));
+        }
+
         jTabbedPane.setSelectedIndex(1); // deal with it!
 
         //add bottom panel
@@ -91,6 +98,11 @@ public class MainFrame extends JFrame {
             @Override
             public void newFile(Path observedFile, String modificationString) {
                 textArea.setText(modificationString);
+            }
+
+            @Override
+            public void deleteFile(Path observedFile) {
+                textArea.setText("");
             }
         }, "./a.txt");
         Thread thread = new Thread(fileWatcher);

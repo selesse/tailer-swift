@@ -83,13 +83,11 @@ public class FileWatcher implements Runnable {
 
     private void performKindBasedAction(WatchEvent.Kind<Path> kind) {
         if (kind == ENTRY_MODIFY) {
-            String modificationString = fileObserver.onModify();
-            ui.updateFile(observedFilePath, modificationString);
+            ui.updateFile(observedFilePath, fileObserver.onModify());
         } else if (kind == ENTRY_CREATE) {
-            String modificationString = fileObserver.onCreate();
-            ui.newFile(observedFilePath, modificationString);
+            ui.newFile(observedFilePath, fileObserver.onCreate());
         } else if (kind == ENTRY_DELETE) {
-            fileObserver.onDelete();
+            ui.deleteFile(observedFilePath);
         }
     }
 
