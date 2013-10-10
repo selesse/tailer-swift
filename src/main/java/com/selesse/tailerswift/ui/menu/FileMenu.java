@@ -8,21 +8,22 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
 
 public class FileMenu {
     private JMenu jMenu;
-    private JFileChooser jFileChooser;
+    private FileDialog fileDialog;
     private JMenuItem addWatchedFileMenuItem;
     private JMenuItem exitMenuItem;
 
-    public FileMenu() {
+    public FileMenu(JFrame parentFrame) {
         this.jMenu = new JMenu("File");
-        if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
-            jFileChooser = new JFileChooser();
 
-            addWatchedFileMenuItem = createAddWatchedFileJMenuItem();
-            jMenu.add(addWatchedFileMenuItem);
+        fileDialog = new FileDialog(parentFrame);
+
+        addWatchedFileMenuItem = createAddWatchedFileJMenuItem();
+        jMenu.add(addWatchedFileMenuItem);
+
+        if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
 
             exitMenuItem = createExitJMenuItem();
             jMenu.add(exitMenuItem);
@@ -36,14 +37,8 @@ public class FileMenu {
         addWatchedFileMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int returnVal = jFileChooser.showDialog(null, "Select File");
-
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File file = jFileChooser.getSelectedFile();
-
-                } else {
-                    // canceled
-                }
+                fileDialog.setVisible(true);
+                fileDialog.getFile();
             }
         });
 
