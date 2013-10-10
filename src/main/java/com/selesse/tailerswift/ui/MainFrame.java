@@ -1,6 +1,8 @@
 package com.selesse.tailerswift.ui;
 
+import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
+import com.selesse.tailerswift.filewatcher.FileWatcher;
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.ui.menu.FileMenu;
@@ -10,6 +12,9 @@ import com.selesse.tailerswift.ui.menu.WindowMenu;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.nio.file.Path;
+import java.util.Map;
 
 public class MainFrame implements Runnable {
     private JFrame jFrame;
@@ -22,9 +27,11 @@ public class MainFrame implements Runnable {
     private Feature filterFeature;
     private JButton searchButton;
     private JButton filterButton;
+    private Map<String, JTextArea> fileTextAreaMap;
 
     public MainFrame() {
         jFrame = new JFrame();
+        fileTextAreaMap = Maps.newHashMap();
         // if we setIconImage in OS X, it throws some command line errors, so let's not try this on a Mac
         if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
             jFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(Resources.getResource("icon.png")));
@@ -79,6 +86,7 @@ public class MainFrame implements Runnable {
 
     public void addTab(String title, Component content) {
         jTabbedPane.addTab(title, content);
+        jTabbedPane.setSelectedComponent(content);
     }
 
     private JMenuBar createJMenuBar() {
@@ -108,5 +116,40 @@ public class MainFrame implements Runnable {
     @Override
     public void run() {
         initializeGui();
+    }
+
+    public JFrame getJFrame() {
+        return jFrame;
+    }
+
+    public void startWatching(File chosenFile) {
+        JTextArea jTextArea = new JTextArea();
+        jTextArea.setEditable(false);
+
+        fileTextAreaMap.put(chosenFile.getAbsolutePath(), jTextArea);
+
+        addTab(chosenFile.getName(), jTextArea);
+
+        FileWatcher fileWatcher = new FileWatcher(new UserInterface() {
+            @Override
+            public void updateFile(Path observedFile, String modificationString) {
+                JTextArea jTextArea = fileTextAreaMap.get(observedFile.toFile().getAbsolutePath());
+                jTextArea.setText(jTextArea.getText() + modificationString);
+            }
+
+            @Override
+            public void newFile(Path observedFile, String modificationString) {
+                JTextArea jTextArea = fileTextAreaMap.get(observedFile.toFile().getAbsolutePath());
+                jTextArea.setText(modificationString);
+            }
+
+            @Override
+            public void deleteFile(Path observedFile) {
+                JTextArea jTextArea = fileTextAreaMap.get(observedFile.toFile().getAbsolutePath());
+                jTextArea.setText("");
+            }
+        }, chosenFile.getAbsolutePath());
+        Thread fileWatcherThread = new Thread(fileWatcher);
+        fileWatcherThread.start();
     }
 }

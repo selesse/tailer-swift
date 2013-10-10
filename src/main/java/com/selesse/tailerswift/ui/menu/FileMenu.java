@@ -2,30 +2,32 @@ package com.selesse.tailerswift.ui.menu;
 
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
+import com.selesse.tailerswift.ui.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 
 public class FileMenu {
     private JMenu jMenu;
     private FileDialog fileDialog;
-    private JMenuItem addWatchedFileMenuItem;
-    private JMenuItem exitMenuItem;
+    private MainFrame mainFrame;
 
-    public FileMenu(JFrame parentFrame) {
+    public FileMenu(MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
         this.jMenu = new JMenu("File");
 
-        fileDialog = new FileDialog(parentFrame);
+        fileDialog = new FileDialog(mainFrame.getJFrame());
 
-        addWatchedFileMenuItem = createAddWatchedFileJMenuItem();
+        JMenuItem addWatchedFileMenuItem = createAddWatchedFileJMenuItem();
         jMenu.add(addWatchedFileMenuItem);
 
+        // OS X handles CMD + Q automatically
         if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
-
-            exitMenuItem = createExitJMenuItem();
+            JMenuItem exitMenuItem = createExitJMenuItem();
             jMenu.add(exitMenuItem);
         }
     }
@@ -38,7 +40,11 @@ public class FileMenu {
             @Override
             public void actionPerformed(ActionEvent e) {
                 fileDialog.setVisible(true);
-                fileDialog.getFile();
+                String chosenFileName = fileDialog.getFile();
+                if (chosenFileName != null) {
+                    File chosenFile = new File(fileDialog.getDirectory() + File.separator + chosenFileName);
+                    mainFrame.startWatching(chosenFile);
+                }
             }
         });
 
