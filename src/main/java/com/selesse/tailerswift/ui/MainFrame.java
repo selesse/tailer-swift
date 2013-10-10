@@ -19,7 +19,6 @@ import java.util.Map;
 public class MainFrame implements Runnable {
     private JFrame jFrame;
     private JTabbedPane jTabbedPane;
-    private JMenuBar jMenuBar;
     private JPanel jBottomPanel;
     private JPanel jFeatureButtonPanel;
     private JPanel jFeatureViewPanel;
@@ -28,10 +27,12 @@ public class MainFrame implements Runnable {
     private JButton searchButton;
     private JButton filterButton;
     private Map<String, JTextArea> fileTextAreaMap;
+    private Map<String, Thread> fileThreadMap;
 
     public MainFrame() {
         jFrame = new JFrame();
         fileTextAreaMap = Maps.newHashMap();
+        fileThreadMap = Maps.newHashMap();
         // if we setIconImage in OS X, it throws some command line errors, so let's not try this on a Mac
         if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
             jFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(Resources.getResource("icon.png")));
@@ -84,9 +85,10 @@ public class MainFrame implements Runnable {
         jFrame.setVisible(true);
     }
 
-    public void addTab(String title, Component content) {
-        jTabbedPane.addTab(title, content);
-        jTabbedPane.setSelectedComponent(content);
+    public void addTab(String title, JTextArea textArea) {
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        jTabbedPane.addTab(title, scrollPane);
+        jTabbedPane.setSelectedComponent(scrollPane);
     }
 
     private JMenuBar createJMenuBar() {
@@ -110,9 +112,6 @@ public class MainFrame implements Runnable {
         Program.getInstance().getSettings().setAlwaysOnTop(!isAlwaysOnTop);
     }
 
-    public void displayFeature() {
-    }
-
     @Override
     public void run() {
         initializeGui();
@@ -123,14 +122,37 @@ public class MainFrame implements Runnable {
     }
 
     public void startWatching(File chosenFile) {
-        JTextArea jTextArea = new JTextArea();
-        jTextArea.setEditable(false);
+        if (fileTextAreaMap.containsKey(chosenFile.getAbsolutePath())) {
+            focusTabToAlreadyOpen(chosenFile);
+            return;
+        }
+        JTextArea textArea = createWatcherTextArea();
 
-        fileTextAreaMap.put(chosenFile.getAbsolutePath(), jTextArea);
+        addTab(chosenFile.getName(), textArea);
 
-        addTab(chosenFile.getName(), jTextArea);
+        Thread fileWatcherThread = new Thread(createFileWatcherFor(chosenFile));
+        fileWatcherThread.start();
 
-        FileWatcher fileWatcher = new FileWatcher(new UserInterface() {
+        fileTextAreaMap.put(chosenFile.getAbsolutePath(), textArea);
+        fileThreadMap.put(chosenFile.getAbsolutePath(), fileWatcherThread);
+    }
+
+    private void focusTabToAlreadyOpen(File chosenFile) {
+        JTextArea textArea = fileTextAreaMap.get(chosenFile.getAbsolutePath());
+        for (int i = 0; i < jTabbedPane.getTabCount(); i++) {
+            Component c = jTabbedPane.getComponentAt(i);
+            if (c instanceof JScrollPane) {
+                JScrollPane scrollPane = (JScrollPane) c;
+                if (scrollPane.getViewport() == textArea.getParent()) {
+                    jTabbedPane.setSelectedComponent(scrollPane);
+                    return;
+                }
+            }
+        }
+    }
+
+    private FileWatcher createFileWatcherFor(File chosenFile) {
+        return new FileWatcher(new UserInterface() {
             @Override
             public void updateFile(Path observedFile, String modificationString) {
                 JTextArea jTextArea = fileTextAreaMap.get(observedFile.toFile().getAbsolutePath());
@@ -149,7 +171,12 @@ public class MainFrame implements Runnable {
                 jTextArea.setText("");
             }
         }, chosenFile.getAbsolutePath());
-        Thread fileWatcherThread = new Thread(fileWatcher);
-        fileWatcherThread.start();
+    }
+
+    private JTextArea createWatcherTextArea() {
+        JTextArea textArea = new JTextArea();
+        textArea.setEditable(false);
+
+        return textArea;
     }
 }
