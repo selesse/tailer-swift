@@ -1,7 +1,6 @@
 package com.selesse.tailerswift.ui;
 
 import com.google.common.io.Resources;
-import com.selesse.tailerswift.filewatcher.FileWatcher;
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.ui.menu.FileMenu;
@@ -11,53 +10,39 @@ import com.selesse.tailerswift.ui.menu.WindowMenu;
 
 import javax.swing.*;
 import java.awt.*;
-import java.nio.file.Path;
 
-public class MainFrame extends JFrame {
-
+public class MainFrame implements Runnable {
+    private JFrame jFrame;
     private JTabbedPane jTabbedPane;
-    private JMenuBar    jMenuBar;
-    private JPanel      jBottomPanel;
-
-    private JPanel      jFeatureButtonPanel;
-    private JPanel      jFeatureViewPanel;
-
-    private Feature     searchFeature;
-    private Feature     filterFeature;
-
-    private JButton     searchButton;
-    private JButton     filterButton;
-    private JTextArea textArea; // ccccombo-breaker
+    private JMenuBar jMenuBar;
+    private JPanel jBottomPanel;
+    private JPanel jFeatureButtonPanel;
+    private JPanel jFeatureViewPanel;
+    private Feature searchFeature;
+    private Feature filterFeature;
+    private JButton searchButton;
+    private JButton filterButton;
 
     public MainFrame() {
-        initializeGui();
+        jFrame = new JFrame();
+        // if we setIconImage in OS X, it throws some command line errors, so let's not try this on a Mac
+        if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
+            jFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(Resources.getResource("icon.png")));
+        }
     }
 
     private void initializeGui() {
-        this.setTitle(Program.getInstance().getProgramName());
-        this.setLayout(new BorderLayout());
-        this.setBackground(null);
-        this.setJMenuBar(createJMenuBar());
-        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        jFrame.setTitle(Program.getInstance().getProgramName());
+        jFrame.setLayout(new BorderLayout());
+        jFrame.setBackground(null);
+        jFrame.setJMenuBar(createJMenuBar());
+        jFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-        //add tabbed pane
+        // add tabbed pane
         jTabbedPane = new JTabbedPane();
-        this.add(jTabbedPane, BorderLayout.CENTER);
+        jFrame.add(jTabbedPane, BorderLayout.CENTER);
 
-        //tab added for testing purposes
-        this.addTab("Thingy", new JLabel("Thingy"));
-        textArea = new JTextArea();
-        textArea.setEditable(false);
-        this.addTab("Thingy2", textArea);
-
-        // if we setIconImage in OS X, it throws some command line errors, so let's not try this on a Mac
-        if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
-            this.setIconImage(Toolkit.getDefaultToolkit().getImage(Resources.getResource("icon.png")));
-        }
-
-        jTabbedPane.setSelectedIndex(1); // deal with it!
-
-        //add bottom panel
+        // add bottom panel
         jBottomPanel = new JPanel();
         jBottomPanel.setLayout(new BorderLayout());
         jBottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -68,7 +53,9 @@ public class MainFrame extends JFrame {
         jBottomPanel.add(jFeatureViewPanel, BorderLayout.NORTH);
         jBottomPanel.add(jFeatureButtonPanel, BorderLayout.SOUTH);
 
-        this.add(jBottomPanel, BorderLayout.SOUTH);
+        jFrame.add(jBottomPanel, BorderLayout.SOUTH);
+
+        // TODO load previous tabs, via Settings object
 
         //add features
         searchFeature = new Feature(new Search());
@@ -85,28 +72,9 @@ public class MainFrame extends JFrame {
         jFeatureButtonPanel.add(searchButton);
         jFeatureButtonPanel.add(filterButton);
 
-        pack();
-        setLocationRelativeTo(null);
-        setVisible(true);
-
-        FileWatcher fileWatcher = new FileWatcher(new UserInterface() {
-            @Override
-            public void updateFile(Path observedFile, String modificationString) {
-                textArea.setText(textArea.getText() + modificationString);
-            }
-
-            @Override
-            public void newFile(Path observedFile, String modificationString) {
-                textArea.setText(modificationString);
-            }
-
-            @Override
-            public void deleteFile(Path observedFile) {
-                textArea.setText("");
-            }
-        }, "./a.txt");
-        Thread thread = new Thread(fileWatcher);
-        thread.start();
+        jFrame.pack();
+        jFrame.setLocationRelativeTo(null);
+        jFrame.setVisible(true);
     }
 
     public void addTab(String title, Component content) {
@@ -130,10 +98,15 @@ public class MainFrame extends JFrame {
 
     public void toggleAlwaysOnTop() {
         boolean isAlwaysOnTop = Program.getInstance().getSettings().isAlwaysOnTop();
-        this.setAlwaysOnTop(!isAlwaysOnTop);
+        jFrame.setAlwaysOnTop(!isAlwaysOnTop);
         Program.getInstance().getSettings().setAlwaysOnTop(!isAlwaysOnTop);
     }
 
     public void displayFeature() {
+    }
+
+    @Override
+    public void run() {
+        initializeGui();
     }
 }

@@ -14,9 +14,6 @@ public class GuiTailerSwift implements Runnable {
 
     @Override
     public void run() {
-        MainFrame mainFrame = new MainFrame();
-        mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
         String lookAndFeel = UIManager.getSystemLookAndFeelClassName();
 
         try {
@@ -25,6 +22,8 @@ public class GuiTailerSwift implements Runnable {
             e.printStackTrace();
         }
 
+        Thread uiThread = new Thread(new MainFrame());
+        uiThread.start();
     }
 
 }
