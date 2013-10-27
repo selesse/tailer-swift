@@ -15,6 +15,7 @@ public class FileWatcher implements Runnable {
     private Path observedFilePath;
     private WatchKey key;
     private FileObserver fileObserver;
+    private long lastObservedFileSize;
 
     public FileWatcher(UserInterface ui, String filePath) {
         try {
@@ -27,6 +28,11 @@ public class FileWatcher implements Runnable {
         this.ui = ui;
         final File observedFile = new File(filePath);
         this.observedFilePath = observedFile.toPath();
+        try {
+            lastObservedFileSize = Files.size(observedFilePath);
+        } catch (IOException e) {
+            lastObservedFileSize = 0;
+        }
         this.observedDirectory = observedFile.getParentFile().toPath();
         registerFilesParentDirectory();
 
@@ -44,7 +50,7 @@ public class FileWatcher implements Runnable {
 
     @Override
     public void run() {
-        ui.newFile(observedFilePath, fileObserver.onCreate());
+        performKindBasedAction(ENTRY_CREATE);
         while (true) {
             WatchKey key;
             try {
@@ -82,12 +88,34 @@ public class FileWatcher implements Runnable {
     }
 
     private void performKindBasedAction(WatchEvent.Kind<Path> kind) {
+        long currentFileSize = 0;
+        try {
+            currentFileSize = Files.size(observedFilePath);
+        } catch (IOException e) {
+            // do nothing
+        }
+        if (currentFileSize < lastObservedFileSize) {
+            lastObservedFileSize = currentFileSize;
+            ui.deleteFile(observedFilePath);
+            fileObserver.onCreate();
+            updateFile(ui);
+            return;
+        }
+
         if (kind == ENTRY_MODIFY) {
-            ui.updateFile(observedFilePath, fileObserver.onModify());
+            updateFile(ui);
         } else if (kind == ENTRY_CREATE) {
-            ui.newFile(observedFilePath, fileObserver.onCreate());
+            fileObserver.onCreate();
+            updateFile(ui);
         } else if (kind == ENTRY_DELETE) {
             ui.deleteFile(observedFilePath);
+        }
+    }
+
+    public void updateFile(UserInterface ui) {
+        String modification;
+        while ((modification = fileObserver.onModify()) != null) {
+            ui.updateFile(observedFilePath, modification);
         }
     }
 

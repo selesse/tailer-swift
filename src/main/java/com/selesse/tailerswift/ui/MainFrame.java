@@ -14,6 +14,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Map;
 
 public class MainFrame implements Runnable {
@@ -153,22 +154,28 @@ public class MainFrame implements Runnable {
 
     private FileWatcher createFileWatcherFor(File chosenFile) {
         return new FileWatcher(new UserInterface() {
+            private StringBuilder stringBuilder = new StringBuilder();
+
             @Override
             public void updateFile(Path observedFile, String modificationString) {
                 JTextArea jTextArea = fileTextAreaMap.get(observedFile.toFile().getAbsolutePath());
-                jTextArea.setText(jTextArea.getText() + modificationString);
+                stringBuilder.append(modificationString);
+                jTextArea.setText(stringBuilder.toString());
             }
 
             @Override
             public void newFile(Path observedFile, String modificationString) {
                 JTextArea jTextArea = fileTextAreaMap.get(observedFile.toFile().getAbsolutePath());
-                jTextArea.setText(modificationString);
+                stringBuilder = new StringBuilder();
+                stringBuilder.append(modificationString);
+                jTextArea.setText(stringBuilder.toString());
             }
 
             @Override
             public void deleteFile(Path observedFile) {
                 JTextArea jTextArea = fileTextAreaMap.get(observedFile.toFile().getAbsolutePath());
-                jTextArea.setText("");
+                stringBuilder = new StringBuilder();
+                jTextArea.setText(stringBuilder.toString());
             }
         }, chosenFile.getAbsolutePath());
     }
@@ -178,5 +185,9 @@ public class MainFrame implements Runnable {
         textArea.setEditable(false);
 
         return textArea;
+    }
+
+    public Collection<Thread> getAllThreads() {
+        return fileThreadMap.values();
     }
 }

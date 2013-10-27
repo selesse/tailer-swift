@@ -22,8 +22,18 @@ public class GuiTailerSwift implements Runnable {
             e.printStackTrace();
         }
 
-        Thread uiThread = new Thread(new MainFrame());
+        final MainFrame mainFrame = new MainFrame();
+        Thread uiThread = new Thread(mainFrame);
         uiThread.start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                for (Thread thread : mainFrame.getAllThreads()) {
+                    thread.interrupt();
+                }
+            }
+        });
     }
 
 }

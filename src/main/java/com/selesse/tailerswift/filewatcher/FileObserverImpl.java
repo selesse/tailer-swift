@@ -1,17 +1,14 @@
 package com.selesse.tailerswift.filewatcher;
 
-import com.google.common.collect.Lists;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.util.List;
 
 public class FileObserverImpl implements FileObserver {
     private long bufferedFileSize;
     private File observedFile;
-    private List<String> bufferedFileContents;
     private BufferedReader bufferedReader;
+    private final int CHUNK_SIZE = 1024;
 
     public FileObserverImpl(File observedFile) {
         this.observedFile = observedFile;
@@ -19,23 +16,37 @@ public class FileObserverImpl implements FileObserver {
 
     @Override
     public String onModify() {
-        StringBuilder modificationBuffered = new StringBuilder();
+        StringBuilder modificationBuffered = new StringBuilder(CHUNK_SIZE);
 
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(observedFile));
+            long currentFileSize = Files.size(observedFile.toPath());
+            if (currentFileSize < bufferedFileSize) {
+                bufferedFileSize = 0;
+            }
+
+            if (bufferedFileSize == Files.size(observedFile.toPath())) {
+                return null;
+            }
+
+            bufferedReader = new BufferedReader(new FileReader(observedFile));
             bufferedReader.skip(bufferedFileSize);
 
-            char[] buffer = new char[1024];
-            int bytesRead;
+            char[] buffer = new char[CHUNK_SIZE];
+            int bytesRead = 0;
 
-            while ((bytesRead = bufferedReader.read(buffer)) != -1) {
+            while (bytesRead < CHUNK_SIZE && bytesRead != -1) {
+                bytesRead = bufferedReader.read(buffer);
                 for (int i = 0; i < bytesRead; i++) {
                     modificationBuffered.append(buffer[i]);
                 }
             }
 
-            bufferedFileContents = Files.readAllLines(observedFile.toPath(), Charset.defaultCharset());
-            bufferedFileSize = Files.size(observedFile.toPath());
+            if (bytesRead == -1) {
+                bufferedFileSize += modificationBuffered.toString().length();
+            }
+            else {
+                bufferedFileSize += bytesRead;
+            }
             bufferedReader.close();
         } catch (FileNotFoundException fileNotFoundException) {
             // we like this, it's easy
@@ -47,31 +58,13 @@ public class FileObserverImpl implements FileObserver {
     }
 
     @Override
-    public String onCreate() {
-        StringBuilder modificationBuffered = new StringBuilder();
-
-        bufferedFileContents = Lists.newArrayList();
+    public void onCreate() {
         bufferedFileSize = 0;
-
         try {
             bufferedReader = new BufferedReader(new FileReader(observedFile));
-            bufferedFileSize = Files.size(observedFile.toPath());
-
-            char[] buffer = new char[1024];
-            int bytesRead;
-
-            while ((bytesRead = bufferedReader.read(buffer)) != -1) {
-                for (int i = 0; i < bytesRead; i++) {
-                    modificationBuffered.append(buffer[i]);
-                }
-            }
-
-            bufferedReader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            // do nothing
         }
-
-        return modificationBuffered.toString();
     }
 
     @Override
