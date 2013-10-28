@@ -12,9 +12,14 @@ import com.selesse.tailerswift.ui.menu.WindowMenu;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public class MainFrame implements Runnable {
@@ -38,6 +43,27 @@ public class MainFrame implements Runnable {
         if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
             jFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(Resources.getResource("icon.png")));
         }
+
+        jFrame.setDropTarget(createFileDropTarget());
+    }
+
+    // if we ever drag and drop a file into the GUI, start watching the file
+    private DropTarget createFileDropTarget() {
+        return new DropTarget() {
+
+            @SuppressWarnings("unchecked")
+            public synchronized void drop(DropTargetDropEvent event) {
+                event.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+                try {
+                    List<File> droppedFiles = (List<File>) event.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    for (File file : droppedFiles) {
+                        startWatching(file);
+                    }
+                } catch (Exception e) {
+                    // if we get any sort of exception, it's no big deal...
+                }
+            }
+        };
     }
 
     private void initializeGui() {
@@ -66,13 +92,13 @@ public class MainFrame implements Runnable {
 
         // TODO load previous tabs, via Settings object
 
-        //add features
+        // add features
         searchFeature = new Feature(new Search());
         filterFeature = new Feature(new Filter());
 
-        //create buttons
-        searchButton = new JButton("apples");
-        filterButton = new JButton("pears");
+        // create buttons
+        searchButton = new JButton("Search");
+        filterButton = new JButton("Filter");
 
         searchButton.addActionListener(new ButtonActionListener(jFeatureViewPanel, searchFeature));
         filterButton.addActionListener(new ButtonActionListener(jFeatureViewPanel, filterFeature));
@@ -183,6 +209,7 @@ public class MainFrame implements Runnable {
     private JTextArea createWatcherTextArea() {
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
+        textArea.setDropTarget(createFileDropTarget());
 
         return textArea;
     }
