@@ -37,4 +37,8 @@ public class Program {
     public Settings getSettings() {
         return settings;
     }
+
+    public void setSettings(Settings settings) {
+        this.settings = settings;
+    }
 }

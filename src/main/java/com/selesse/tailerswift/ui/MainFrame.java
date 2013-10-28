@@ -1,10 +1,12 @@
 package com.selesse.tailerswift.ui;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import com.selesse.tailerswift.filewatcher.FileWatcher;
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
+import com.selesse.tailerswift.settings.Settings;
 import com.selesse.tailerswift.ui.menu.FileMenu;
 import com.selesse.tailerswift.ui.menu.HelpMenu;
 import com.selesse.tailerswift.ui.menu.SettingsMenu;
@@ -90,7 +92,7 @@ public class MainFrame implements Runnable {
 
         jFrame.add(jBottomPanel, BorderLayout.SOUTH);
 
-        // TODO load previous tabs, via Settings object
+        loadSettings();
 
         // add features
         searchFeature = new Feature(new Search());
@@ -110,6 +112,14 @@ public class MainFrame implements Runnable {
         jFrame.pack();
         jFrame.setLocationRelativeTo(null);
         jFrame.setVisible(true);
+    }
+
+    private void loadSettings() {
+        Settings settings = Program.getInstance().getSettings();
+        jFrame.setAlwaysOnTop(settings.isAlwaysOnTop());
+        for (String filePath : settings.getAbsoluteFilePaths()) {
+            startWatching(new File(filePath));
+        }
     }
 
     public void addTab(String title, JTextArea textArea) {
@@ -162,6 +172,11 @@ public class MainFrame implements Runnable {
 
         fileTextAreaMap.put(chosenFile.getAbsolutePath(), textArea);
         fileThreadMap.put(chosenFile.getAbsolutePath(), fileWatcherThread);
+
+        Settings settings = Program.getInstance().getSettings();
+        List<String> absoluteFilePaths = Lists.newArrayList();
+        absoluteFilePaths.addAll(fileTextAreaMap.keySet());
+        settings.setAbsoluteFilePaths(absoluteFilePaths);
     }
 
     private void focusTabToAlreadyOpen(File chosenFile) {
