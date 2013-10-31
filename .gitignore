@@ -8,6 +8,4 @@ out/
 .gradle
 release/
 
-something
-
-anotherthing
+*.orig
