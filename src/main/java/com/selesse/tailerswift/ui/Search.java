@@ -10,7 +10,6 @@ public class Search implements FeatureContent, Observer {
 
     public Search() {
         name = "Search";
-
         mainComponent = new JLabel("search feature");
     }
 

@@ -1,26 +1,20 @@
 package com.selesse.tailerswift.ui;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ButtonActionListener implements ActionListener {
-    private JComponent displayArea;
+    private FeaturePanel featurePanel;
     private Feature feature;
 
-    public ButtonActionListener(JComponent displayArea, Feature feature) {
-        this.displayArea = displayArea;
+    public ButtonActionListener(FeaturePanel featurePanel, Feature feature) {
+        this.featurePanel = featurePanel;
         this.feature = feature;
     }
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        if (feature.isVisible()) {
-            //do something
-            feature.changeVisibility();
-        } else {
-            //do something
-            feature.changeVisibility();
-        }
+        featurePanel.setFeature(feature);
+        feature.changeVisibility();
     }
 }
