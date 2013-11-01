@@ -1,9 +1,11 @@
 package com.selesse.tailerswift.ui;
 
-import java.awt.Component;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.text.*;
+import javax.swing.text.DefaultCaret;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 
 /**
  *  SmartScroller taken from http://tips4java.wordpress.com/2013/03/03/smart-scrolling/

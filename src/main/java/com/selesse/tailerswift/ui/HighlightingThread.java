@@ -6,8 +6,8 @@ import com.google.common.collect.Lists;
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
-import java.util.List;
 import java.awt.*;
+import java.util.List;
 
 public class HighlightingThread implements Runnable {
     private String string;

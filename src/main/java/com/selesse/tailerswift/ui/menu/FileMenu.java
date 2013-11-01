@@ -11,30 +11,27 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 
-public class FileMenu {
-    private JMenu jMenu;
+public class FileMenu extends AbstractMenu {
     private FileDialog fileDialog;
     private MainFrame mainFrame;
 
     public FileMenu(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
-        this.jMenu = new JMenu("File");
+        this.menu = new JMenu("File");
 
         fileDialog = new FileDialog(mainFrame.getJFrame());
 
-        JMenuItem addWatchedFileMenuItem = createAddWatchedFileJMenuItem();
-        jMenu.add(addWatchedFileMenuItem);
+        menu.add(createAddWatchedFileMenuItem());
+        menu.add(createCloseCurrentFileMenuItem());
 
         // OS X handles CMD + Q automatically
         if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
-            JMenuItem exitMenuItem = createExitJMenuItem();
-            jMenu.add(exitMenuItem);
+            JMenuItem exitMenuItem = createExitMenuItem();
+            menu.add(exitMenuItem);
         }
-
-        jMenu.add(createCloseCurrentFileJMenuItem());
     }
 
-    private JMenuItem createAddWatchedFileJMenuItem() {
+    private JMenuItem createAddWatchedFileMenuItem() {
         JMenuItem addWatchedFileMenuItem = new JMenuItem("Open/watch file...");
         addWatchedFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -53,20 +50,20 @@ public class FileMenu {
         return addWatchedFileMenuItem;
     }
 
-    private JMenuItem createCloseCurrentFileJMenuItem() {
-        JMenuItem closeCurrentFileJMenuItem = new JMenuItem("Close current file");
-        closeCurrentFileJMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
+    private JMenuItem createCloseCurrentFileMenuItem() {
+        JMenuItem closeCurrentFileMenuItem = new JMenuItem("Close current file");
+        closeCurrentFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        closeCurrentFileJMenuItem.addActionListener(new ActionListener() {
+        closeCurrentFileMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 mainFrame.closeCurrentTab();
             }
         });
-        return closeCurrentFileJMenuItem;
+        return closeCurrentFileMenuItem;
     }
 
-    private JMenuItem createExitJMenuItem() {
+    private JMenuItem createExitMenuItem() {
         JMenuItem exitMenuItem = new JMenuItem("Exit");
         exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -79,9 +76,4 @@ public class FileMenu {
 
         return exitMenuItem;
     }
-
-    public JMenu getJMenu() {
-        return jMenu;
-    }
-
 }

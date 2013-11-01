@@ -8,16 +8,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-public class SettingsMenu {
-    private JMenu jMenu;
+public class SettingsMenu extends AbstractMenu {
+    private JMenu menu;
     private DisplayPreferencesFrame displayPreferencesFrame;
 
     public SettingsMenu() {
-        this.jMenu = new JMenu("Settings");
-        this.jMenu.add(createDisplayOptionsJMenuItem());
+        this.menu = new JMenu("Settings");
+        this.menu.add(createDisplayOptionsMenuItem());
     }
 
-    private JMenuItem createDisplayOptionsJMenuItem() {
+    private JMenuItem createDisplayOptionsMenuItem() {
         JMenuItem displayOptionsMenuItem = new JMenuItem("Display preferences");
         displayOptionsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -37,9 +37,5 @@ public class SettingsMenu {
             }
         });
         return displayOptionsMenuItem;
-    }
-
-    public JMenu getJMenu() {
-        return jMenu;
     }
 }

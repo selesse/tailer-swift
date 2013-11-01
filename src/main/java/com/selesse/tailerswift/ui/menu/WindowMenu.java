@@ -10,32 +10,27 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-public class WindowMenu {
+public class WindowMenu extends AbstractMenu {
     private MainFrame mainFrame;
-    private JMenu jMenu;
 
     public WindowMenu(MainFrame mainFrame) {
-        this.jMenu = new JMenu("Window");
-        this.jMenu.add(createAlwaysOnTopJMenuItem());
+        this.menu = new JMenu("Window");
+        this.menu.add(createAlwaysOnTopMenuItem());
         this.mainFrame = mainFrame;
     }
 
-    private JCheckBoxMenuItem createAlwaysOnTopJMenuItem() {
+    private JCheckBoxMenuItem createAlwaysOnTopMenuItem() {
         Settings settings = Program.getInstance().getSettings();
-        JCheckBoxMenuItem alwaysOnTopJMenuItem = new JCheckBoxMenuItem("Always on top", settings.isAlwaysOnTop());
-        alwaysOnTopJMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A,
+        JCheckBoxMenuItem alwaysOnTopMenuItem = new JCheckBoxMenuItem("Always on top", settings.isAlwaysOnTop());
+        alwaysOnTopMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        alwaysOnTopJMenuItem.addActionListener(new ActionListener() {
+        alwaysOnTopMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 mainFrame.toggleAlwaysOnTop();
             }
         });
 
-        return alwaysOnTopJMenuItem;
-    }
-
-    public JMenu getJMenu() {
-        return jMenu;
+        return alwaysOnTopMenuItem;
     }
 }

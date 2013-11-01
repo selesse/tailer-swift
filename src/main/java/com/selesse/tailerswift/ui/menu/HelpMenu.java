@@ -5,12 +5,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-public class HelpMenu {
-    private JMenu jMenu;
-
+public class HelpMenu extends AbstractMenu {
     public HelpMenu() {
-        this.jMenu = new JMenu("Help");
-        this.jMenu.add(createAboutMenuItem());
+        menu = new JMenu("Help");
+        menu.add(createAboutMenuItem());
     }
 
     private JMenuItem createAboutMenuItem() {
@@ -25,7 +23,4 @@ public class HelpMenu {
         return displayOptionsMenuItem;
     }
 
-    public JMenu getJMenu() {
-        return jMenu;
-    }
 }

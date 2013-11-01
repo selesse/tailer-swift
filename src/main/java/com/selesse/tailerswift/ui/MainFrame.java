@@ -1,6 +1,5 @@
 package com.selesse.tailerswift.ui;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
@@ -17,15 +16,12 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.Highlighter;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
-import java.io.*;
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -175,9 +171,9 @@ public class MainFrame implements Runnable {
         HelpMenu helpMenu = new HelpMenu();
 
         menuBar.add(fileMenu.getJMenu());
-        menuBar.add(settingsMenu.getJMenu());
+        menuBar.add(settingsMenu.getMenu());
         menuBar.add(windowMenu.getJMenu());
-        menuBar.add(helpMenu.getJMenu());
+        menuBar.add(helpMenu.getMenu());
 
         return menuBar;
     }
