@@ -1,5 +1,6 @@
 package com.selesse.tailerswift.ui;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
@@ -16,6 +17,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
@@ -223,41 +227,29 @@ public class MainFrame implements Runnable {
 
             @Override
             public void updateFile(Path observedPath, String modificationString) {
-                JTextArea jTextArea = fileTextAreaMap.get(observedPath.toFile().getAbsolutePath());
+                JTextArea textArea = fileTextAreaMap.get(observedPath.toFile().getAbsolutePath());
                 stringBuilder.append(modificationString);
-                jTextArea.setText(stringBuilder.toString());
+                textArea.setText(stringBuilder.toString());
+
+                Thread highlightingThread = new Thread(new HighlightingThread(stringBuilder, textArea));
+                highlightingThread.start();
             }
 
             @Override
             public void newFile(Path observedPath, String modificationString) {
-                JTextArea jTextArea = fileTextAreaMap.get(observedPath.toFile().getAbsolutePath());
+                JTextArea textArea = fileTextAreaMap.get(observedPath.toFile().getAbsolutePath());
                 stringBuilder = new StringBuilder();
                 stringBuilder.append(modificationString);
-                jTextArea.setText(stringBuilder.toString());
+                textArea.setText(stringBuilder.toString());
             }
 
             @Override
             public void deleteFile(Path observedPath) {
-                JTextArea jTextArea = fileTextAreaMap.get(observedPath.toFile().getAbsolutePath());
+                JTextArea textArea = fileTextAreaMap.get(observedPath.toFile().getAbsolutePath());
                 stringBuilder = new StringBuilder();
-                jTextArea.setText(stringBuilder.toString());
+                textArea.setText(stringBuilder.toString());
             }
         }, chosenFile.getAbsolutePath());
-    }
-
-    private int getNumberOfLines(File file) {
-        int numberOfLines = 0;
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-            while (bufferedReader.readLine() != null) {
-                numberOfLines++;
-            }
-            bufferedReader.close();
-        } catch (IOException e) {
-            // shouldn't happen
-        }
-
-        return numberOfLines;
     }
 
     private JTextArea createWatcherTextArea() {
