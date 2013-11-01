@@ -35,8 +35,10 @@ public class MainFrame implements Runnable {
     private FeaturePanel jFeatureViewPanel;
     private Feature searchFeature;
     private Feature filterFeature;
+    private Feature highlightFeature;
     private JButton searchButton;
     private JButton filterButton;
+    private JButton highlightButton;
     private JLabel absoluteFilePathLabel;
     private Map<String, JTextArea> fileTextAreaMap;
     private Map<String, Thread> fileThreadMap;
@@ -64,7 +66,7 @@ public class MainFrame implements Runnable {
         jFrame.setTitle(Program.getInstance().getProgramName());
         jFrame.setLayout(new BorderLayout());
         jFrame.setBackground(null);
-        jFrame.setJMenuBar(createJMenuBar());
+        jFrame.setJMenuBar(createMenuBar());
         jFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         // add tabbed pane
@@ -108,17 +110,21 @@ public class MainFrame implements Runnable {
         // add features
         searchFeature = new Feature(new Search());
         filterFeature = new Feature(new Filter());
+        highlightFeature = new Feature(new Highlight());
 
         // create buttons
         searchButton = new JButton("Search");
         filterButton = new JButton("Filter");
+        highlightButton = new JButton("Highlight");
 
         searchButton.addActionListener(new ButtonActionListener(jFeatureViewPanel, searchFeature));
         filterButton.addActionListener(new ButtonActionListener(jFeatureViewPanel, filterFeature));
+        highlightButton.addActionListener(new ButtonActionListener(jFeatureViewPanel, highlightFeature));
 
         // add buttons
         jFeatureButtonPanel.add(searchButton);
         jFeatureButtonPanel.add(filterButton);
+        jFeatureButtonPanel.add(highlightButton);
 
         jFrame.pack();
         jFrame.setLocationRelativeTo(null);
@@ -162,7 +168,7 @@ public class MainFrame implements Runnable {
         absoluteFilePathLabel.setText(file.getAbsolutePath());
     }
 
-    private JMenuBar createJMenuBar() {
+    private JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
         FileMenu fileMenu = new FileMenu(this);
@@ -170,9 +176,9 @@ public class MainFrame implements Runnable {
         SettingsMenu settingsMenu = new SettingsMenu();
         HelpMenu helpMenu = new HelpMenu();
 
-        menuBar.add(fileMenu.getJMenu());
+        menuBar.add(fileMenu.getMenu());
         menuBar.add(settingsMenu.getMenu());
-        menuBar.add(windowMenu.getJMenu());
+        menuBar.add(windowMenu.getMenu());
         menuBar.add(helpMenu.getMenu());
 
         return menuBar;

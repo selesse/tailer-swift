@@ -17,7 +17,7 @@ public class FileMenu extends AbstractMenu {
 
     public FileMenu(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
-        this.menu = new JMenu("File");
+        menu = new JMenu("File");
 
         fileDialog = new FileDialog(mainFrame.getJFrame());
 

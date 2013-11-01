@@ -9,12 +9,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 public class SettingsMenu extends AbstractMenu {
-    private JMenu menu;
     private DisplayPreferencesFrame displayPreferencesFrame;
 
     public SettingsMenu() {
-        this.menu = new JMenu("Settings");
-        this.menu.add(createDisplayOptionsMenuItem());
+        menu = new JMenu("Settings");
+        menu.add(createDisplayOptionsMenuItem());
     }
 
     private JMenuItem createDisplayOptionsMenuItem() {
