@@ -3,6 +3,7 @@ package com.selesse.tailerswift.filewatcher;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 
 public class FileObserverImpl implements FileObserver {
     private long bufferedFileSize;
@@ -48,8 +49,8 @@ public class FileObserverImpl implements FileObserver {
                 bufferedFileSize += bytesRead;
             }
             bufferedReader.close();
-        } catch (FileNotFoundException fileNotFoundException) {
-            // we like this, it's easy
+        } catch (NoSuchFileException | FileNotFoundException e) {
+            // we like this, do nothing
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -107,11 +107,11 @@ public class FileWatcher implements Runnable {
     }
 
     private boolean fileHasBeenDeletedAndRecreated() {
-        long currentFileSize = 0;
+        long currentFileSize;
         try {
             currentFileSize = Files.size(observedFilePath);
         } catch (IOException e) {
-            // do nothing
+            return false;
         }
         return currentFileSize < lastObservedFileSize;
     }

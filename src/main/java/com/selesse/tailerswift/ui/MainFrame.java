@@ -21,7 +21,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
-import java.io.File;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -55,23 +55,9 @@ public class MainFrame implements Runnable {
         jFrame.setDropTarget(createFileDropTarget());
     }
 
-    // if we ever drag and drop a file into the GUI, start watching the file
-    private DropTarget createFileDropTarget() {
-        return new DropTarget() {
-
-            @SuppressWarnings("unchecked")
-            public synchronized void drop(DropTargetDropEvent event) {
-                event.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
-                try {
-                    List<File> droppedFiles = (List<File>) event.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-                    for (File file : droppedFiles) {
-                        startWatching(file);
-                    }
-                } catch (Exception e) {
-                    // if we get any sort of exception, it's no big deal...
-                }
-            }
-        };
+    @Override
+    public void run() {
+        initializeGui();
     }
 
     private void initializeGui() {
@@ -139,10 +125,29 @@ public class MainFrame implements Runnable {
         jFrame.setVisible(true);
     }
 
+    // if we ever drag and drop a file into the GUI, start watching the file
+    private DropTarget createFileDropTarget() {
+        return new DropTarget() {
+
+            @SuppressWarnings("unchecked")
+            public synchronized void drop(DropTargetDropEvent event) {
+                event.acceptDrop(DnDConstants.ACTION_LINK);
+                try {
+                    List<File> droppedFiles = (List<File>) event.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    for (File file : droppedFiles) {
+                        startWatching(file);
+                    }
+                } catch (Exception e) {
+                    // if we get any sort of exception, it's no big deal...
+                }
+            }
+        };
+    }
+
     private void loadSettings() {
         Settings settings = Program.getInstance().getSettings();
         jFrame.setAlwaysOnTop(settings.isAlwaysOnTop());
-        for (String filePath : Lists.reverse(settings.getAbsoluteFilePaths())) {
+        for (String filePath : settings.getAbsoluteFilePaths()) {
             File file = new File(filePath);
             startWatching(file);
         }
@@ -152,6 +157,7 @@ public class MainFrame implements Runnable {
         JScrollPane scrollPane = new JScrollPane(textArea);
         jTabbedPane.addTab(file.getName(), scrollPane);
         jTabbedPane.setSelectedComponent(scrollPane);
+        scrollPane.getVerticalScrollBar().addAdjustmentListener(new SmartScroller(scrollPane));
 
         absoluteFilePathLabel.setText(file.getAbsolutePath());
     }
@@ -176,11 +182,6 @@ public class MainFrame implements Runnable {
         boolean isAlwaysOnTop = Program.getInstance().getSettings().isAlwaysOnTop();
         jFrame.setAlwaysOnTop(!isAlwaysOnTop);
         Program.getInstance().getSettings().setAlwaysOnTop(!isAlwaysOnTop);
-    }
-
-    @Override
-    public void run() {
-        initializeGui();
     }
 
     public JFrame getJFrame() {
@@ -216,32 +217,47 @@ public class MainFrame implements Runnable {
         }
     }
 
-    private FileWatcher createFileWatcherFor(File chosenFile) {
+    private FileWatcher createFileWatcherFor(final File chosenFile) {
         return new FileWatcher(new UserInterface() {
             private StringBuilder stringBuilder = new StringBuilder();
 
             @Override
-            public void updateFile(Path observedFile, String modificationString) {
-                JTextArea jTextArea = fileTextAreaMap.get(observedFile.toFile().getAbsolutePath());
+            public void updateFile(Path observedPath, String modificationString) {
+                JTextArea jTextArea = fileTextAreaMap.get(observedPath.toFile().getAbsolutePath());
                 stringBuilder.append(modificationString);
                 jTextArea.setText(stringBuilder.toString());
             }
 
             @Override
-            public void newFile(Path observedFile, String modificationString) {
-                JTextArea jTextArea = fileTextAreaMap.get(observedFile.toFile().getAbsolutePath());
+            public void newFile(Path observedPath, String modificationString) {
+                JTextArea jTextArea = fileTextAreaMap.get(observedPath.toFile().getAbsolutePath());
                 stringBuilder = new StringBuilder();
                 stringBuilder.append(modificationString);
                 jTextArea.setText(stringBuilder.toString());
             }
 
             @Override
-            public void deleteFile(Path observedFile) {
-                JTextArea jTextArea = fileTextAreaMap.get(observedFile.toFile().getAbsolutePath());
+            public void deleteFile(Path observedPath) {
+                JTextArea jTextArea = fileTextAreaMap.get(observedPath.toFile().getAbsolutePath());
                 stringBuilder = new StringBuilder();
                 jTextArea.setText(stringBuilder.toString());
             }
         }, chosenFile.getAbsolutePath());
+    }
+
+    private int getNumberOfLines(File file) {
+        int numberOfLines = 0;
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            while (bufferedReader.readLine() != null) {
+                numberOfLines++;
+            }
+            bufferedReader.close();
+        } catch (IOException e) {
+            // shouldn't happen
+        }
+
+        return numberOfLines;
     }
 
     private JTextArea createWatcherTextArea() {
