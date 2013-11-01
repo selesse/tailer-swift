@@ -36,6 +36,7 @@ public class MainFrame implements Runnable {
     private JButton filterButton;
     private Map<String, JTextArea> fileTextAreaMap;
     private Map<String, Thread> fileThreadMap;
+    private File currentlyFocusedFile;
 
     public MainFrame() {
         jFrame = new JFrame();
@@ -43,7 +44,7 @@ public class MainFrame implements Runnable {
         fileThreadMap = Maps.newHashMap();
         // if we setIconImage in OS X, it throws some command line errors, so let's not try this on a Mac
         if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
-            //jFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(Resources.getResource("icon.png")));
+            jFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(Resources.getResource("icon.png")));
         }
 
         jFrame.setDropTarget(createFileDropTarget());
@@ -117,9 +118,11 @@ public class MainFrame implements Runnable {
     private void loadSettings() {
         Settings settings = Program.getInstance().getSettings();
         jFrame.setAlwaysOnTop(settings.isAlwaysOnTop());
-        for (String filePath : settings.getAbsoluteFilePaths()) {
-            startWatching(new File(filePath));
+        for (String filePath : Lists.reverse(settings.getAbsoluteFilePaths())) {
+            currentlyFocusedFile = new File(filePath);
+            startWatching(currentlyFocusedFile);
         }
+
     }
 
     public void addTab(String title, JTextArea textArea) {
@@ -140,6 +143,7 @@ public class MainFrame implements Runnable {
         menuBar.add(settingsMenu.getJMenu());
         menuBar.add(windowMenu.getJMenu());
         menuBar.add(helpMenu.getJMenu());
+
         return menuBar;
     }
 
@@ -173,10 +177,9 @@ public class MainFrame implements Runnable {
         fileTextAreaMap.put(chosenFile.getAbsolutePath(), textArea);
         fileThreadMap.put(chosenFile.getAbsolutePath(), fileWatcherThread);
 
-        Settings settings = Program.getInstance().getSettings();
-        List<String> absoluteFilePaths = Lists.newArrayList();
-        absoluteFilePaths.addAll(fileTextAreaMap.keySet());
-        settings.setAbsoluteFilePaths(absoluteFilePaths);
+        updateSettings();
+
+        currentlyFocusedFile = chosenFile;
     }
 
     private void focusTabToAlreadyOpen(File chosenFile) {
@@ -231,5 +234,28 @@ public class MainFrame implements Runnable {
 
     public Collection<Thread> getAllThreads() {
         return fileThreadMap.values();
+    }
+
+    public void closeCurrentTab() {
+        Component component = jTabbedPane.getSelectedComponent();
+        if (component != null) {
+            jTabbedPane.remove(component);
+            if (currentlyFocusedFile != null) {
+                removeFile(currentlyFocusedFile);
+                // TODO currentlyFocusedFile = jTabbedPane.getSelectedComponent();
+            }
+        }
+    }
+
+    public void removeFile(File file) {
+        Thread associatedThread = fileThreadMap.get(file.getAbsolutePath());
+        fileTextAreaMap.remove(file.getAbsolutePath());
+        associatedThread.interrupt();
+
+        updateSettings();
+    }
+
+    private void updateSettings() {
+        Program.getInstance().setWatchedFiles(fileTextAreaMap.keySet());
     }
 }

@@ -30,11 +30,13 @@ public class FileMenu {
             JMenuItem exitMenuItem = createExitJMenuItem();
             jMenu.add(exitMenuItem);
         }
+
+        jMenu.add(createCloseCurrentFileJMenuItem());
     }
 
     private JMenuItem createAddWatchedFileJMenuItem() {
-        JMenuItem addWatchedFileMenuItem = new JMenuItem("Watch File...");
-        addWatchedFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
+        JMenuItem addWatchedFileMenuItem = new JMenuItem("Open/watch file...");
+        addWatchedFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         addWatchedFileMenuItem.addActionListener(new ActionListener() {
             @Override
@@ -49,6 +51,19 @@ public class FileMenu {
         });
 
         return addWatchedFileMenuItem;
+    }
+
+    private JMenuItem createCloseCurrentFileJMenuItem() {
+        JMenuItem closeCurrentFileJMenuItem = new JMenuItem("Close current file");
+        closeCurrentFileJMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        closeCurrentFileJMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainFrame.closeCurrentTab();
+            }
+        });
+        return closeCurrentFileJMenuItem;
     }
 
     private JMenuItem createExitJMenuItem() {

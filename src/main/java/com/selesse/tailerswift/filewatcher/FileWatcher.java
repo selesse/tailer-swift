@@ -33,7 +33,8 @@ public class FileWatcher implements Runnable {
         } catch (IOException e) {
             lastObservedFileSize = 0;
         }
-        this.observedDirectory = observedFile.getParentFile().toPath();
+        // need to do "getAbsoluteFile" to support CLI relative paths
+        this.observedDirectory = observedFile.getAbsoluteFile().getParentFile().toPath();
         registerFilesParentDirectory();
 
         this.fileObserver = new FileObserverImpl(observedFile);
@@ -50,7 +51,9 @@ public class FileWatcher implements Runnable {
 
     @Override
     public void run() {
-        performKindBasedAction(ENTRY_CREATE);
+        if (observedFilePath.toFile().exists()) {
+            performKindBasedAction(ENTRY_CREATE);
+        }
         while (true) {
             WatchKey key;
             try {
@@ -88,17 +91,8 @@ public class FileWatcher implements Runnable {
     }
 
     private void performKindBasedAction(WatchEvent.Kind<Path> kind) {
-        long currentFileSize = 0;
-        try {
-            currentFileSize = Files.size(observedFilePath);
-        } catch (IOException e) {
-            // do nothing
-        }
-        if (currentFileSize < lastObservedFileSize) {
-            lastObservedFileSize = currentFileSize;
-            ui.deleteFile(observedFilePath);
-            fileObserver.onCreate();
-            updateFile(ui);
+        if (fileHasBeenDeletedAndRecreated()) {
+            handleFileRecreation();
             return;
         }
 
@@ -111,6 +105,30 @@ public class FileWatcher implements Runnable {
             ui.deleteFile(observedFilePath);
         }
     }
+
+    private boolean fileHasBeenDeletedAndRecreated() {
+        long currentFileSize = 0;
+        try {
+            currentFileSize = Files.size(observedFilePath);
+        } catch (IOException e) {
+            // do nothing
+        }
+        return currentFileSize < lastObservedFileSize;
+    }
+
+    private void handleFileRecreation() {
+        long currentFileSize = 0;
+        try {
+            currentFileSize = Files.size(observedFilePath);
+        } catch (IOException e) {
+            // do nothing
+        }
+        lastObservedFileSize = currentFileSize;
+        ui.deleteFile(observedFilePath);
+        fileObserver.onCreate();
+        updateFile(ui);
+    }
+
 
     public void updateFile(UserInterface ui) {
         String modification;

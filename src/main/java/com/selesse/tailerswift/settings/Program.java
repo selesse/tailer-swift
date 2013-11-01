@@ -1,5 +1,10 @@
 package com.selesse.tailerswift.settings;
 
+import com.google.common.collect.Lists;
+
+import java.util.List;
+import java.util.Set;
+
 public class Program {
     private OperatingSystem operatingSystem;
     private Settings settings;
@@ -40,5 +45,11 @@ public class Program {
 
     public void setSettings(Settings settings) {
         this.settings = settings;
+    }
+
+    public void setWatchedFiles(Set<String> watchedFiles) {
+        List<String> absoluteFilePaths = Lists.newArrayList();
+        absoluteFilePaths.addAll(watchedFiles);
+        this.settings.setAbsoluteFilePaths(absoluteFilePaths);
     }
 }
