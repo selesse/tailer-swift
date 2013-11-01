@@ -13,6 +13,9 @@ import com.selesse.tailerswift.ui.menu.SettingsMenu;
 import com.selesse.tailerswift.ui.menu.WindowMenu;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
@@ -34,14 +37,16 @@ public class MainFrame implements Runnable {
     private Feature filterFeature;
     private JButton searchButton;
     private JButton filterButton;
+    private JLabel absoluteFilePathLabel;
     private Map<String, JTextArea> fileTextAreaMap;
     private Map<String, Thread> fileThreadMap;
-    private File currentlyFocusedFile;
+    private List<File> watchedFiles;
 
     public MainFrame() {
         jFrame = new JFrame();
         fileTextAreaMap = Maps.newHashMap();
         fileThreadMap = Maps.newHashMap();
+        watchedFiles = Lists.newArrayList();
         // if we setIconImage in OS X, it throws some command line errors, so let's not try this on a Mac
         if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
             jFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(Resources.getResource("icon.png")));
@@ -78,6 +83,19 @@ public class MainFrame implements Runnable {
 
         // add tabbed pane
         jTabbedPane = new JTabbedPane();
+        jTabbedPane.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent event) {
+                int selectedIndex = jTabbedPane.getSelectedIndex();
+                try {
+                    absoluteFilePathLabel.setText(watchedFiles.get(selectedIndex).getAbsolutePath());
+                }
+                // this will only be an issue on startup
+                catch (IndexOutOfBoundsException e) {
+                    absoluteFilePathLabel.setText("");
+                }
+            }
+        });
         jFrame.add(jTabbedPane, BorderLayout.CENTER);
 
         // add bottom panel
@@ -88,7 +106,13 @@ public class MainFrame implements Runnable {
         jFeatureViewPanel = new FeaturePanel();
         jFeatureButtonPanel = new JPanel();
 
+        absoluteFilePathLabel = new JLabel();
+        absoluteFilePathLabel.setForeground(Colors.DARK_GREEN.toColor());
+        // pad a bit on the right so it looks prettier
+        absoluteFilePathLabel.setBorder(new EmptyBorder(0, 0, 0, 10));
+
         jBottomPanel.add(jFeatureViewPanel, BorderLayout.NORTH);
+        jBottomPanel.add(absoluteFilePathLabel, BorderLayout.EAST);
         jBottomPanel.add(jFeatureButtonPanel, BorderLayout.SOUTH);
 
         jFrame.add(jBottomPanel, BorderLayout.SOUTH);
@@ -106,7 +130,7 @@ public class MainFrame implements Runnable {
         searchButton.addActionListener(new ButtonActionListener(jFeatureViewPanel, searchFeature));
         filterButton.addActionListener(new ButtonActionListener(jFeatureViewPanel, filterFeature));
 
-        //add buttons
+        // add buttons
         jFeatureButtonPanel.add(searchButton);
         jFeatureButtonPanel.add(filterButton);
 
@@ -119,16 +143,17 @@ public class MainFrame implements Runnable {
         Settings settings = Program.getInstance().getSettings();
         jFrame.setAlwaysOnTop(settings.isAlwaysOnTop());
         for (String filePath : Lists.reverse(settings.getAbsoluteFilePaths())) {
-            currentlyFocusedFile = new File(filePath);
-            startWatching(currentlyFocusedFile);
+            File file = new File(filePath);
+            startWatching(file);
         }
-
     }
 
-    public void addTab(String title, JTextArea textArea) {
+    public void addTab(File file, JTextArea textArea) {
         JScrollPane scrollPane = new JScrollPane(textArea);
-        jTabbedPane.addTab(title, scrollPane);
+        jTabbedPane.addTab(file.getName(), scrollPane);
         jTabbedPane.setSelectedComponent(scrollPane);
+
+        absoluteFilePathLabel.setText(file.getAbsolutePath());
     }
 
     private JMenuBar createJMenuBar() {
@@ -169,29 +194,24 @@ public class MainFrame implements Runnable {
         }
         JTextArea textArea = createWatcherTextArea();
 
-        addTab(chosenFile.getName(), textArea);
+        addTab(chosenFile, textArea);
 
         Thread fileWatcherThread = new Thread(createFileWatcherFor(chosenFile));
         fileWatcherThread.start();
 
         fileTextAreaMap.put(chosenFile.getAbsolutePath(), textArea);
         fileThreadMap.put(chosenFile.getAbsolutePath(), fileWatcherThread);
+        watchedFiles.add(chosenFile);
 
         updateSettings();
-
-        currentlyFocusedFile = chosenFile;
     }
 
-    private void focusTabToAlreadyOpen(File chosenFile) {
-        JTextArea textArea = fileTextAreaMap.get(chosenFile.getAbsolutePath());
-        for (int i = 0; i < jTabbedPane.getTabCount(); i++) {
-            Component c = jTabbedPane.getComponentAt(i);
-            if (c instanceof JScrollPane) {
-                JScrollPane scrollPane = (JScrollPane) c;
-                if (scrollPane.getViewport() == textArea.getParent()) {
-                    jTabbedPane.setSelectedComponent(scrollPane);
-                    return;
-                }
+    private void focusTabToAlreadyOpen(File focusFile) {
+        for (int i = 0; i < watchedFiles.size(); i++) {
+            File file = watchedFiles.get(i);
+            if (file.getAbsolutePath().equals(focusFile.getAbsolutePath())) {
+                jTabbedPane.setSelectedIndex(i);
+                break;
             }
         }
     }
@@ -237,12 +257,18 @@ public class MainFrame implements Runnable {
     }
 
     public void closeCurrentTab() {
-        Component component = jTabbedPane.getSelectedComponent();
-        if (component != null) {
-            jTabbedPane.remove(component);
-            if (currentlyFocusedFile != null) {
-                removeFile(currentlyFocusedFile);
-                // TODO currentlyFocusedFile = jTabbedPane.getSelectedComponent();
+        int currentlyFocusedFileIndex = jTabbedPane.getSelectedIndex();
+        if (currentlyFocusedFileIndex != -1) {
+            jTabbedPane.remove(currentlyFocusedFileIndex);
+            if (!watchedFiles.isEmpty()) {
+                removeFile(watchedFiles.get(currentlyFocusedFileIndex));
+                if (!watchedFiles.isEmpty()) {
+                    File file = watchedFiles.get(jTabbedPane.getSelectedIndex());
+                    absoluteFilePathLabel.setText(file.getAbsolutePath());
+                }
+                else {
+                    absoluteFilePathLabel.setText("");
+                }
             }
         }
     }
@@ -251,6 +277,8 @@ public class MainFrame implements Runnable {
         Thread associatedThread = fileThreadMap.get(file.getAbsolutePath());
         fileTextAreaMap.remove(file.getAbsolutePath());
         associatedThread.interrupt();
+
+        watchedFiles.remove(file);
 
         updateSettings();
     }
