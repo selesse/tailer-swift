@@ -16,6 +16,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
@@ -28,33 +29,24 @@ import java.util.List;
 import java.util.Map;
 
 public class MainFrame implements Runnable {
-    private JFrame jFrame;
-    private JTabbedPane jTabbedPane;
-    private JPanel jBottomPanel;
-    private JPanel jFeatureButtonPanel;
-    private FeaturePanel jFeatureViewPanel;
-    private Feature searchFeature;
-    private Feature filterFeature;
-    private Feature highlightFeature;
-    private JButton searchButton;
-    private JButton filterButton;
-    private JButton highlightButton;
+    private JFrame frame;
+    private JTabbedPane tabbedPane;
     private JLabel absoluteFilePathLabel;
-    private Map<String, JTextArea> fileTextAreaMap;
+    private Map<String, JTextComponent> fileTextComponentMap;
     private Map<String, Thread> fileThreadMap;
     private List<File> watchedFiles;
 
     public MainFrame() {
-        jFrame = new JFrame();
-        fileTextAreaMap = Maps.newHashMap();
+        frame = new JFrame();
+        fileTextComponentMap = Maps.newHashMap();
         fileThreadMap = Maps.newHashMap();
         watchedFiles = Lists.newArrayList();
         // if we setIconImage in OS X, it throws some command line errors, so let's not try this on a Mac
         if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
-            jFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(Resources.getResource("icon.png")));
+            frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Resources.getResource("icon.png")));
         }
 
-        jFrame.setDropTarget(createFileDropTarget());
+        frame.setDropTarget(createFileDropTarget());
     }
 
     @Override
@@ -63,18 +55,18 @@ public class MainFrame implements Runnable {
     }
 
     private void initializeGui() {
-        jFrame.setTitle(Program.getInstance().getProgramName());
-        jFrame.setLayout(new BorderLayout());
-        jFrame.setBackground(null);
-        jFrame.setJMenuBar(createMenuBar());
-        jFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setTitle(Program.getInstance().getProgramName());
+        frame.setLayout(new BorderLayout());
+        frame.setBackground(null);
+        frame.setJMenuBar(createMenuBar());
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         // add tabbed pane
-        jTabbedPane = new JTabbedPane();
-        jTabbedPane.addChangeListener(new ChangeListener() {
+        tabbedPane = new JTabbedPane();
+        tabbedPane.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent event) {
-                int selectedIndex = jTabbedPane.getSelectedIndex();
+                int selectedIndex = tabbedPane.getSelectedIndex();
                 try {
                     absoluteFilePathLabel.setText(watchedFiles.get(selectedIndex).getAbsolutePath());
                 }
@@ -84,51 +76,51 @@ public class MainFrame implements Runnable {
                 }
             }
         });
-        jFrame.add(jTabbedPane, BorderLayout.CENTER);
+        frame.add(tabbedPane, BorderLayout.CENTER);
 
         // add bottom panel
-        jBottomPanel = new JPanel();
-        jBottomPanel.setLayout(new BorderLayout());
-        jBottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BorderLayout());
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        jFeatureViewPanel = new FeaturePanel();
-        jFeatureButtonPanel = new JPanel();
+        FeaturePanel featurePanel = new FeaturePanel();
+        JPanel featureButtonPanel = new JPanel();
 
         absoluteFilePathLabel = new JLabel();
         absoluteFilePathLabel.setForeground(Colors.DARK_GREEN.toColor());
         // pad a bit on the right so it looks prettier
         absoluteFilePathLabel.setBorder(new EmptyBorder(0, 0, 0, 10));
 
-        jBottomPanel.add(jFeatureViewPanel, BorderLayout.NORTH);
-        jBottomPanel.add(absoluteFilePathLabel, BorderLayout.EAST);
-        jBottomPanel.add(jFeatureButtonPanel, BorderLayout.SOUTH);
+        bottomPanel.add(featurePanel, BorderLayout.NORTH);
+        bottomPanel.add(absoluteFilePathLabel, BorderLayout.EAST);
+        bottomPanel.add(featureButtonPanel, BorderLayout.SOUTH);
 
-        jFrame.add(jBottomPanel, BorderLayout.SOUTH);
+        frame.add(bottomPanel, BorderLayout.SOUTH);
 
         loadSettings();
 
         // add features
-        searchFeature = new Feature(new Search());
-        filterFeature = new Feature(new Filter());
-        highlightFeature = new Feature(new Highlight());
+        Feature searchFeature = new Feature(new Search());
+        Feature filterFeature = new Feature(new Filter());
+        Feature highlightFeature = new Feature(new Highlight());
 
         // create buttons
-        searchButton = new JButton("Search");
-        filterButton = new JButton("Filter");
-        highlightButton = new JButton("Highlight");
+        JButton searchButton = new JButton("Search");
+        JButton filterButton = new JButton("Filter");
+        JButton highlightButton = new JButton("Highlight");
 
-        searchButton.addActionListener(new ButtonActionListener(jFeatureViewPanel, searchFeature));
-        filterButton.addActionListener(new ButtonActionListener(jFeatureViewPanel, filterFeature));
-        highlightButton.addActionListener(new ButtonActionListener(jFeatureViewPanel, highlightFeature));
+        searchButton.addActionListener(new ButtonActionListener(featurePanel, searchFeature));
+        filterButton.addActionListener(new ButtonActionListener(featurePanel, filterFeature));
+        highlightButton.addActionListener(new ButtonActionListener(featurePanel, highlightFeature));
 
         // add buttons
-        jFeatureButtonPanel.add(searchButton);
-        jFeatureButtonPanel.add(filterButton);
-        jFeatureButtonPanel.add(highlightButton);
+        featureButtonPanel.add(searchButton);
+        featureButtonPanel.add(filterButton);
+        featureButtonPanel.add(highlightButton);
 
-        jFrame.pack();
-        jFrame.setLocationRelativeTo(null);
-        jFrame.setVisible(true);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
     // if we ever drag and drop a file into the GUI, start watching the file
@@ -152,17 +144,17 @@ public class MainFrame implements Runnable {
 
     private void loadSettings() {
         Settings settings = Program.getInstance().getSettings();
-        jFrame.setAlwaysOnTop(settings.isAlwaysOnTop());
+        frame.setAlwaysOnTop(settings.isAlwaysOnTop());
         for (String filePath : settings.getAbsoluteFilePaths()) {
             File file = new File(filePath);
             startWatching(file);
         }
     }
 
-    public void addTab(File file, JTextArea textArea) {
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        jTabbedPane.addTab(file.getName(), scrollPane);
-        jTabbedPane.setSelectedComponent(scrollPane);
+    public void addTab(File file, JTextComponent textComponent) {
+        JScrollPane scrollPane = new JScrollPane(textComponent);
+        tabbedPane.addTab(file.getName(), scrollPane);
+        tabbedPane.setSelectedComponent(scrollPane);
         scrollPane.getVerticalScrollBar().addAdjustmentListener(new SmartScroller(scrollPane));
 
         absoluteFilePathLabel.setText(file.getAbsolutePath());
@@ -186,27 +178,27 @@ public class MainFrame implements Runnable {
 
     public void toggleAlwaysOnTop() {
         boolean isAlwaysOnTop = Program.getInstance().getSettings().isAlwaysOnTop();
-        jFrame.setAlwaysOnTop(!isAlwaysOnTop);
+        frame.setAlwaysOnTop(!isAlwaysOnTop);
         Program.getInstance().getSettings().setAlwaysOnTop(!isAlwaysOnTop);
     }
 
     public JFrame getJFrame() {
-        return jFrame;
+        return frame;
     }
 
     public void startWatching(File chosenFile) {
-        if (fileTextAreaMap.containsKey(chosenFile.getAbsolutePath())) {
+        if (fileTextComponentMap.containsKey(chosenFile.getAbsolutePath())) {
             focusTabToAlreadyOpen(chosenFile);
             return;
         }
-        JTextArea textArea = createWatcherTextArea();
+        JTextComponent textComponent = createWatcherTextComponent();
 
-        addTab(chosenFile, textArea);
+        addTab(chosenFile, textComponent);
 
         Thread fileWatcherThread = new Thread(createFileWatcherFor(chosenFile));
         fileWatcherThread.start();
 
-        fileTextAreaMap.put(chosenFile.getAbsolutePath(), textArea);
+        fileTextComponentMap.put(chosenFile.getAbsolutePath(), textComponent);
         fileThreadMap.put(chosenFile.getAbsolutePath(), fileWatcherThread);
         watchedFiles.add(chosenFile);
 
@@ -217,7 +209,7 @@ public class MainFrame implements Runnable {
         for (int i = 0; i < watchedFiles.size(); i++) {
             File file = watchedFiles.get(i);
             if (file.getAbsolutePath().equals(focusFile.getAbsolutePath())) {
-                jTabbedPane.setSelectedIndex(i);
+                tabbedPane.setSelectedIndex(i);
                 break;
             }
         }
@@ -229,37 +221,37 @@ public class MainFrame implements Runnable {
 
             @Override
             public void updateFile(Path observedPath, String modificationString) {
-                JTextArea textArea = fileTextAreaMap.get(observedPath.toFile().getAbsolutePath());
+                JTextComponent textComponent = fileTextComponentMap.get(observedPath.toFile().getAbsolutePath());
                 stringBuilder.append(modificationString);
-                textArea.setText(stringBuilder.toString());
+                textComponent.setText(stringBuilder.toString());
 
-                Thread highlightingThread = new Thread(new HighlightingThread(stringBuilder, textArea));
+                Thread highlightingThread = new Thread(new HighlightingThread(stringBuilder, textComponent));
                 highlightingThread.start();
             }
 
             @Override
             public void newFile(Path observedPath, String modificationString) {
-                JTextArea textArea = fileTextAreaMap.get(observedPath.toFile().getAbsolutePath());
+                JTextComponent textComponent = fileTextComponentMap.get(observedPath.toFile().getAbsolutePath());
                 stringBuilder = new StringBuilder();
                 stringBuilder.append(modificationString);
-                textArea.setText(stringBuilder.toString());
+                textComponent.setText(stringBuilder.toString());
             }
 
             @Override
             public void deleteFile(Path observedPath) {
-                JTextArea textArea = fileTextAreaMap.get(observedPath.toFile().getAbsolutePath());
+                JTextComponent textComponent = fileTextComponentMap.get(observedPath.toFile().getAbsolutePath());
                 stringBuilder = new StringBuilder();
-                textArea.setText(stringBuilder.toString());
+                textComponent.setText(stringBuilder.toString());
             }
         }, chosenFile.getAbsolutePath());
     }
 
-    private JTextArea createWatcherTextArea() {
-        JTextArea textArea = new JTextArea();
-        textArea.setEditable(false);
-        textArea.setDropTarget(createFileDropTarget());
+    private JTextComponent createWatcherTextComponent() {
+        JTextPane textPane = new JTextPane();
+        textPane.setEditable(false);
+        textPane.setDropTarget(createFileDropTarget());
 
-        return textArea;
+        return textPane;
     }
 
     public Collection<Thread> getAllThreads() {
@@ -267,13 +259,13 @@ public class MainFrame implements Runnable {
     }
 
     public void closeCurrentTab() {
-        int currentlyFocusedFileIndex = jTabbedPane.getSelectedIndex();
+        int currentlyFocusedFileIndex = tabbedPane.getSelectedIndex();
         if (currentlyFocusedFileIndex != -1) {
-            jTabbedPane.remove(currentlyFocusedFileIndex);
+            tabbedPane.remove(currentlyFocusedFileIndex);
             if (!watchedFiles.isEmpty()) {
                 removeFile(watchedFiles.get(currentlyFocusedFileIndex));
                 if (!watchedFiles.isEmpty()) {
-                    File file = watchedFiles.get(jTabbedPane.getSelectedIndex());
+                    File file = watchedFiles.get(tabbedPane.getSelectedIndex());
                     absoluteFilePathLabel.setText(file.getAbsolutePath());
                 }
                 else {
@@ -285,7 +277,7 @@ public class MainFrame implements Runnable {
 
     public void removeFile(File file) {
         Thread associatedThread = fileThreadMap.get(file.getAbsolutePath());
-        fileTextAreaMap.remove(file.getAbsolutePath());
+        fileTextComponentMap.remove(file.getAbsolutePath());
         associatedThread.interrupt();
 
         watchedFiles.remove(file);
@@ -294,6 +286,6 @@ public class MainFrame implements Runnable {
     }
 
     private void updateSettings() {
-        Program.getInstance().setWatchedFiles(fileTextAreaMap.keySet());
+        Program.getInstance().setWatchedFiles(fileTextComponentMap.keySet());
     }
 }

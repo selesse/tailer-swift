@@ -1,19 +1,17 @@
 package com.selesse.tailerswift.ui;
 
-import java.awt.*;
-
 public class FileSetting {
     private final String string;
     private final boolean isIgnoreCase;
     private final boolean contains;
-    private final Color color;
+    private final HighlightSettings highlightSettings;
 
     // TODO make this static constructor builder pattern
-    public FileSetting(String string, boolean isIgnoreCase, boolean contains, Color color) {
+    public FileSetting(String string, boolean isIgnoreCase, boolean contains, HighlightSettings highlightSettings) {
         this.string = string;
         this.isIgnoreCase = isIgnoreCase;
         this.contains = contains;
-        this.color = color;
+        this.highlightSettings = highlightSettings;
     }
 
     public String getString() {
@@ -28,8 +26,8 @@ public class FileSetting {
         return contains;
     }
 
-    public Color getColor() {
-        return color;
+    public HighlightSettings getHighlightSettings() {
+        return highlightSettings;
     }
 
     public boolean matches(String matchString) {

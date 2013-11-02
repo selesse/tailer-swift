@@ -23,6 +23,7 @@ public class Feature {
 
     public void changeVisibility() {
         isVisible = !isVisible;
+        mainPanel.setVisible(isVisible);
     }
 
     public Component getComponent() {
