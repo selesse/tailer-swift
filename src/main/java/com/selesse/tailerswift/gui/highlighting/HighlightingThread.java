@@ -1,4 +1,4 @@
-package com.selesse.tailerswift.ui;
+package com.selesse.tailerswift.gui.highlighting;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;

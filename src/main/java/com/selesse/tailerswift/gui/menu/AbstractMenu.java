@@ -1,4 +1,4 @@
-package com.selesse.tailerswift.ui.menu;
+package com.selesse.tailerswift.gui.menu;
 
 import javax.swing.*;
 

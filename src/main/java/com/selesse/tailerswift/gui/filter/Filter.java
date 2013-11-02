@@ -1,16 +1,18 @@
-package com.selesse.tailerswift.ui;
+package com.selesse.tailerswift.gui.filter;
+
+import com.selesse.tailerswift.gui.section.FeatureContent;
 
 import javax.swing.*;
 import java.util.Observable;
 import java.util.Observer;
 
-public class Search implements FeatureContent, Observer {
+public class Filter implements FeatureContent, Observer {
     private JComponent mainComponent;
     private String name;
 
-    public Search() {
-        name = "Search";
-        mainComponent = new JLabel("search feature");
+    public Filter() {
+        name = "Filter";
+        mainComponent = new JLabel("filter feature");
     }
 
     @Override
@@ -26,4 +28,6 @@ public class Search implements FeatureContent, Observer {
     @Override
     public void update(Observable observable, Object o) {
     }
+
+
 }

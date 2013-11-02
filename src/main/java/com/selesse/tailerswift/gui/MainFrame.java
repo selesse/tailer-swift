@@ -1,16 +1,25 @@
-package com.selesse.tailerswift.ui;
+package com.selesse.tailerswift.gui;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
+import com.selesse.tailerswift.UserInterface;
 import com.selesse.tailerswift.filewatcher.FileWatcher;
+import com.selesse.tailerswift.gui.filter.Filter;
+import com.selesse.tailerswift.gui.highlighting.Colors;
+import com.selesse.tailerswift.gui.highlighting.Feature;
+import com.selesse.tailerswift.gui.highlighting.Highlight;
+import com.selesse.tailerswift.gui.highlighting.HighlightingThread;
+import com.selesse.tailerswift.gui.menu.FileMenu;
+import com.selesse.tailerswift.gui.menu.HelpMenu;
+import com.selesse.tailerswift.gui.menu.SettingsMenu;
+import com.selesse.tailerswift.gui.menu.WindowMenu;
+import com.selesse.tailerswift.gui.search.Search;
+import com.selesse.tailerswift.gui.section.ButtonActionListener;
+import com.selesse.tailerswift.gui.section.FeaturePanel;
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.settings.Settings;
-import com.selesse.tailerswift.ui.menu.FileMenu;
-import com.selesse.tailerswift.ui.menu.HelpMenu;
-import com.selesse.tailerswift.ui.menu.SettingsMenu;
-import com.selesse.tailerswift.ui.menu.WindowMenu;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

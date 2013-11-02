@@ -1,6 +1,7 @@
 package com.selesse.tailerswift;
 
-import com.selesse.tailerswift.ui.GuiTailerSwift;
+import com.selesse.tailerswift.cli.CliTailerSwift;
+import com.selesse.tailerswift.gui.GuiTailerSwift;
 
 public class Main {
     public static void main(String[] args) {
@@ -11,7 +12,7 @@ public class Main {
             thread = new Thread(new GuiTailerSwift());
         }
         else {
-            thread = new Thread(new TailerSwift(args));
+            thread = new Thread(new CliTailerSwift(args));
         }
 
         thread.start();

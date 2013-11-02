@@ -1,4 +1,4 @@
-package com.selesse.tailerswift.ui;
+package com.selesse.tailerswift.gui.highlighting;
 
 import java.awt.*;
 

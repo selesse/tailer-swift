@@ -1,6 +1,6 @@
-package com.selesse.tailerswift.ui.menu;
+package com.selesse.tailerswift.gui.menu;
 
-import com.selesse.tailerswift.ui.displayoptions.DisplayPreferencesFrame;
+import com.selesse.tailerswift.gui.displayoptions.DisplayPreferencesFrame;
 
 import javax.swing.*;
 import java.awt.*;

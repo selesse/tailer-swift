@@ -1,4 +1,4 @@
-package com.selesse.tailerswift.ui.displayoptions;
+package com.selesse.tailerswift.gui.displayoptions;
 
 import javax.swing.*;
 import java.awt.*;

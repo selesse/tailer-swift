@@ -1,9 +1,11 @@
-package com.selesse.tailerswift.ui;
+package com.selesse.tailerswift.cli;
+
+import com.selesse.tailerswift.UserInterface;
 
 import java.nio.file.Path;
 import java.util.Date;
 
-public class CliTailerSwift implements UserInterface {
+public class CliTailerSwiftImpl implements UserInterface {
     @Override
     public void updateFile(Path observedFile, String modificationString) {
         System.out.print(modificationString);

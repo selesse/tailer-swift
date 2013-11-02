@@ -1,7 +1,10 @@
-package com.selesse.tailerswift.ui;
+package com.selesse.tailerswift.gui.highlighting;
 
 import java.awt.*;
 
+/**
+ * Custom list of non-standard {@link Color}s.
+ */
 public enum Colors {
     DARK_GREEN(0, 100, 0);
 

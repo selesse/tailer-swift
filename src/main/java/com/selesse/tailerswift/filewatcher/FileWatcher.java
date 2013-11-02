@@ -1,6 +1,6 @@
 package com.selesse.tailerswift.filewatcher;
 
-import com.selesse.tailerswift.ui.UserInterface;
+import com.selesse.tailerswift.UserInterface;
 
 import java.io.File;
 import java.io.IOException;
