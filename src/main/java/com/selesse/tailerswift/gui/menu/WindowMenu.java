@@ -1,6 +1,6 @@
 package com.selesse.tailerswift.gui.menu;
 
-import com.selesse.tailerswift.gui.MainFrame;
+import com.selesse.tailerswift.gui.view.MainFrameView;
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.settings.Settings;
 
@@ -11,12 +11,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 public class WindowMenu extends AbstractMenu {
-    private MainFrame mainFrame;
+    private MainFrameView mainFrameView;
 
-    public WindowMenu(MainFrame mainFrame) {
+    public WindowMenu(MainFrameView mainFrameView) {
         this.menu = new JMenu("Window");
         this.menu.add(createAlwaysOnTopMenuItem());
-        this.mainFrame = mainFrame;
+        this.mainFrameView = mainFrameView;
     }
 
     private JCheckBoxMenuItem createAlwaysOnTopMenuItem() {
@@ -27,7 +27,7 @@ public class WindowMenu extends AbstractMenu {
         alwaysOnTopMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainFrame.toggleAlwaysOnTop();
+                mainFrameView.toggleAlwaysOnTop();
             }
         });
 

@@ -4,10 +4,9 @@ import com.google.common.collect.Lists;
 
 import java.io.*;
 import java.util.List;
-import java.util.Set;
 
 public class Program {
-    private final String settingsName = ".tswiftrc";
+    private final String settingsName = ".tswift-settings";
     private final String homeDirectory = System.getProperty("user.home");
     private final File settingsFile = new File(homeDirectory + File.separator + settingsName);
     private OperatingSystem operatingSystem;
@@ -84,10 +83,11 @@ public class Program {
         return settings;
     }
 
-    public void setWatchedFiles(Set<String> watchedFiles) {
+    public void setWatchedFiles(List<File> watchedFiles) {
         List<String> absoluteFilePaths = Lists.newArrayList();
-        absoluteFilePaths.addAll(watchedFiles);
+        for (File file : watchedFiles) {
+            absoluteFilePaths.add(file.getAbsolutePath());
+        }
         this.settings.setAbsoluteFilePaths(absoluteFilePaths);
     }
-
 }
