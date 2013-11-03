@@ -19,7 +19,7 @@ public class FileMenu extends AbstractMenu {
         this.mainFrame = mainFrame;
         menu = new JMenu("File");
 
-        fileDialog = new FileDialog(mainFrame.getView().getFrame());
+        fileDialog = new FileDialog(mainFrame.getFrame());
 
         menu.add(createAddWatchedFileMenuItem());
         menu.add(createCloseCurrentFileMenuItem());

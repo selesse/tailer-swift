@@ -2,26 +2,25 @@ package com.selesse.tailerswift.gui;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.selesse.tailerswift.UserInterface;
-import com.selesse.tailerswift.filewatcher.FileWatcher;
-import com.selesse.tailerswift.gui.highlighting.HighlightingThread;
 import com.selesse.tailerswift.gui.view.MainFrameView;
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.settings.Settings;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.text.JTextComponent;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controller for {@link MainFrameView}. Thin shell that handles all the actions that are non-trivial or not related
+ * to the user interface. Mostly, this implementation is in charge of handling the {@link Thread}s for files. This
+ * implementation also delegates appropriate methods to the view.
+ */
 public class MainFrame implements Runnable {
     private MainFrameView mainFrameView;
     private Map<String, Thread> fileThreadMap;
@@ -36,23 +35,11 @@ public class MainFrame implements Runnable {
     @Override
     public void run() {
         mainFrameView.initializeGui();
-        mainFrameView.addTabbedPaneChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                int selectedIndex = mainFrameView.getTabbedPane().getSelectedIndex();
-                try {
-                    mainFrameView.getFilePathLabel().setText(watchedFiles.get(selectedIndex).getAbsolutePath());
-                }
-                // this will only be an issue on startup
-                catch (IndexOutOfBoundsException e) {
-                    mainFrameView.getFilePathLabel().setText("");
-                }
-            }
-        });
 
         loadSettings();
     }
 
+    // Allows people to drag files from a file explorer into the program
     public DropTarget createFileDropTarget() {
         return new DropTarget() {
 
@@ -60,7 +47,8 @@ public class MainFrame implements Runnable {
             public synchronized void drop(DropTargetDropEvent event) {
                 event.acceptDrop(DnDConstants.ACTION_LINK);
                 try {
-                    List<File> droppedFiles = (List<File>) event.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    List<File> droppedFiles = (List<File>)
+                            event.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
                     for (File file : droppedFiles) {
                         startWatching(file);
                     }
@@ -81,63 +69,6 @@ public class MainFrame implements Runnable {
         }
     }
 
-    public void startWatching(File chosenFile) {
-        if (watchedFiles.contains(chosenFile)) {
-            mainFrameView.focusTabToAlreadyOpen(chosenFile);
-            return;
-        }
-        // add it to the view
-        mainFrameView.addTab(chosenFile);
-
-        // create a thread to watch the file, add it to our map
-        Thread fileWatcherThread = new Thread(createFileWatcherFor(chosenFile));
-        fileWatcherThread.start();
-        fileThreadMap.put(chosenFile.getAbsolutePath(), fileWatcherThread);
-
-        // master list of watched files
-        watchedFiles.add(chosenFile);
-
-        // add this new file to our settings
-        updateSettings();
-    }
-
-    private FileWatcher createFileWatcherFor(final File chosenFile) {
-        return new FileWatcher(new UserInterface() {
-            private StringBuilder stringBuilder = new StringBuilder();
-
-            @Override
-            public void updateFile(Path observedPath, String modificationString) {
-                String absolutePath = observedPath.toFile().getAbsolutePath();
-
-                JTextComponent textComponent = mainFrameView.getTextComponentFor(absolutePath);
-                stringBuilder.append(modificationString);
-                textComponent.setText(stringBuilder.toString());
-
-                Thread highlightingThread = new Thread(new HighlightingThread(stringBuilder, textComponent));
-                highlightingThread.start();
-            }
-
-            @Override
-            public void newFile(Path observedPath, String modificationString) {
-                String absolutePath = observedPath.toFile().getAbsolutePath();
-
-                JTextComponent textComponent = mainFrameView.getTextComponentFor(absolutePath);
-                stringBuilder = new StringBuilder();
-                stringBuilder.append(modificationString);
-                textComponent.setText(stringBuilder.toString());
-            }
-
-            @Override
-            public void deleteFile(Path observedPath) {
-                String absolutePath = observedPath.toFile().getAbsolutePath();
-
-                JTextComponent textComponent = mainFrameView.getTextComponentFor(absolutePath);
-                stringBuilder = new StringBuilder();
-                textComponent.setText(stringBuilder.toString());
-            }
-        }, chosenFile.getAbsolutePath());
-    }
-
     public Collection<Thread> getAllThreads() {
         return fileThreadMap.values();
     }
@@ -146,10 +77,19 @@ public class MainFrame implements Runnable {
         Program.getInstance().setWatchedFiles(watchedFiles);
     }
 
-    public MainFrameView getView() {
-        return mainFrameView;
+    public Frame getFrame() {
+        return mainFrameView.getFrame();
     }
 
+    public void toggleAlwaysOnTop() {
+        mainFrameView.toggleAlwaysOnTop();
+        Program.getInstance().getSettings().setAlwaysOnTop(mainFrameView.getFrame().isAlwaysOnTop());
+    }
+
+    /**
+     * Close the current tab (and terminate its file watching thread).
+     * Also updates the settings
+     */
     public void closeCurrentTab() {
         String focusedTabName = mainFrameView.getFocusedTabName();
         if (focusedTabName != null) {
@@ -163,5 +103,25 @@ public class MainFrame implements Runnable {
 
             mainFrameView.closeCurrentTab();
         }
+    }
+
+    public void startWatching(File chosenFile) {
+        if (watchedFiles.contains(chosenFile)) {
+            mainFrameView.focusTabToAlreadyOpen(chosenFile);
+            return;
+        }
+        // create a new tab in the view for this file
+        mainFrameView.addTab(chosenFile);
+
+        // initialize and start a thread to watch the file, add it to our thread map
+        Thread fileWatcherThread = new Thread(mainFrameView.createFileWatcherFor(chosenFile));
+        fileWatcherThread.start();
+        fileThreadMap.put(chosenFile.getAbsolutePath(), fileWatcherThread);
+
+        // master list of watched files
+        watchedFiles.add(chosenFile);
+
+        // add this new file to our settings
+        updateSettings();
     }
 }

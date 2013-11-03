@@ -3,12 +3,15 @@ package com.selesse.tailerswift.gui.view;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
+import com.selesse.tailerswift.UserInterface;
+import com.selesse.tailerswift.filewatcher.FileWatcher;
 import com.selesse.tailerswift.gui.MainFrame;
 import com.selesse.tailerswift.gui.SmartScroller;
 import com.selesse.tailerswift.gui.filter.Filter;
 import com.selesse.tailerswift.gui.highlighting.Colors;
 import com.selesse.tailerswift.gui.highlighting.Feature;
 import com.selesse.tailerswift.gui.highlighting.Highlight;
+import com.selesse.tailerswift.gui.highlighting.HighlightingThread;
 import com.selesse.tailerswift.gui.menu.FileMenu;
 import com.selesse.tailerswift.gui.menu.HelpMenu;
 import com.selesse.tailerswift.gui.menu.SettingsMenu;
@@ -21,13 +24,18 @@ import com.selesse.tailerswift.settings.Program;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * All the nitty-gritty GUI-related functions for the {@link MainFrame}.
+ */
 public class MainFrameView {
     private JFrame frame;
     private JTabbedPane tabbedPane;
@@ -38,6 +46,7 @@ public class MainFrameView {
 
     public MainFrameView(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
+
         frame = new JFrame();
         stringTextComponentMap = Maps.newHashMap();
         watchedFileNames = Lists.newArrayList();
@@ -58,6 +67,19 @@ public class MainFrameView {
 
         // add tabbed pane
         tabbedPane = new JTabbedPane();
+        tabbedPane.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent event) {
+                int selectedIndex = tabbedPane.getSelectedIndex();
+                try {
+                    absoluteFilePathLabel.setText(watchedFileNames.get(selectedIndex));
+                }
+                // this will only be an issue on startup
+                catch (IndexOutOfBoundsException e) {
+                    absoluteFilePathLabel.setText("");
+                }
+            }
+        });
         frame.add(tabbedPane, BorderLayout.CENTER);
 
         // add bottom panel
@@ -103,11 +125,15 @@ public class MainFrameView {
         frame.setVisible(true);
     }
 
+    /****************************************************************************************************************
+     *  Component creation section.                                                                                 *
+     ****************************************************************************************************************
+     */
     private JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
         FileMenu fileMenu = new FileMenu(mainFrame);
-        WindowMenu windowMenu = new WindowMenu(this);
+        WindowMenu windowMenu = new WindowMenu(mainFrame);
         SettingsMenu settingsMenu = new SettingsMenu();
         HelpMenu helpMenu = new HelpMenu();
 
@@ -119,20 +145,6 @@ public class MainFrameView {
         return menuBar;
     }
 
-    public void setAlwaysOnTop(boolean alwaysOnTop) {
-        frame.setAlwaysOnTop(alwaysOnTop);
-    }
-
-    public void focusTabToAlreadyOpen(File chosenFile) {
-        int fileIndex = watchedFileNames.indexOf(chosenFile.getAbsolutePath());
-        if (fileIndex != -1) {
-            tabbedPane.setSelectedIndex(fileIndex);
-        }
-        else {
-            System.err.println("Error, got -1 file index for " + chosenFile.getAbsolutePath());
-        }
-    }
-
     private JTextComponent createWatcherTextComponent() {
         JTextPane textPane = new JTextPane();
         textPane.setEditable(false);
@@ -141,19 +153,24 @@ public class MainFrameView {
         return textPane;
     }
 
-    public void closeCurrentTab() {
-        int currentlyFocusedFileIndex = tabbedPane.getSelectedIndex();
-        if (currentlyFocusedFileIndex != -1) {
-            tabbedPane.remove(currentlyFocusedFileIndex);
-            String removeName = watchedFileNames.remove(currentlyFocusedFileIndex);
-            stringTextComponentMap.remove(removeName);
-            if (watchedFileNames.isEmpty()) {
-                absoluteFilePathLabel.setText("");
-            }
-            else {
-                watchedFileNames.get(currentlyFocusedFileIndex);
-            }
-        }
+    /****************************************************************************************************************
+     *  Getters and setters.                                                                                        *
+     ****************************************************************************************************************
+     */
+    public Frame getFrame() {
+        return frame;
+    }
+
+    /****************************************************************************************************************
+     *  View functionality.                                                                                         *
+     ****************************************************************************************************************
+     */
+    public void toggleAlwaysOnTop() {
+        frame.setAlwaysOnTop(!frame.isAlwaysOnTop());
+    }
+
+    public void setAlwaysOnTop(boolean alwaysOnTop) {
+        frame.setAlwaysOnTop(alwaysOnTop);
     }
 
     public void addTab(File file) {
@@ -170,8 +187,29 @@ public class MainFrameView {
         absoluteFilePathLabel.setText(file.getAbsolutePath());
     }
 
-    public JTabbedPane getTabbedPane() {
-        return tabbedPane;
+    public void closeCurrentTab() {
+        int currentlyFocusedFileIndex = tabbedPane.getSelectedIndex();
+        if (currentlyFocusedFileIndex != -1) {
+            tabbedPane.remove(currentlyFocusedFileIndex);
+            String removeName = watchedFileNames.remove(currentlyFocusedFileIndex);
+            stringTextComponentMap.remove(removeName);
+            if (watchedFileNames.isEmpty()) {
+                absoluteFilePathLabel.setText("");
+            }
+            else {
+                absoluteFilePathLabel.setText(watchedFileNames.get(tabbedPane.getSelectedIndex()));
+            }
+        }
+    }
+
+    public void focusTabToAlreadyOpen(File chosenFile) {
+        int fileIndex = watchedFileNames.indexOf(chosenFile.getAbsolutePath());
+        if (fileIndex != -1) {
+            tabbedPane.setSelectedIndex(fileIndex);
+        }
+        else {
+            System.err.println("Error, got -1 file index for " + chosenFile.getAbsolutePath());
+        }
     }
 
     public String getFocusedTabName() {
@@ -181,24 +219,40 @@ public class MainFrameView {
         return watchedFileNames.get(tabbedPane.getSelectedIndex());
     }
 
-    public JLabel getFilePathLabel() {
-        return absoluteFilePathLabel;
-    }
+    public FileWatcher createFileWatcherFor(File chosenFile) {
+        return new FileWatcher(new UserInterface() {
+            private StringBuilder stringBuilder = new StringBuilder();
 
-    public void addTabbedPaneChangeListener(ChangeListener changeListener) {
-        tabbedPane.addChangeListener(changeListener);
-    }
+            @Override
+            public void updateFile(Path observedPath, String modificationString) {
+                String absolutePath = observedPath.toFile().getAbsolutePath();
 
-    public JTextComponent getTextComponentFor(String absolutePath) {
-        return stringTextComponentMap.get(absolutePath);
-    }
+                JTextComponent textComponent = stringTextComponentMap.get(absolutePath);
+                stringBuilder.append(modificationString);
+                textComponent.setText(stringBuilder.toString());
 
-    public void toggleAlwaysOnTop() {
-        frame.setAlwaysOnTop(!frame.isAlwaysOnTop());
-        Program.getInstance().getSettings().setAlwaysOnTop(frame.isAlwaysOnTop());
-    }
+                Thread highlightingThread = new Thread(new HighlightingThread(stringBuilder, textComponent));
+                highlightingThread.start();
+            }
 
-    public Frame getFrame() {
-        return frame;
+            @Override
+            public void newFile(Path observedPath, String modificationString) {
+                String absolutePath = observedPath.toFile().getAbsolutePath();
+
+                JTextComponent textComponent = stringTextComponentMap.get(absolutePath);
+                stringBuilder = new StringBuilder();
+                stringBuilder.append(modificationString);
+                textComponent.setText(stringBuilder.toString());
+            }
+
+            @Override
+            public void deleteFile(Path observedPath) {
+                String absolutePath = observedPath.toFile().getAbsolutePath();
+
+                JTextComponent textComponent = stringTextComponentMap.get(absolutePath);
+                stringBuilder = new StringBuilder();
+                textComponent.setText(stringBuilder.toString());
+            }
+        }, chosenFile.getAbsolutePath());
     }
 }
