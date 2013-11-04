@@ -11,7 +11,9 @@ import com.selesse.tailerswift.gui.features.FeatureFactory;
 import com.selesse.tailerswift.gui.filter.Filter;
 import com.selesse.tailerswift.gui.highlighting.Colors;
 import com.selesse.tailerswift.gui.features.Feature;
+import com.selesse.tailerswift.gui.highlighting.FileSetting;
 import com.selesse.tailerswift.gui.highlighting.Highlight;
+import com.selesse.tailerswift.gui.highlighting.HighlightThread;
 import com.selesse.tailerswift.gui.menu.FileMenu;
 import com.selesse.tailerswift.gui.menu.HelpMenu;
 import com.selesse.tailerswift.gui.menu.SettingsMenu;
@@ -106,7 +108,7 @@ public class MainFrameView {
         // add features
         Feature searchFeature = new Feature(new Search());
         Feature filterFeature = new Feature(new Filter());
-        Feature highlightFeature = new Feature(new Highlight());
+        Feature highlightFeature = new Feature(new Highlight(mainFrame));
 
         // create buttons
         JButton searchButton = new JButton("Search");
@@ -264,6 +266,16 @@ public class MainFrameView {
         for (String filePath : stringTextComponentMap.keySet()) {
             JTextComponent textComponent = stringTextComponentMap.get(filePath);
             textComponent.setFont(font);
+        }
+    }
+
+    public void addHighlight(FileSetting fileSetting) {
+        List<FileSetting> fileSettings = Lists.newArrayList(fileSetting);
+        for (String filePaths : stringTextComponentMap.keySet()) {
+            JTextComponent textComponent = stringTextComponentMap.get(filePaths);
+
+            Thread highlightThread = new Thread(new HighlightThread(textComponent, fileSettings));
+            highlightThread.start();
         }
     }
 }

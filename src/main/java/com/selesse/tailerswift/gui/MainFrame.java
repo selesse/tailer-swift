@@ -2,6 +2,7 @@ package com.selesse.tailerswift.gui;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.selesse.tailerswift.gui.highlighting.FileSetting;
 import com.selesse.tailerswift.gui.view.MainFrameView;
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.settings.Settings;
@@ -128,5 +129,9 @@ public class MainFrame implements Runnable {
     public void setFont(Font font) {
         Program.getInstance().getSettings().setFont(font);
         mainFrameView.setFont(font);
+    }
+
+    public void addHighlight(FileSetting fileSetting) {
+        mainFrameView.addHighlight(fileSetting);
     }
 }

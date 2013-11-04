@@ -1,7 +1,6 @@
 package com.selesse.tailerswift.gui.highlighting;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 
 import javax.swing.text.*;
 import java.util.List;
@@ -11,10 +10,10 @@ public class HighlightThread implements Runnable {
     private JTextComponent textComponent;
     private List<FileSetting> fileSettingList;
 
-    public HighlightThread(StringBuilder stringBuilder, JTextComponent textComponent) {
-        this.currentText = stringBuilder.toString();
+    public HighlightThread(JTextComponent textComponent, List<FileSetting> fileSettingsList) {
+        this.currentText = textComponent.getText();
         this.textComponent = textComponent;
-        fileSettingList = Lists.newArrayList();
+        this.fileSettingList = fileSettingsList;
     }
 
     @Override
