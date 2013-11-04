@@ -1,6 +1,6 @@
 package com.selesse.tailerswift.gui.section;
 
-import com.selesse.tailerswift.gui.highlighting.Feature;
+import com.selesse.tailerswift.gui.features.Feature;
 
 import javax.swing.*;
 

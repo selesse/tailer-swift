@@ -5,6 +5,12 @@ import com.selesse.tailerswift.gui.section.FeatureContent;
 import javax.swing.*;
 
 public class Highlight implements FeatureContent {
+    private HighlightView highlightView;
+
+    public Highlight() {
+        this.highlightView = new HighlightView();
+    }
+
     @Override
     public String getName() {
         return "Highlight";
@@ -12,6 +18,6 @@ public class Highlight implements FeatureContent {
 
     @Override
     public JComponent getComponent() {
-        return new JLabel("Highlight");
+        return highlightView.getComponent();
     }
 }

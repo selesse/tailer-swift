@@ -7,19 +7,19 @@ import javax.swing.text.*;
 import java.util.List;
 
 public class HighlightThread implements Runnable {
-    private String string;
+    private String currentText;
     private JTextComponent textComponent;
     private List<FileSetting> fileSettingList;
 
     public HighlightThread(StringBuilder stringBuilder, JTextComponent textComponent) {
-        this.string = stringBuilder.toString();
+        this.currentText = stringBuilder.toString();
         this.textComponent = textComponent;
         fileSettingList = Lists.newArrayList();
     }
 
     @Override
     public void run() {
-        Iterable<String> strings = Splitter.on(System.lineSeparator()).split(string);
+        Iterable<String> strings = Splitter.on(System.lineSeparator()).split(currentText);
 
         int offset = 0;
         for (String string : strings) {

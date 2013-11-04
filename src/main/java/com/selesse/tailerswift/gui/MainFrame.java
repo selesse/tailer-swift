@@ -124,4 +124,9 @@ public class MainFrame implements Runnable {
         // add this new file to our settings
         updateSettings();
     }
+
+    public void setFont(Font font) {
+        Program.getInstance().getSettings().setFont(font);
+        mainFrameView.setFont(font);
+    }
 }

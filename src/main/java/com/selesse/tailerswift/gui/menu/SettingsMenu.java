@@ -1,5 +1,6 @@
 package com.selesse.tailerswift.gui.menu;
 
+import com.selesse.tailerswift.gui.MainFrame;
 import com.selesse.tailerswift.gui.displayoptions.DisplayPreferencesFrame;
 
 import javax.swing.*;
@@ -10,8 +11,11 @@ import java.awt.event.KeyEvent;
 
 public class SettingsMenu extends AbstractMenu {
     private DisplayPreferencesFrame displayPreferencesFrame;
+    private MainFrame mainFrame;
 
-    public SettingsMenu() {
+    public SettingsMenu(MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
+
         menu = new JMenu("Settings");
         menu.add(createDisplayOptionsMenuItem());
     }
@@ -27,7 +31,7 @@ public class SettingsMenu extends AbstractMenu {
                     @Override
                     public void run() {
                         if (displayPreferencesFrame == null) {
-                            displayPreferencesFrame = new DisplayPreferencesFrame();
+                            displayPreferencesFrame = new DisplayPreferencesFrame(mainFrame);
                         }
                         displayPreferencesFrame.focus();
                     }

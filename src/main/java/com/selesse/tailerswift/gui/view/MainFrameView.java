@@ -10,7 +10,7 @@ import com.selesse.tailerswift.gui.SmartScroller;
 import com.selesse.tailerswift.gui.features.FeatureFactory;
 import com.selesse.tailerswift.gui.filter.Filter;
 import com.selesse.tailerswift.gui.highlighting.Colors;
-import com.selesse.tailerswift.gui.highlighting.Feature;
+import com.selesse.tailerswift.gui.features.Feature;
 import com.selesse.tailerswift.gui.highlighting.Highlight;
 import com.selesse.tailerswift.gui.menu.FileMenu;
 import com.selesse.tailerswift.gui.menu.HelpMenu;
@@ -62,6 +62,8 @@ public class MainFrameView {
         frame.setLayout(new BorderLayout());
         frame.setBackground(null);
         frame.setJMenuBar(createMenuBar());
+        // TODO do something better than this
+        frame.setMinimumSize(new Dimension(400, 400));
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setDropTarget(mainFrame.createFileDropTarget());
 
@@ -134,7 +136,7 @@ public class MainFrameView {
 
         FileMenu fileMenu = new FileMenu(mainFrame);
         WindowMenu windowMenu = new WindowMenu(mainFrame);
-        SettingsMenu settingsMenu = new SettingsMenu();
+        SettingsMenu settingsMenu = new SettingsMenu(mainFrame);
         HelpMenu helpMenu = new HelpMenu();
 
         menuBar.add(fileMenu.getMenu());
@@ -149,6 +151,7 @@ public class MainFrameView {
         JTextPane textPane = new JTextPane();
         textPane.setEditable(false);
         textPane.setDropTarget(mainFrame.createFileDropTarget());
+        textPane.setFont(Program.getInstance().getSettings().getDisplayFont());
 
         return textPane;
     }
@@ -255,5 +258,12 @@ public class MainFrameView {
                 textComponent.setText(stringBuilder.toString());
             }
         }, chosenFile.getAbsolutePath());
+    }
+
+    public void setFont(Font font) {
+        for (String filePath : stringTextComponentMap.keySet()) {
+            JTextComponent textComponent = stringTextComponentMap.get(filePath);
+            textComponent.setFont(font);
+        }
     }
 }

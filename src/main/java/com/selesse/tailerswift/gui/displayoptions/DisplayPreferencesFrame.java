@@ -1,29 +1,44 @@
 package com.selesse.tailerswift.gui.displayoptions;
 
+import com.selesse.tailerswift.gui.MainFrame;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class DisplayPreferencesFrame {
-    private JFrame jFrame;
+    private JFrame frame;
 
-    public DisplayPreferencesFrame() {
-        jFrame = new JFrame("Display preferences");
-        jFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+    public DisplayPreferencesFrame(final MainFrame mainFrame) {
+        frame = new JFrame("Display preferences");
+        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         Dimension currentScreenSize = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension preferredDimension = new Dimension( (int) currentScreenSize.getWidth() / 2, (int) currentScreenSize.getHeight() / 2);
-        jFrame.setPreferredSize(preferredDimension);
+        frame.setPreferredSize(preferredDimension);
 
-        JLabel jLabel = new JLabel("Patrick please add details");
-        jFrame.add(jLabel);
+        JButton button = new JButton("Modify font");
+        frame.add(button);
 
-        jFrame.pack();
-        jFrame.setVisible(true);
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFontChooser fontChooser = new JFontChooser();
+                int result = fontChooser.showDialog(frame);
+                if (result == JFontChooser.OK_OPTION) {
+                    mainFrame.setFont(fontChooser.getSelectedFont());
+                }
+            }
+        });
+
+        frame.pack();
+        frame.setVisible(true);
     }
 
     public void focus() {
-        jFrame.toFront();
-        jFrame.setVisible(true);
-        jFrame.setLocationRelativeTo(null);
+        frame.toFront();
+        frame.setVisible(true);
+        frame.setLocationRelativeTo(null);
     }
 }
 
