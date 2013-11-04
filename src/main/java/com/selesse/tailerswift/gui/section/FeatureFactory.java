@@ -1,4 +1,4 @@
-package com.selesse.tailerswift.gui.features;
+package com.selesse.tailerswift.gui.section;
 
 import com.google.common.collect.Lists;
 import com.selesse.tailerswift.gui.filter.FilterThread;

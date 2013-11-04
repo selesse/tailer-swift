@@ -1,6 +1,4 @@
-package com.selesse.tailerswift.gui.features;
-
-import com.selesse.tailerswift.gui.section.FeatureContent;
+package com.selesse.tailerswift.gui.section;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +11,7 @@ public class Feature {
     public Feature(FeatureContent content) {
         this.content = content;
         this.mainPanel = new JPanel();
-        this.mainPanel.add(this.content.getComponent());
+        this.mainPanel.add(content.getComponent());
         this.isVisible = false;
      }
 

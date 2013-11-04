@@ -18,7 +18,7 @@ public class HighlightThread implements Runnable {
 
     @Override
     public void run() {
-        Iterable<String> strings = Splitter.on(System.lineSeparator()).split(currentText);
+        Iterable<String> strings = Splitter.onPattern("\r?\n").split(currentText);
 
         int offset = 0;
         for (String string : strings) {

@@ -32,14 +32,6 @@ public class Program {
         }
 
         settings = loadOrInitializeSettings();
-
-        // on shutdown, save settings
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                saveSettings();
-            }
-        });
     }
 
     private Settings loadOrInitializeSettings() {
@@ -61,7 +53,6 @@ public class Program {
     public void saveSettings() {
         try {
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(settingsFile));
-            Settings settings = Program.getInstance().getSettings();
             objectOutputStream.writeObject(settings);
             objectOutputStream.flush();
             objectOutputStream.close();

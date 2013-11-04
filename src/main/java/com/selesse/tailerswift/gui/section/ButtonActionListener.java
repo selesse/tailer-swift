@@ -1,7 +1,5 @@
 package com.selesse.tailerswift.gui.section;
 
-import com.selesse.tailerswift.gui.features.Feature;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 

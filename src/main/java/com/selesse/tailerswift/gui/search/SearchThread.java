@@ -1,5 +1,7 @@
 package com.selesse.tailerswift.gui.search;
 
+import com.google.common.base.Splitter;
+
 import javax.swing.text.JTextComponent;
 
 public class SearchThread implements Runnable {
@@ -20,7 +22,10 @@ public class SearchThread implements Runnable {
     public void run() {
         int i = 1;
         // TODO line being \n is making me uneasy
-        for (String line : fileContents.split("\n")) {
+
+        Iterable<String> splitStrings = Splitter.onPattern("\r?\n").split(fileContents);
+
+        for (String line : splitStrings) {
             if (line.contains(queryString)) {
                 searchMatches.addMatch(i, line);
             }

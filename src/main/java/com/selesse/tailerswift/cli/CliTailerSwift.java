@@ -1,25 +1,23 @@
 package com.selesse.tailerswift.cli;
 
-import com.google.common.collect.Maps;
-import com.selesse.tailerswift.filewatcher.FileWatcher;
+import com.selesse.tailerswift.UserInterface;
 
 import java.nio.file.Path;
-import java.nio.file.WatchKey;
-import java.util.Map;
+import java.util.Date;
 
-public class CliTailerSwift implements Runnable {
-    private Map<WatchKey, Path> keys;
-    private String[] args;
-
-    public CliTailerSwift(String[] args) {
-        keys = Maps.newHashMap();
-        this.args = args;
+public class CliTailerSwift implements UserInterface {
+    @Override
+    public void updateFile(Path observedFile, String modificationString) {
+        System.out.print(modificationString);
     }
 
     @Override
-    public void run() {
-        FileWatcher fileWatcher = new FileWatcher(new CliTailerSwiftImpl(), args[0]);
-        keys.put(fileWatcher.getKey(), fileWatcher.getPath());
-        fileWatcher.run();
+    public void newFile(Path observedFile, String modificationString) {
+        System.out.print(modificationString);
+    }
+
+    @Override
+    public void deleteFile(Path observedFile) {
+        System.out.println("***** " + observedFile.getFileName() + " was deleted on " + new Date() + " *****");
     }
 }

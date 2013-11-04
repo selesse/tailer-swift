@@ -11,6 +11,7 @@ public class Settings implements Serializable {
     private boolean isAlwaysOnTop;
     private List<String> absoluteFilePaths;
     private Font displayFont;
+    private int focusedFileIndex = -1;
 
     public Settings() {
         this.isAlwaysOnTop = false;
@@ -42,5 +43,13 @@ public class Settings implements Serializable {
             displayFont = UIManager.getDefaults().getFont("TabbedPane.font");
         }
         return displayFont;
+    }
+
+    public int getFocusedFileIndex() {
+        return focusedFileIndex;
+    }
+
+    public void setFocusedFileIndex(int focusedFileIndex) {
+        this.focusedFileIndex = focusedFileIndex;
     }
 }

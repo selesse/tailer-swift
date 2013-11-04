@@ -7,10 +7,8 @@ import com.selesse.tailerswift.UserInterface;
 import com.selesse.tailerswift.filewatcher.FileWatcher;
 import com.selesse.tailerswift.gui.MainFrame;
 import com.selesse.tailerswift.gui.SmartScroller;
-import com.selesse.tailerswift.gui.features.FeatureFactory;
 import com.selesse.tailerswift.gui.filter.Filter;
 import com.selesse.tailerswift.gui.highlighting.Colors;
-import com.selesse.tailerswift.gui.features.Feature;
 import com.selesse.tailerswift.gui.highlighting.FileSetting;
 import com.selesse.tailerswift.gui.highlighting.Highlight;
 import com.selesse.tailerswift.gui.highlighting.HighlightThread;
@@ -22,6 +20,8 @@ import com.selesse.tailerswift.gui.search.Search;
 import com.selesse.tailerswift.gui.search.SearchResults;
 import com.selesse.tailerswift.gui.search.SearchThread;
 import com.selesse.tailerswift.gui.section.ButtonActionListener;
+import com.selesse.tailerswift.gui.section.Feature;
+import com.selesse.tailerswift.gui.section.FeatureFactory;
 import com.selesse.tailerswift.gui.section.FeaturePanel;
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
@@ -59,6 +59,15 @@ public class MainFrameView {
         if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
             frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Resources.getResource("icon.png")));
         }
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                Program program = Program.getInstance();
+                program.getSettings().setFocusedFileIndex(getFocusedTabIndex());
+                program.saveSettings();
+            }
+        });
     }
 
     public void initializeGui() {
@@ -297,5 +306,13 @@ public class MainFrameView {
         }
 
         return searchResults;
+    }
+
+    public int getFocusedTabIndex() {
+        return tabbedPane.getSelectedIndex();
+    }
+
+    public JTabbedPane getTabbedPane() {
+        return tabbedPane;
     }
 }

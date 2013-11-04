@@ -8,6 +8,7 @@ import com.selesse.tailerswift.gui.view.MainFrameView;
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.settings.Settings;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
@@ -63,12 +64,19 @@ public class MainFrame implements Runnable {
     }
 
     private void loadSettings() {
+        mainFrameView.getTabbedPane().setVisible(false);
         Settings settings = Program.getInstance().getSettings();
         mainFrameView.setAlwaysOnTop(settings.isAlwaysOnTop());
         for (String filePath : settings.getAbsoluteFilePaths()) {
             File file = new File(filePath);
             startWatching(file);
         }
+
+        int focusedFileIndex = settings.getFocusedFileIndex();
+        if (focusedFileIndex >= 0 && focusedFileIndex < watchedFiles.size()) {
+            mainFrameView.focusTabToAlreadyOpen(watchedFiles.get(focusedFileIndex));
+        }
+        mainFrameView.getTabbedPane().setVisible(true);
     }
 
     public Collection<Thread> getAllThreads() {
