@@ -18,6 +18,7 @@ public class HighlightThread implements Runnable {
 
     @Override
     public void run() {
+        // \r?\n is important: it makes this program line-ending agnostic
         Iterable<String> strings = Splitter.onPattern("\r?\n").split(currentText);
 
         int offset = 0;
@@ -27,7 +28,7 @@ public class HighlightThread implements Runnable {
                     doHighlight(offset, string.length(), fileSetting.getHighlightSettings());
                 }
             }
-            offset += string.length() + System.lineSeparator().length();
+            offset += string.length() + 1; // Assume "\n", which is length 1
         }
     }
 

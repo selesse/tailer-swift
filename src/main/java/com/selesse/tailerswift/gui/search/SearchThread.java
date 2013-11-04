@@ -20,11 +20,10 @@ public class SearchThread implements Runnable {
 
     @Override
     public void run() {
-        int i = 1;
-        // TODO line being \n is making me uneasy
-
+        // \r?\n is important: it makes this program line-ending agnostic
         Iterable<String> splitStrings = Splitter.onPattern("\r?\n").split(fileContents);
 
+        int i = 1;
         for (String line : splitStrings) {
             if (line.contains(queryString)) {
                 searchMatches.addMatch(i, line);
