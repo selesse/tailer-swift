@@ -7,6 +7,14 @@ Todo
   chooser might expect a file that exists.
 * UI indications when watched files are deleted, are created, another open tab
   has been modified/deleted.
+* Use default font in Font Chooser.
+* Fix line endings. Maybe read everything as "\n" to avoid "\r\n" vs "\n"
+  highlighting problem.
+
+Bugs
+====
+* If you highlight a word, append it to an already-open file, it doesn't
+  get highlighted.
 
 Done
 ====
