@@ -7,11 +7,11 @@ import com.selesse.tailerswift.UserInterface;
 import com.selesse.tailerswift.filewatcher.FileWatcher;
 import com.selesse.tailerswift.gui.MainFrame;
 import com.selesse.tailerswift.gui.SmartScroller;
+import com.selesse.tailerswift.gui.features.FeatureFactory;
 import com.selesse.tailerswift.gui.filter.Filter;
 import com.selesse.tailerswift.gui.highlighting.Colors;
 import com.selesse.tailerswift.gui.highlighting.Feature;
 import com.selesse.tailerswift.gui.highlighting.Highlight;
-import com.selesse.tailerswift.gui.highlighting.HighlightingThread;
 import com.selesse.tailerswift.gui.menu.FileMenu;
 import com.selesse.tailerswift.gui.menu.HelpMenu;
 import com.selesse.tailerswift.gui.menu.SettingsMenu;
@@ -231,8 +231,7 @@ public class MainFrameView {
                 stringBuilder.append(modificationString);
                 textComponent.setText(stringBuilder.toString());
 
-                Thread highlightingThread = new Thread(new HighlightingThread(stringBuilder, textComponent));
-                highlightingThread.start();
+                FeatureFactory.createAndRunThreads(stringBuilder, textComponent);
             }
 
             @Override
@@ -243,6 +242,8 @@ public class MainFrameView {
                 stringBuilder = new StringBuilder();
                 stringBuilder.append(modificationString);
                 textComponent.setText(stringBuilder.toString());
+
+                FeatureFactory.createAndRunThreads(stringBuilder, textComponent);
             }
 
             @Override

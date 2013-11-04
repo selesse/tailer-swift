@@ -4,21 +4,17 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import javax.swing.text.*;
-import java.awt.*;
 import java.util.List;
 
-public class HighlightingThread implements Runnable {
+public class HighlightThread implements Runnable {
     private String string;
     private JTextComponent textComponent;
     private List<FileSetting> fileSettingList;
 
-    public HighlightingThread(StringBuilder stringBuilder, JTextComponent textComponent) {
+    public HighlightThread(StringBuilder stringBuilder, JTextComponent textComponent) {
         this.string = stringBuilder.toString();
         this.textComponent = textComponent;
-        fileSettingList = Lists.newArrayList(new FileSetting("hello", true, true,
-                new HighlightSettings(Color.WHITE, Color.RED, false, false, true)),
-                new FileSetting("test", true, true,
-                        new HighlightSettings(Color.YELLOW, Color.MAGENTA, true, false, false)));
+        fileSettingList = Lists.newArrayList();
     }
 
     @Override

@@ -24,7 +24,7 @@ public class FileMenu extends AbstractMenu {
         menu.add(createAddWatchedFileMenuItem());
         menu.add(createCloseCurrentFileMenuItem());
 
-        // OS X handles CMD + Q automatically
+        // OS X already handles CMD + Q
         if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
             JMenuItem exitMenuItem = createExitMenuItem();
             menu.add(exitMenuItem);
