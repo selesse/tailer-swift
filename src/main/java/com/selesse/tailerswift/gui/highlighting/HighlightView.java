@@ -7,10 +7,8 @@ import java.awt.event.ActionListener;
 
 public class HighlightView {
     private JPanel panel;
-    private Highlight highlight;
 
     public HighlightView(final Highlight highlight) {
-        this.highlight = highlight;
         this.panel = new JPanel();
 
         JLabel textFieldLabel = new JLabel("String to highlight");

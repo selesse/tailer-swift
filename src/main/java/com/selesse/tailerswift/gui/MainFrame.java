@@ -3,6 +3,7 @@ package com.selesse.tailerswift.gui;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.selesse.tailerswift.gui.highlighting.FileSetting;
+import com.selesse.tailerswift.gui.search.SearchResults;
 import com.selesse.tailerswift.gui.view.MainFrameView;
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.settings.Settings;
@@ -133,5 +134,9 @@ public class MainFrame implements Runnable {
 
     public void addHighlight(FileSetting fileSetting) {
         mainFrameView.addHighlight(fileSetting);
+    }
+
+    public SearchResults searchFor(String text) {
+        return mainFrameView.runSearchQuery(text);
     }
 }

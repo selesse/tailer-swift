@@ -19,6 +19,8 @@ import com.selesse.tailerswift.gui.menu.HelpMenu;
 import com.selesse.tailerswift.gui.menu.SettingsMenu;
 import com.selesse.tailerswift.gui.menu.WindowMenu;
 import com.selesse.tailerswift.gui.search.Search;
+import com.selesse.tailerswift.gui.search.SearchResults;
+import com.selesse.tailerswift.gui.search.SearchThread;
 import com.selesse.tailerswift.gui.section.ButtonActionListener;
 import com.selesse.tailerswift.gui.section.FeaturePanel;
 import com.selesse.tailerswift.settings.OperatingSystem;
@@ -106,7 +108,7 @@ public class MainFrameView {
         frame.add(bottomPanel, BorderLayout.SOUTH);
 
         // add features
-        Feature searchFeature = new Feature(new Search());
+        Feature searchFeature = new Feature(new Search(mainFrame));
         Feature filterFeature = new Feature(new Filter());
         Feature highlightFeature = new Feature(new Highlight(mainFrame));
 
@@ -277,5 +279,23 @@ public class MainFrameView {
             Thread highlightThread = new Thread(new HighlightThread(textComponent, fileSettings));
             highlightThread.start();
         }
+    }
+
+    public SearchResults runSearchQuery(String text) {
+        SearchResults searchResults = new SearchResults();
+        for (String filePaths : stringTextComponentMap.keySet()) {
+            JTextComponent textComponent = stringTextComponentMap.get(filePaths);
+
+            SearchThread searchingThread = new SearchThread(textComponent, text);
+            Thread searchThread = new Thread(searchingThread);
+            searchThread.start();
+
+            while (!searchingThread.isFinished()) {
+            }
+
+            searchResults.addMatch(filePaths, searchingThread.getResults());
+        }
+
+        return searchResults;
     }
 }

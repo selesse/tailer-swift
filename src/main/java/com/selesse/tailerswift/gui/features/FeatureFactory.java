@@ -16,7 +16,7 @@ public class FeatureFactory {
         Thread filterThread = new Thread(new FilterThread(stringBuilder, textComponent));
         filterThread.start();
 
-        Thread searchThread = new Thread(new SearchThread(stringBuilder));
+        Thread searchThread = new Thread(new SearchThread(textComponent, stringBuilder.toString()));
         searchThread.start();
     }
 }
