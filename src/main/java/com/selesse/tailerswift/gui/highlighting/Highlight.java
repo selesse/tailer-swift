@@ -1,26 +1,20 @@
 package com.selesse.tailerswift.gui.highlighting;
 
 import com.selesse.tailerswift.gui.MainFrame;
-import com.selesse.tailerswift.gui.section.FeatureContent;
+import com.selesse.tailerswift.gui.section.AbstractFeature;
 
 import javax.swing.*;
 
-public class Highlight implements FeatureContent {
+public class Highlight extends AbstractFeature {
     private HighlightView highlightView;
-    private MainFrame mainFrame;
 
     public Highlight(MainFrame mainFrame) {
-        this.mainFrame = mainFrame;
+        super("Highlight", mainFrame);
         this.highlightView = new HighlightView(this);
     }
 
     @Override
-    public String getName() {
-        return "Highlight";
-    }
-
-    @Override
-    public JComponent getComponent() {
+    public JComponent getViewComponent() {
         return highlightView.getComponent();
     }
 

@@ -8,6 +8,9 @@ import com.selesse.tailerswift.filewatcher.FileWatcher;
 import com.selesse.tailerswift.gui.MainFrame;
 import com.selesse.tailerswift.gui.SmartScroller;
 import com.selesse.tailerswift.gui.filter.Filter;
+import com.selesse.tailerswift.gui.filter.FilterMatches;
+import com.selesse.tailerswift.gui.filter.FilterResults;
+import com.selesse.tailerswift.gui.filter.FilterThread;
 import com.selesse.tailerswift.gui.highlighting.Colors;
 import com.selesse.tailerswift.gui.highlighting.FileSetting;
 import com.selesse.tailerswift.gui.highlighting.Highlight;
@@ -122,7 +125,7 @@ public class MainFrameView {
 
         // add features
         Feature searchFeature = new Feature(new Search(mainFrame));
-        Feature filterFeature = new Feature(new Filter());
+        Feature filterFeature = new Feature(new Filter(mainFrame));
         Feature highlightFeature = new Feature(new Highlight(mainFrame));
 
         // create buttons
@@ -343,5 +346,37 @@ public class MainFrameView {
 
     public JTabbedPane getTabbedPane() {
         return tabbedPane;
+    }
+
+    public FilterResults filter(final String text) {
+        final FilterResults filterResults = new FilterResults();
+        for (final String filePaths : stringTextComponentMap.keySet()) {
+            final JTextComponent textComponent = stringTextComponentMap.get(filePaths);
+
+            SwingWorker worker = new SwingWorker<FilterMatches, Void>() {
+                private FilterMatches filterMatches;
+
+                @Override
+                protected FilterMatches doInBackground() throws Exception {
+                    FilterThread filteringThread = new FilterThread(textComponent, text);
+
+                    Thread filterThread = new Thread(filteringThread);
+                    filterThread.start();
+                    filterThread.join();
+
+                    filterMatches = filteringThread.getResults();
+
+                    return filterMatches;
+                }
+
+                @Override
+                public void done() {
+                    filterResults.addMatch(filePaths, filterMatches);
+                }
+            };
+            worker.run();
+        }
+
+        return filterResults;
     }
 }

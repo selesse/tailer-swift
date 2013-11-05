@@ -7,7 +7,6 @@ Todo
 * UI indications when watched files are deleted, are created, another open tab
   has been modified/deleted.
 * Smoothen GUI initialization.
-* Mac: Figure out why shortcuts aren't being displayed in menus.
 * Display preferences: line spacing, line wrapping.
 * Merge foreground/background color picker into 1, with live preview.
 * Create cut "feature". Functionality equivalent of $(cut -f1 -d'|' $file).
@@ -18,6 +17,8 @@ Bugs
   get highlighted.
 * Line number makes it seem like there's an n+1th line when there isn't. In
   other words, if your file is 10 lines long, it'll show 11 lines long.
+* Fix the "feature" buttons (press Search, then Filter, then Highlight).
+* Mac: Figure out why shortcuts aren't being displayed in menus.
 
 Done
 ====

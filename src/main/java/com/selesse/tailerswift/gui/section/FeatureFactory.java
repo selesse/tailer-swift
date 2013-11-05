@@ -13,7 +13,7 @@ public class FeatureFactory {
         Thread highlightingThread = new Thread(new HighlightThread(textComponent, Lists.<FileSetting>newArrayList()));
         highlightingThread.start();
 
-        Thread filterThread = new Thread(new FilterThread(stringBuilder, textComponent));
+        Thread filterThread = new Thread(new FilterThread(textComponent, stringBuilder.toString()));
         filterThread.start();
 
         Thread searchThread = new Thread(new SearchThread(textComponent, stringBuilder.toString()));

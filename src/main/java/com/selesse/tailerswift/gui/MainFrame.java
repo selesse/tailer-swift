@@ -2,6 +2,7 @@ package com.selesse.tailerswift.gui;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.selesse.tailerswift.gui.filter.FilterResults;
 import com.selesse.tailerswift.gui.highlighting.FileSetting;
 import com.selesse.tailerswift.gui.search.SearchResults;
 import com.selesse.tailerswift.gui.view.MainFrameView;
@@ -145,5 +146,9 @@ public class MainFrame implements Runnable {
 
     public SearchResults searchFor(String text) {
         return mainFrameView.runSearchQuery(text);
+    }
+
+    public FilterResults filter(String text) {
+        return mainFrameView.filter(text);
     }
 }

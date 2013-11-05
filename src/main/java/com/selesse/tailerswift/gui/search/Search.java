@@ -1,31 +1,18 @@
 package com.selesse.tailerswift.gui.search;
 
 import com.selesse.tailerswift.gui.MainFrame;
-import com.selesse.tailerswift.gui.section.FeatureContent;
+import com.selesse.tailerswift.gui.section.AbstractFeature;
 
-import javax.swing.*;
+import java.awt.*;
 import java.util.Observable;
 import java.util.Observer;
 
-public class Search implements FeatureContent, Observer {
+public class Search extends AbstractFeature implements Observer {
     private SearchView searchView;
-    private String name;
-    private MainFrame mainFrame;
 
     public Search(MainFrame mainFrame) {
-        this.mainFrame = mainFrame;
+        super("Search", mainFrame);
         this.searchView = new SearchView(this);
-        this.name = "Search";
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public JComponent getComponent() {
-        return searchView.getComponent();
     }
 
     @Override
@@ -34,5 +21,10 @@ public class Search implements FeatureContent, Observer {
 
     public SearchResults searchFor(String text) {
         return mainFrame.searchFor(text);
+    }
+
+    @Override
+    public Component getViewComponent() {
+        return searchView.getComponent();
     }
 }

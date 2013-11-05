@@ -11,7 +11,7 @@ public class Feature {
     public Feature(FeatureContent content) {
         this.content = content;
         this.mainPanel = new JPanel();
-        this.mainPanel.add(content.getComponent());
+        this.mainPanel.add(content.getViewComponent());
         this.isVisible = false;
      }
 

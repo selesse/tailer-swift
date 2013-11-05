@@ -33,5 +33,4 @@ public class SearchThread implements Runnable {
     public SearchMatches getResults() {
         return searchMatches;
     }
-
 }
