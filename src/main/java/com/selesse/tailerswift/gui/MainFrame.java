@@ -37,9 +37,8 @@ public class MainFrame implements Runnable {
 
     @Override
     public void run() {
-        mainFrameView.initializeGui();
-
         loadSettings();
+        mainFrameView.initializeGui();
     }
 
     // Allows people to drag files from a file explorer into the program

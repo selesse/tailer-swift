@@ -54,11 +54,16 @@ public class MainFrameView {
     private List<String> watchedFileNames;
     private MainFrame mainFrame;
     private List<FileSetting> fileSettings;
+    private boolean isInitialized = false;
 
     public MainFrameView(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
 
+        // initialize UI components, but do not make them visible yet
         frame = new JFrame();
+        tabbedPane = new JTabbedPane();
+        absoluteFilePathLabel = new JLabel();
+
         stringTextComponentMap = Maps.newHashMap();
         watchedFileNames = Lists.newArrayList();
         fileSettings = Lists.newArrayList();
@@ -89,7 +94,6 @@ public class MainFrameView {
         frame.setDropTarget(mainFrame.createFileDropTarget());
 
         // add tabbed pane
-        tabbedPane = new JTabbedPane();
         tabbedPane.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent event) {
@@ -103,6 +107,12 @@ public class MainFrameView {
                 }
             }
         });
+        tabbedPane.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                removeModificationHint(tabbedPane.getSelectedIndex());
+            }
+        });
         frame.add(tabbedPane, BorderLayout.CENTER);
 
         // add bottom panel
@@ -113,7 +123,6 @@ public class MainFrameView {
         FeaturePanel featurePanel = new FeaturePanel();
         JPanel featureButtonPanel = new JPanel();
 
-        absoluteFilePathLabel = new JLabel();
         absoluteFilePathLabel.setForeground(Colors.DARK_GREEN.toColor());
         // pad a bit on the right so it looks prettier
         absoluteFilePathLabel.setBorder(new EmptyBorder(0, 0, 0, 10));
@@ -146,6 +155,9 @@ public class MainFrameView {
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+
+        isInitialized = true;
+        doHighlights();
     }
 
     /****************************************************************************************************************
@@ -267,6 +279,11 @@ public class MainFrameView {
                 textComponent.setText(stringBuilder.toString());
 
                 doHighlights();
+
+                int fileIndex = watchedFileNames.indexOf(absolutePath);
+                if (fileIndex != getFocusedTabIndex()) {
+                    showModificationHint(fileIndex, observedPath.toFile().getName());
+                }
             }
 
             @Override
@@ -292,6 +309,17 @@ public class MainFrameView {
         }, chosenFile.getAbsolutePath());
     }
 
+    private void removeModificationHint(int index) {
+        File file = new File(watchedFileNames.get(index));
+        tabbedPane.setTitleAt(index, file.getName());
+    }
+
+    private void showModificationHint(int index, String name) {
+        if (isInitialized) {
+            tabbedPane.setTitleAt(index, "* " + name);
+        }
+    }
+
     public void setFont(Font font) {
         for (String filePath : stringTextComponentMap.keySet()) {
             JTextComponent textComponent = stringTextComponentMap.get(filePath);
@@ -305,11 +333,13 @@ public class MainFrameView {
     }
 
     private void doHighlights() {
-        for (String filePaths : stringTextComponentMap.keySet()) {
-            JTextComponent textComponent = stringTextComponentMap.get(filePaths);
+        if (isInitialized) {
+            for (String filePaths : stringTextComponentMap.keySet()) {
+                JTextComponent textComponent = stringTextComponentMap.get(filePaths);
 
-            Thread highlightThread = new Thread(new HighlightThread(textComponent, fileSettings));
-            highlightThread.start();
+                Thread highlightThread = new Thread(new HighlightThread(textComponent, fileSettings));
+                highlightThread.start();
+            }
         }
     }
 

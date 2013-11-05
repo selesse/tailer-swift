@@ -6,10 +6,10 @@ Todo
   chooser might expect a file that exists.
 * UI indications when watched files are deleted, are created, another open tab
   has been modified/deleted.
-* Smoothen GUI initialization.
 * Display preferences: line spacing, line wrapping.
 * Merge foreground/background color picker into 1, with live preview.
 * Create cut "feature". Functionality equivalent of $(cut -f1 -d'|' $file).
+* Add global tabs for every "feature".
 
 Bugs
 ====
@@ -34,3 +34,4 @@ Done
 * Add line numbers (Nov 4 2013).
 * (Fixed) If you highlight a word, append it to an already-open file, it
   doesn't get highlighted (Nov 4 2013).
+* Smoothen GUI initialization (Nov 4 2013).
