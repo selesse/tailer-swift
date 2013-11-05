@@ -1,5 +1,9 @@
 package com.selesse.tailerswift.gui.displayoptions;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import com.selesse.tailerswift.settings.Program;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
@@ -12,6 +16,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 
 /**
  * Taken from JFontChooser: http://jfontchooser.sourceforge.jp/site/jfontchooser/screenshots.html.
@@ -50,8 +55,7 @@ public class JFontChooser extends JComponent {
      * @see #showDialog
      */
     public static final int ERROR_OPTION = -1;
-    private static final Font DEFAULT_SELECTED_FONT = new Font("Consolas", Font.PLAIN, 12);
-    private static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 10);
+    private static final Font DEFAULT_FONT = UIManager.getFont("Label.font");
     private static final int[] FONT_STYLE_CODES = { Font.PLAIN, Font.BOLD, Font.ITALIC, Font.BOLD | Font.ITALIC };
     private static final String[] DEFAULT_FONT_SIZE_STRINGS = {
             "8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72",
@@ -60,20 +64,20 @@ public class JFontChooser extends JComponent {
     // instance variables
     protected int dialogResultValue = ERROR_OPTION;
 
-    private String[] fontStyleNames = null;
-    private String[] fontFamilyNames = null;
-    private String[] fontSizeStrings = null;
-    private JTextField fontFamilyTextField = null;
-    private JTextField fontStyleTextField = null;
-    private JTextField fontSizeTextField = null;
-    private JList fontNameList = null;
-    private JList fontStyleList = null;
-    private JList fontSizeList = null;
-    private JPanel fontNamePanel = null;
-    private JPanel fontStylePanel = null;
-    private JPanel fontSizePanel = null;
-    private JPanel samplePanel = null;
-    private JTextField sampleText = null;
+    private String[] fontStyleNames;
+    private String[] fontFamilyNames;
+    private String[] fontSizeStrings;
+    private JTextField fontFamilyTextField;
+    private JTextField fontStyleTextField;
+    private JTextField fontSizeTextField;
+    private JList fontNameList;
+    private JList fontStyleList;
+    private JList fontSizeList;
+    private JPanel fontNamePanel;
+    private JPanel fontStylePanel;
+    private JPanel fontSizePanel;
+    private JPanel samplePanel;
+    private JTextArea sampleText;
 
     /**
      * Constructs a <code>JFontChooser</code> object.
@@ -107,7 +111,9 @@ public class JFontChooser extends JComponent {
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         this.add(contentsPanel);
         this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        this.setSelectedFont(DEFAULT_SELECTED_FONT);
+
+        Font defaultFont = Program.getInstance().getSettings().getDisplayFont();
+        this.setSelectedFont(defaultFont);
     }
 
     public JTextField getFontFamilyTextField() {
@@ -643,11 +649,14 @@ public class JFontChooser extends JComponent {
         return samplePanel;
     }
 
-    protected JTextField getSampleTextField() {
+    protected JTextComponent getSampleTextField() {
         if (sampleText == null) {
             Border lowered = BorderFactory.createLoweredBevelBorder();
 
-            sampleText = new JTextField(("AaBbYyZz"));
+            List<String> sampleTextList = Lists.newArrayList("the quick brown fox jumps over the lazy dog.",
+            "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG.", "1234567890!@#$%^&*()_+{}[]");
+
+            sampleText = new JTextArea(Joiner.on("\n").join(sampleTextList));
             sampleText.setBorder(lowered);
             sampleText.setPreferredSize(new Dimension(300, 100));
         }

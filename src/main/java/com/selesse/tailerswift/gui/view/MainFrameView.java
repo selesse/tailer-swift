@@ -1,5 +1,6 @@
 package com.selesse.tailerswift.gui.view;
 
+import com.apple.eawt.Application;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
@@ -27,6 +28,7 @@ import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -165,6 +167,7 @@ public class MainFrameView {
         textPane.setEditable(false);
         textPane.setDropTarget(mainFrame.createFileDropTarget());
         textPane.setFont(Program.getInstance().getSettings().getDisplayFont());
+        textPane.setBorder(new EmptyBorder(0, 5, 0, 0));
 
         return textPane;
     }
@@ -199,7 +202,8 @@ public class MainFrameView {
         tabbedPane.addTab(file.getName(), scrollPane);
         tabbedPane.setSelectedComponent(scrollPane);
         scrollPane.getVerticalScrollBar().addAdjustmentListener(new SmartScroller(scrollPane));
-
+        TextLineNumber textLineNumber = new TextLineNumber(textComponent);
+        scrollPane.setRowHeaderView(textLineNumber);
         absoluteFilePathLabel.setText(file.getAbsolutePath());
     }
 

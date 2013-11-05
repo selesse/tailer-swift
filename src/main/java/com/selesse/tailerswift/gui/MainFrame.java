@@ -8,7 +8,6 @@ import com.selesse.tailerswift.gui.view.MainFrameView;
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.settings.Settings;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
@@ -136,7 +135,7 @@ public class MainFrame implements Runnable {
     }
 
     public void setFont(Font font) {
-        Program.getInstance().getSettings().setFont(font);
+        Program.getInstance().getSettings().setDisplayFont(font);
         mainFrameView.setFont(font);
     }
 

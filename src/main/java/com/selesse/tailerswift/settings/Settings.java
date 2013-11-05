@@ -34,13 +34,16 @@ public class Settings implements Serializable {
         this.absoluteFilePaths = absoluteFilePaths;
     }
 
-    public void setFont(Font font) {
+    public void setDisplayFont(Font font) {
         this.displayFont = font;
     }
 
+    /**
+     * Returns the display font, or the default font (same as JLabels).
+     */
     public Font getDisplayFont() {
         if (displayFont == null) {
-            displayFont = UIManager.getDefaults().getFont("TabbedPane.font");
+            displayFont = UIManager.getDefaults().getFont("Label.font");
         }
         return displayFont;
     }
