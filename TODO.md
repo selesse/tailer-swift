@@ -10,6 +10,7 @@ Todo
 * Mac: Figure out why shortcuts aren't being displayed in menus.
 * Display preferences: line spacing, line wrapping.
 * Merge foreground/background color picker into 1, with live preview.
+* Create cut "feature". Functionality equivalent of $(cut -f1 -d'|' $file).
 
 Bugs
 ====
