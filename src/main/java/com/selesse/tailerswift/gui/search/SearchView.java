@@ -1,13 +1,14 @@
 package com.selesse.tailerswift.gui.search;
 
+import com.selesse.tailerswift.gui.view.FeatureView;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
 
-public class SearchView {
-    private JPanel panel;
+public class SearchView extends FeatureView {
     private JTextArea textArea;
 
     public SearchView(final Search search) {
@@ -45,9 +46,5 @@ public class SearchView {
                 }
             }
         });
-    }
-
-    public JComponent getComponent() {
-        return panel;
     }
 }

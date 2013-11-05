@@ -1,13 +1,13 @@
 package com.selesse.tailerswift.gui.highlighting;
 
+import com.selesse.tailerswift.gui.view.FeatureView;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class HighlightView {
-    private JPanel panel;
-
+public class HighlightView extends FeatureView {
     public HighlightView(final Highlight highlight) {
         this.panel = new JPanel();
 
@@ -21,8 +21,8 @@ public class HighlightView {
         panel.add(foregroundButton);
         panel.add(backgroundButton);
 
-        final JColorChooser foregroundColorChooser = createColorChooser();
-        final JColorChooser backgroundColorChooser = createColorChooser();
+        final JColorChooser foregroundColorChooser = new JColorChooser();
+        final JColorChooser backgroundColorChooser = new JColorChooser();
         foregroundButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -74,22 +74,5 @@ public class HighlightView {
                 highlight.addToHighlights(fileSetting);
             }
         });
-    }
-
-    public JColorChooser createColorChooser() {
-        JColorChooser colorChooser = new JColorChooser();
-        // for (AbstractColorChooserPanel abstractColorChooserPanel : colorChooser.getChooserPanels()) {
-        //     if (!abstractColorChooserPanel.getDisplayName().equals("HSL")) {
-        //         colorChooser.removeChooserPanel(abstractColorChooserPanel);
-        //     }
-        // }
-        // disable the preview panel
-        // colorChooser.setPreviewPanel(new JPanel());
-
-        return colorChooser;
-    }
-
-    public JComponent getComponent() {
-        return panel;
     }
 }

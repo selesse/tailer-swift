@@ -1,13 +1,14 @@
 package com.selesse.tailerswift.gui.filter;
 
+import com.selesse.tailerswift.gui.view.FeatureView;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
 
-public class FilterView {
-    private JPanel panel;
+public class FilterView extends FeatureView {
     private JTextArea textArea;
 
     public FilterView(final Filter filter) {
@@ -45,9 +46,5 @@ public class FilterView {
                 }
             }
         });
-    }
-
-    public JComponent getComponent() {
-        return panel;
     }
 }
