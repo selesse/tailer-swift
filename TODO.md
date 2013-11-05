@@ -17,6 +17,7 @@ Bugs
   other words, if your file is 10 lines long, it'll show 11 lines long.
 * Fix the "feature" buttons (press Search, then Filter, then Highlight).
 * Mac: Figure out why shortcuts aren't being displayed in menus.
+* Fix smart scrolling when loading a long/large file.
 
 Done
 ====
