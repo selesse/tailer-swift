@@ -141,7 +141,7 @@ public class MainFrame implements Runnable {
     }
 
     public void addHighlight(FileSetting fileSetting) {
-        mainFrameView.addHighlight(fileSetting);
+        mainFrameView.addAndDoHighlight(fileSetting);
     }
 
     public SearchResults searchFor(String text) {

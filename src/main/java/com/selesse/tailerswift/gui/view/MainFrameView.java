@@ -25,7 +25,6 @@ import com.selesse.tailerswift.gui.search.SearchResults;
 import com.selesse.tailerswift.gui.search.SearchThread;
 import com.selesse.tailerswift.gui.section.ButtonActionListener;
 import com.selesse.tailerswift.gui.section.Feature;
-import com.selesse.tailerswift.gui.section.FeatureFactory;
 import com.selesse.tailerswift.gui.section.FeaturePanel;
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
@@ -54,6 +53,7 @@ public class MainFrameView {
     private Map<String, JTextComponent> stringTextComponentMap;
     private List<String> watchedFileNames;
     private MainFrame mainFrame;
+    private List<FileSetting> fileSettings;
 
     public MainFrameView(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
@@ -61,6 +61,7 @@ public class MainFrameView {
         frame = new JFrame();
         stringTextComponentMap = Maps.newHashMap();
         watchedFileNames = Lists.newArrayList();
+        fileSettings = Lists.newArrayList();
 
         // if we setIconImage in OS X, it throws some command line errors, so let's not try this on a Mac
         if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
@@ -265,7 +266,7 @@ public class MainFrameView {
                 stringBuilder.append(modificationString);
                 textComponent.setText(stringBuilder.toString());
 
-                FeatureFactory.createAndRunThreads(stringBuilder, textComponent);
+                doHighlights();
             }
 
             @Override
@@ -277,7 +278,7 @@ public class MainFrameView {
                 stringBuilder.append(modificationString);
                 textComponent.setText(stringBuilder.toString());
 
-                FeatureFactory.createAndRunThreads(stringBuilder, textComponent);
+                doHighlights();
             }
 
             @Override
@@ -298,8 +299,12 @@ public class MainFrameView {
         }
     }
 
-    public void addHighlight(FileSetting fileSetting) {
-        List<FileSetting> fileSettings = Lists.newArrayList(fileSetting);
+    public void addAndDoHighlight(FileSetting fileSetting) {
+        fileSettings.add(fileSetting);
+        doHighlights();
+    }
+
+    private void doHighlights() {
         for (String filePaths : stringTextComponentMap.keySet()) {
             JTextComponent textComponent = stringTextComponentMap.get(filePaths);
 
@@ -307,6 +312,7 @@ public class MainFrameView {
             highlightThread.start();
         }
     }
+
 
     public SearchResults runSearchQuery(final String text) {
         final SearchResults searchResults = new SearchResults();
