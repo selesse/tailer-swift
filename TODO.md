@@ -8,6 +8,8 @@ Todo
   has been modified/deleted.
 * Smoothen GUI initialization.
 * Mac: Figure out why shortcuts aren't being displayed in menus.
+* Display preferences: line spacing, line wrapping.
+* Merge foreground/background color picker into 1, with live preview.
 
 Bugs
 ====

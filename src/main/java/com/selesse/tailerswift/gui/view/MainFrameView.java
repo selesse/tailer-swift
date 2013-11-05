@@ -18,6 +18,7 @@ import com.selesse.tailerswift.gui.menu.HelpMenu;
 import com.selesse.tailerswift.gui.menu.SettingsMenu;
 import com.selesse.tailerswift.gui.menu.WindowMenu;
 import com.selesse.tailerswift.gui.search.Search;
+import com.selesse.tailerswift.gui.search.SearchMatches;
 import com.selesse.tailerswift.gui.search.SearchResults;
 import com.selesse.tailerswift.gui.search.SearchThread;
 import com.selesse.tailerswift.gui.section.ButtonActionListener;
@@ -33,6 +34,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.io.File;
 import java.nio.file.Path;
@@ -172,6 +176,15 @@ public class MainFrameView {
         return textPane;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
+    private void setLineSpacing(JTextPane textPane, float modifier) {
+        MutableAttributeSet mutableAttributeSet = new SimpleAttributeSet();
+        StyleConstants.setLineSpacing(mutableAttributeSet, modifier);
+
+        textPane.setParagraphAttributes(mutableAttributeSet, false);
+    }
+
+
     /****************************************************************************************************************
      *  Getters and setters.                                                                                        *
      ****************************************************************************************************************
@@ -294,19 +307,33 @@ public class MainFrameView {
         }
     }
 
-    public SearchResults runSearchQuery(String text) {
-        SearchResults searchResults = new SearchResults();
-        for (String filePaths : stringTextComponentMap.keySet()) {
-            JTextComponent textComponent = stringTextComponentMap.get(filePaths);
+    public SearchResults runSearchQuery(final String text) {
+        final SearchResults searchResults = new SearchResults();
+        for (final String filePaths : stringTextComponentMap.keySet()) {
+            final JTextComponent textComponent = stringTextComponentMap.get(filePaths);
 
-            SearchThread searchingThread = new SearchThread(textComponent, text);
-            Thread searchThread = new Thread(searchingThread);
-            searchThread.start();
+            SwingWorker worker = new SwingWorker<SearchMatches, Void>() {
+                private SearchMatches searchMatches;
 
-            while (!searchingThread.isFinished()) {
-            }
+                @Override
+                protected SearchMatches doInBackground() throws Exception {
+                    SearchThread searchingThread = new SearchThread(textComponent, text);
 
-            searchResults.addMatch(filePaths, searchingThread.getResults());
+                    Thread searchThread = new Thread(searchingThread);
+                    searchThread.start();
+                    searchThread.join();
+
+                    searchMatches = searchingThread.getResults();
+
+                    return searchMatches;
+                }
+
+                @Override
+                public void done() {
+                    searchResults.addMatch(filePaths, searchMatches);
+                }
+            };
+            worker.run();
         }
 
         return searchResults;
