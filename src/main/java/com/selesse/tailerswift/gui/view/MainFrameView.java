@@ -98,19 +98,16 @@ public class MainFrameView {
             @Override
             public void stateChanged(ChangeEvent event) {
                 int selectedIndex = tabbedPane.getSelectedIndex();
-                try {
+                if (selectedIndex != -1) {
                     absoluteFilePathLabel.setText(watchedFileNames.get(selectedIndex));
-                }
-                // this will only be an issue on startup
-                catch (IndexOutOfBoundsException e) {
-                    absoluteFilePathLabel.setText("");
                 }
             }
         });
         tabbedPane.addChangeListener(new ChangeListener() {
+
             @Override
             public void stateChanged(ChangeEvent e) {
-                removeModificationHint(tabbedPane.getSelectedIndex());
+                normalizeTabTitle();
             }
         });
         frame.add(tabbedPane, BorderLayout.CENTER);
@@ -231,6 +228,7 @@ public class MainFrameView {
         scrollPane.getVerticalScrollBar().addAdjustmentListener(new SmartScroller(scrollPane));
         TextLineNumber textLineNumber = new TextLineNumber(textComponent);
         scrollPane.setRowHeaderView(textLineNumber);
+
         absoluteFilePathLabel.setText(file.getAbsolutePath());
     }
 
@@ -244,7 +242,7 @@ public class MainFrameView {
                 absoluteFilePathLabel.setText("");
             }
             else {
-                absoluteFilePathLabel.setText(watchedFileNames.get(tabbedPane.getSelectedIndex()));
+                normalizeTabTitle();
             }
         }
     }
@@ -275,6 +273,7 @@ public class MainFrameView {
                 String absolutePath = observedPath.toFile().getAbsolutePath();
 
                 JTextComponent textComponent = stringTextComponentMap.get(absolutePath);
+
                 stringBuilder.append(modificationString);
                 textComponent.setText(stringBuilder.toString());
 
@@ -309,9 +308,21 @@ public class MainFrameView {
         }, chosenFile.getAbsolutePath());
     }
 
-    private void removeModificationHint(int index) {
-        File file = new File(watchedFileNames.get(index));
-        tabbedPane.setTitleAt(index, file.getName());
+    /**
+     * Make sure that if the tab title isn't what it's supposed to be, reset it.
+     */
+    private void normalizeTabTitle() {
+        int index = tabbedPane.getSelectedIndex();
+        if (index > 0) {
+            File file = new File(watchedFileNames.get(index));
+
+            String currentTitle = tabbedPane.getTitleAt(index);
+            String expectedTitle = file.getName();
+
+            if (!currentTitle.equals(expectedTitle)) {
+                tabbedPane.setTitleAt(index, expectedTitle);
+            }
+        }
     }
 
     private void showModificationHint(int index, String name) {

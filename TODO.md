@@ -10,6 +10,7 @@ Todo
 * Merge foreground/background color picker into 1, with live preview.
 * Create cut "feature". Functionality equivalent of $(cut -f1 -d'|' $file).
 * Add global tabs for every "feature".
+* Don't overwrite settings for multiple instances?
 
 Bugs
 ====
