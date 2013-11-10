@@ -11,6 +11,7 @@ Todo
 * Create cut "feature". Functionality equivalent of $(cut -f1 -d'|' $file).
 * Add global tabs for every "feature".
 * Don't overwrite settings for multiple instances?
+* Tests. :(
 
 Bugs
 ====

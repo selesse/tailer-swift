@@ -7,6 +7,10 @@ version = '1.0.0'
 
 buildDir = "out"
 
+configurations {
+  proguard
+}
+
 ext {
   releaseDir = "release"
 }
@@ -18,6 +22,8 @@ repositories {
 dependencies {
   compile 'com.google.guava:guava:15.0'
   testCompile 'junit:junit:4.11'
+
+  proguard 'net.sf.proguard:proguard-base:4.10'
 }
 
 clean.doLast {
@@ -46,3 +52,28 @@ jar {
 task getVersion << {
   out.println version
 }
+
+task proguard(type: JavaExec, dependsOn: jar) {
+    def outFile = jar.destinationDir.getPath() + '/' + jar.baseName + '-' + jar.version + '-small' + '.' + jar.extension
+    inputs.file jar.archivePath
+    outputs.file outFile
+
+    classpath = configurations.proguard
+    main = 'proguard.ProGuard'
+    args "-injars ${jar.archivePath}"
+    args "-outjars ${outFile}"
+    args "-libraryjars ${System.properties['java.home']}/lib/rt.jar"
+    args "-printseeds"
+    args '-dontobfuscate'
+    args '-dontoptimize'
+    args '-keep public class org.slf4j.** { *; }'
+    args '-keep public class ch.qos.** { *; }'
+    args '-keep public class com.selesse.tailerswift.Main { public static void main(java.lang.String[]); }'
+    args '-keepclassmembers enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
+    args '-dontwarn com.google.common.**'
+    args '-dontnote com.google.common.**'
+    args '-dontwarn ch.qos.**'
+    args '-dontnote ch.qos.**'
+}
+
+tasks.getByPath(':release').dependsOn(proguard)
