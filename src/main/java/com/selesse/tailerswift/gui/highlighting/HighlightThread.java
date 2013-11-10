@@ -24,7 +24,7 @@ public class HighlightThread implements Runnable {
         int offset = 0;
         for (String string : strings) {
             for (FileSetting fileSetting : fileSettingList) {
-                if (fileSetting.matches(string)) {
+                if (fileSetting.matchesHighlight(string)) {
                     doHighlight(offset, string.length(), fileSetting.getHighlightSettings());
                 }
             }

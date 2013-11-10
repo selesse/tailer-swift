@@ -18,8 +18,10 @@ public class FileMenu extends AbstractMenu {
     public FileMenu(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         menu = new JMenu("File");
+        menu.setName("Menu");
 
         fileDialog = new FileDialog(mainFrame.getFrame());
+        fileDialog.setName("File dialog");
 
         menu.add(createAddWatchedFileMenuItem());
         menu.add(createCloseCurrentFileMenuItem());
@@ -33,6 +35,7 @@ public class FileMenu extends AbstractMenu {
 
     private JMenuItem createAddWatchedFileMenuItem() {
         JMenuItem addWatchedFileMenuItem = new JMenuItem("Open/watch file...");
+        addWatchedFileMenuItem.setName("Open/watch file...");
         addWatchedFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         addWatchedFileMenuItem.addActionListener(new ActionListener() {

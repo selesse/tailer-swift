@@ -70,7 +70,7 @@ public class HighlightView extends FeatureView {
                 Color backgroundColor = backgroundColorChooser.getColor();
                 String highlightString = textField.getText();
 
-                FileSetting fileSetting = new FileSetting(highlightString, true, true, new HighlightSettings(foregroundColor, backgroundColor, false, false, false));
+                FileSetting fileSetting = new FileSetting(highlightString, false, true, new HighlightSettings(foregroundColor, backgroundColor, false, false, false));
                 highlight.addToHighlights(fileSetting);
             }
         });

@@ -1,5 +1,6 @@
 package com.selesse.tailerswift.gui;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.selesse.tailerswift.gui.filter.FilterResults;
@@ -9,6 +10,7 @@ import com.selesse.tailerswift.gui.view.MainFrameView;
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.settings.Settings;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
@@ -37,8 +39,13 @@ public class MainFrame implements Runnable {
 
     @Override
     public void run() {
-        loadSettings();
-        mainFrameView.initializeGui();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                loadSettings();
+                mainFrameView.initializeGui();
+            }
+        });
     }
 
     // Allows people to drag files from a file explorer into the program
@@ -101,7 +108,7 @@ public class MainFrame implements Runnable {
      */
     public void closeCurrentTab() {
         String focusedTabName = mainFrameView.getFocusedTabName();
-        if (focusedTabName != null) {
+        if (!Strings.isNullOrEmpty(focusedTabName)) {
             File file = new File(focusedTabName);
             Thread associatedThread = fileThreadMap.get(file.getAbsolutePath());
             associatedThread.interrupt();
@@ -114,7 +121,7 @@ public class MainFrame implements Runnable {
         }
     }
 
-    public void startWatching(File chosenFile) {
+    public synchronized void startWatching(File chosenFile) {
         if (watchedFiles.contains(chosenFile)) {
             mainFrameView.focusTabToAlreadyOpen(chosenFile);
             return;

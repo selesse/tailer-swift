@@ -30,7 +30,7 @@ public class FileSetting {
         return highlightSettings;
     }
 
-    public boolean matches(String matchString) {
+    public boolean matchesHighlight(String matchString) {
         if (matchString.trim().length() == 0) {
             return false;
         }
