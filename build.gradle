@@ -67,7 +67,7 @@ task proguard(type: JavaExec, dependsOn: jar) {
     main = 'proguard.ProGuard'
     args "-injars ${jar.archivePath}"
     args "-outjars ${outFile}"
-    args "-libraryjars ${System.properties['java.home']}/lib/rt.jar"
+    args "-libraryjars '${System.properties['java.home']}" + File.separator + "lib" + File.separator + "rt.jar'"
     args '-dontobfuscate'
     args '-dontoptimize'
     args '-keep public class org.slf4j.** { *; }'
