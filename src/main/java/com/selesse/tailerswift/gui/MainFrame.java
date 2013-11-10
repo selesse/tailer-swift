@@ -10,6 +10,7 @@ import com.selesse.tailerswift.gui.view.MainFrameView;
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.settings.Settings;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
@@ -38,8 +39,13 @@ public class MainFrame implements Runnable {
 
     @Override
     public void run() {
-        loadSettings();
-        mainFrameView.initializeGui();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                loadSettings();
+                mainFrameView.initializeGui();
+            }
+        });
     }
 
     // Allows people to drag files from a file explorer into the program
