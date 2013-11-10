@@ -27,7 +27,7 @@ Limitations
 -----------
 
 OS X `WatchService` implementation is currently polling-based and extremely
-slow. Support status can be found [here under "WatchService"](https://wikis.oracle.com/display/OpenJDK/Mac+OS+X+Port+Project+Status).
+slow. Support status can be found [here under "WatchService"](https://wiki.openjdk.java.net/display/MacOSXPort/Mac+OS+X+Port+Project+Status).
 
 License
 -------
