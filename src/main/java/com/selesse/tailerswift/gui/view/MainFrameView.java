@@ -216,7 +216,7 @@ public class MainFrameView {
         frame.setAlwaysOnTop(alwaysOnTop);
     }
 
-    public void addTab(File file) {
+    public synchronized void addTab(File file) {
         JTextComponent textComponent = createWatcherTextComponent();
 
         stringTextComponentMap.put(file.getAbsolutePath(), textComponent);
@@ -259,7 +259,7 @@ public class MainFrameView {
 
     public String getFocusedTabName() {
         if (watchedFileNames.isEmpty()) {
-            return null;
+            return "";
         }
         return watchedFileNames.get(tabbedPane.getSelectedIndex());
     }
@@ -343,7 +343,7 @@ public class MainFrameView {
         doHighlights();
     }
 
-    private void doHighlights() {
+    private synchronized void doHighlights() {
         if (isInitialized) {
             for (String filePaths : stringTextComponentMap.keySet()) {
                 JTextComponent textComponent = stringTextComponentMap.get(filePaths);

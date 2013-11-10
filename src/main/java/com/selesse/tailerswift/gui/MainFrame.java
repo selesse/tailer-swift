@@ -1,5 +1,6 @@
 package com.selesse.tailerswift.gui;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.selesse.tailerswift.gui.filter.FilterResults;
@@ -101,7 +102,7 @@ public class MainFrame implements Runnable {
      */
     public void closeCurrentTab() {
         String focusedTabName = mainFrameView.getFocusedTabName();
-        if (focusedTabName != null) {
+        if (!Strings.isNullOrEmpty(focusedTabName)) {
             File file = new File(focusedTabName);
             Thread associatedThread = fileThreadMap.get(file.getAbsolutePath());
             associatedThread.interrupt();
@@ -114,7 +115,7 @@ public class MainFrame implements Runnable {
         }
     }
 
-    public void startWatching(File chosenFile) {
+    public synchronized void startWatching(File chosenFile) {
         if (watchedFiles.contains(chosenFile)) {
             mainFrameView.focusTabToAlreadyOpen(chosenFile);
             return;
