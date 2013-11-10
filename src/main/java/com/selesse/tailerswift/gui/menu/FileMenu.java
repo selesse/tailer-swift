@@ -12,7 +12,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 
 public class FileMenu extends AbstractMenu {
-    private FileDialog fileDialog;
+    private JFileChooser fileChooser;
     private MainFrame mainFrame;
 
     public FileMenu(MainFrame mainFrame) {
@@ -20,8 +20,10 @@ public class FileMenu extends AbstractMenu {
         menu = new JMenu("File");
         menu.setName("Menu");
 
-        fileDialog = new FileDialog(mainFrame.getFrame());
-        fileDialog.setName("File dialog");
+        fileChooser = new JFileChooser();
+        fileChooser.setName("File chooser");
+        fileChooser.setMultiSelectionEnabled(true);
+        fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
 
         menu.add(createAddWatchedFileMenuItem());
         menu.add(createCloseCurrentFileMenuItem());
@@ -41,11 +43,12 @@ public class FileMenu extends AbstractMenu {
         addWatchedFileMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fileDialog.setVisible(true);
-                String chosenFileName = fileDialog.getFile();
-                if (chosenFileName != null) {
-                    File chosenFile = new File(fileDialog.getDirectory() + File.separator + chosenFileName);
-                    mainFrame.startWatching(chosenFile);
+                int returnStatus = fileChooser.showOpenDialog(mainFrame.getFrame());
+
+                if (returnStatus == JFileChooser.APPROVE_OPTION) {
+                    for (File file : fileChooser.getSelectedFiles()) {
+                        mainFrame.startWatching(file);
+                    }
                 }
             }
         });
@@ -55,6 +58,7 @@ public class FileMenu extends AbstractMenu {
 
     private JMenuItem createCloseCurrentFileMenuItem() {
         JMenuItem closeCurrentFileMenuItem = new JMenuItem("Close current file");
+        closeCurrentFileMenuItem.setName("Close current file");
         closeCurrentFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         closeCurrentFileMenuItem.addActionListener(new ActionListener() {
@@ -68,12 +72,13 @@ public class FileMenu extends AbstractMenu {
 
     private JMenuItem createExitMenuItem() {
         JMenuItem exitMenuItem = new JMenuItem("Exit");
+        exitMenuItem.setName("Exit");
         exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         exitMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.exit(1);
+                System.exit(0);
             }
         });
 

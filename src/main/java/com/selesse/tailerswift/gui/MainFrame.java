@@ -26,23 +26,20 @@ import java.util.Map;
  * to the user interface. Mostly, this implementation is in charge of handling the {@link Thread}s for files. This
  * implementation also delegates appropriate methods to the view.
  */
-public class MainFrame implements Runnable {
+public class MainFrame {
     private MainFrameView mainFrameView;
     private Map<String, Thread> fileThreadMap;
     private List<File> watchedFiles;
 
-    public MainFrame() {
+    public MainFrame(final Settings settings) {
         mainFrameView = new MainFrameView(this);
         fileThreadMap = Maps.newHashMap();
         watchedFiles = Lists.newArrayList();
-    }
 
-    @Override
-    public void run() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                loadSettings();
+                loadSettings(settings);
                 mainFrameView.initializeGui();
             }
         });
@@ -69,9 +66,8 @@ public class MainFrame implements Runnable {
         };
     }
 
-    private void loadSettings() {
+    private void loadSettings(Settings settings) {
         mainFrameView.getTabbedPane().setVisible(false);
-        Settings settings = Program.getInstance().getSettings();
         mainFrameView.setAlwaysOnTop(settings.isAlwaysOnTop());
         for (String filePath : settings.getAbsoluteFilePaths()) {
             File file = new File(filePath);

@@ -62,6 +62,7 @@ public class MainFrameView {
         // initialize UI components, but do not make them visible yet
         frame = new JFrame();
         tabbedPane = new JTabbedPane();
+        tabbedPane.setName("Tabbed pane");
         absoluteFilePathLabel = new JLabel();
 
         stringTextComponentMap = Maps.newHashMap();
