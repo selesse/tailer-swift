@@ -111,9 +111,9 @@ public class MainFrameTester {
         assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
 
         File tempDirectory = Files.newTemporaryFolder();
-        File tempFile = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "foo.txt");
-        File tempFile2 = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "bar");
-        File tempFile3 = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "temporaryFile");
+        File tempFile = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "foo");
+        File tempFile2 = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "foo2");
+        File tempFile3 = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "foo3");
         tempDirectory.deleteOnExit();
         tempFile.deleteOnExit();
         tempFile2.deleteOnExit();
