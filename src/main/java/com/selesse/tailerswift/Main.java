@@ -6,16 +6,14 @@ import com.selesse.tailerswift.gui.GuiTailerSwift;
 
 public class Main {
     public static void main(String[] args) {
-        Thread thread;
 
         // if there are args, command line version. otherwise, GUI
         if (args.length == 0) {
-            thread = new Thread(new GuiTailerSwift());
+            new GuiTailerSwift();
         }
         else {
-            thread = new Thread(new FileWatcher(new CliTailerSwift(), args[0]));
+            Thread thread = new Thread(new FileWatcher(new CliTailerSwift(), args[0]));
+            thread.start();
         }
-
-        thread.start();
     }
 }

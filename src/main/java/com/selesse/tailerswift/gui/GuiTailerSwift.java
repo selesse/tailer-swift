@@ -5,15 +5,12 @@ import com.selesse.tailerswift.settings.Program;
 
 import javax.swing.*;
 
-public class GuiTailerSwift implements Runnable {
+public class GuiTailerSwift {
     public GuiTailerSwift() {
         if (Program.getInstance().getOperatingSystem() == OperatingSystem.MAC) {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
-    }
 
-    @Override
-    public void run() {
         String lookAndFeel = UIManager.getSystemLookAndFeelClassName();
 
         try {

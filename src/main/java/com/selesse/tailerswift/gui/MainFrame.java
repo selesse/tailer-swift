@@ -9,6 +9,8 @@ import com.selesse.tailerswift.gui.search.SearchResults;
 import com.selesse.tailerswift.gui.view.MainFrameView;
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.settings.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,6 +29,8 @@ import java.util.Map;
  * implementation also delegates appropriate methods to the view.
  */
 public class MainFrame {
+    private static Logger logger = LoggerFactory.getLogger(MainFrame.class);
+
     private MainFrameView mainFrameView;
     private Map<String, Thread> fileThreadMap;
     private List<File> watchedFiles;
@@ -35,6 +39,7 @@ public class MainFrame {
         mainFrameView = new MainFrameView(this);
         fileThreadMap = Maps.newHashMap();
         watchedFiles = Lists.newArrayList();
+        logger.info("Main frame turn on");
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -67,11 +72,15 @@ public class MainFrame {
     }
 
     private void loadSettings(Settings settings) {
+        logger.info("Settings: Loading from settings");
+
         mainFrameView.getTabbedPane().setVisible(false);
         mainFrameView.setAlwaysOnTop(settings.isAlwaysOnTop());
+
         for (String filePath : settings.getAbsoluteFilePaths()) {
             File file = new File(filePath);
             startWatching(file);
+            logger.info("Settings: Resuming watch of {}", file.getAbsolutePath());
         }
 
         int focusedFileIndex = settings.getFocusedFileIndex();
@@ -79,6 +88,9 @@ public class MainFrame {
             mainFrameView.focusTabToAlreadyOpen(watchedFiles.get(focusedFileIndex));
         }
         mainFrameView.getTabbedPane().setVisible(true);
+
+        logger.info("Settings: Focusing on tab index {}", focusedFileIndex);
+        logger.info("Settings: Load complete");
     }
 
     public Collection<Thread> getAllThreads() {
@@ -117,21 +129,21 @@ public class MainFrame {
         }
     }
 
-    public synchronized void startWatching(File chosenFile) {
-        if (watchedFiles.contains(chosenFile)) {
-            mainFrameView.focusTabToAlreadyOpen(chosenFile);
+    public synchronized void startWatching(File file) {
+        if (watchedFiles.contains(file)) {
+            mainFrameView.focusTabToAlreadyOpen(file);
             return;
         }
         // create a new tab in the view for this file
-        mainFrameView.addTab(chosenFile);
+        mainFrameView.addTab(file);
 
         // initialize and start a thread to watch the file, add it to our thread map
-        Thread fileWatcherThread = new Thread(mainFrameView.createFileWatcherFor(chosenFile));
+        Thread fileWatcherThread = new Thread(mainFrameView.createFileWatcherFor(file));
         fileWatcherThread.start();
-        fileThreadMap.put(chosenFile.getAbsolutePath(), fileWatcherThread);
+        fileThreadMap.put(file.getAbsolutePath(), fileWatcherThread);
 
         // master list of watched files
-        watchedFiles.add(chosenFile);
+        watchedFiles.add(file);
 
         // add this new file to our settings
         updateSettings();

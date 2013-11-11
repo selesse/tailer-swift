@@ -1,6 +1,8 @@
 package com.selesse.tailerswift.gui.highlighting;
 
 import com.google.common.base.Splitter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.text.*;
 import java.util.List;
@@ -9,6 +11,7 @@ public class HighlightThread implements Runnable {
     private String currentText;
     private JTextComponent textComponent;
     private List<FileSetting> fileSettingList;
+    private static final Logger logger = LoggerFactory.getLogger(HighlightThread.class);
 
     public HighlightThread(JTextComponent textComponent, List<FileSetting> fileSettingsList) {
         this.currentText = textComponent.getText();
@@ -30,6 +33,8 @@ public class HighlightThread implements Runnable {
             }
             offset += string.length() + 1; // Assume "\n", which is length 1
         }
+
+        logger.info("Finished highlighting, file was {} bytes long", offset);
     }
 
     private void doHighlight(int offset, int highlightLength, HighlightSettings highlightSettings) {
