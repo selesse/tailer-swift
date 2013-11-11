@@ -11,7 +11,7 @@ Todo
 * Create cut "feature". Functionality equivalent of $(cut -f1 -d'|' $file).
 * Add global tabs for every "feature".
 * Don't overwrite settings for multiple instances?
-* Tests. :(
+* Tests. (work in progress)
 
 Bugs
 ====
@@ -38,3 +38,10 @@ Done
 * (Fixed) If you highlight a word, append it to an already-open file, it
   doesn't get highlighted (Nov 4 2013).
 * Smoothen GUI initialization (Nov 4 2013).
+* Our jars are now on a diet. Thanks, Proguard! (in other words: Proguard
+  support) (Nov 9 2013).
+* Use logback + slf4j. Might only use this for debugging (Nov 9 2013).
+* Add FEST, and our first unit test. This took way too long, sorry! (Nov 9
+  2013)
+* Make "release" depend on tests and Proguard. This means that whenever we do
+  a release, our jar will be skinny and pass all the tests. (Nov 10 2013)

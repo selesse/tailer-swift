@@ -8,20 +8,38 @@ regular-expression support.
 Installation
 ------------
 
-1. Clone this repository.
-2. Type `gradle`.
+1. Make sure Java 7+ is installed.
+2. Clone this repository.
+3. Run the Gradle wrapper. On Windows, `gradlew.bat`. On anything else,
+   run `gradlew`. The Gradle wrapper will install Gradle; Gradle will then
+   install all the dependencies.
 
 Requirements
 ------------
 
-[Gradle](http://gradle.org) is required to build the code.
+Java 7+ needs to be installed. Everything else will be handled by the Gradle
+wrapper. The following libraries are used:
 
   * [Guava](https://code.google.com/p/guava-libraries/)
+  * [SLF4J](http://www.slf4j.org/)
+  * [Logback](http://logback.qos.ch/)
+
+For testing, the following libraries are used:
+
+  * [FEST swing](https://code.google.com/p/fest/)
+  * [JUnit](http://junit.org/)
+
+For releases, our fat jar is slimmed with [Proguard](http://proguard.sourceforge.net/).
 
 Building the Code
 -----------------
 
-To build the code, run `gradle`.
+To build the code, run the Gradle wrapper. See the installation section.
+
+Todo
+----
+
+See [here](TODO.md).
 
 Limitations
 -----------
