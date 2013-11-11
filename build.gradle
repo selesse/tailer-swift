@@ -80,4 +80,4 @@ task proguard(type: JavaExec, dependsOn: jar) {
     args '-dontnote ch.qos.**'
 }
 
-tasks.getByPath(':release').dependsOn(proguard)
+tasks.getByPath(':release').dependsOn(proguard, "check")
