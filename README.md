@@ -26,7 +26,7 @@ wrapper. The following libraries are used:
 
 For testing, the following libraries are used:
 
-  * [FEST swing](https://code.google.com/p/fest/)
+  * [FEST Swing](https://code.google.com/p/fest/)
   * [JUnit](http://junit.org/)
 
 For releases, our fat jar is slimmed with [Proguard](http://proguard.sourceforge.net/).
