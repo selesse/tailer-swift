@@ -22,6 +22,7 @@ public class WindowMenu extends AbstractMenu {
     private JCheckBoxMenuItem createAlwaysOnTopMenuItem() {
         Settings settings = Program.getInstance().getSettings();
         JCheckBoxMenuItem alwaysOnTopMenuItem = new JCheckBoxMenuItem("Always on top", settings.isAlwaysOnTop());
+        alwaysOnTopMenuItem.setName("Always on top");
         alwaysOnTopMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         alwaysOnTopMenuItem.addActionListener(new ActionListener() {

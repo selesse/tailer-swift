@@ -1,5 +1,6 @@
 package com.selesse.tailerswift.gui.view;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
@@ -28,17 +29,17 @@ import com.selesse.tailerswift.gui.section.Feature;
 import com.selesse.tailerswift.gui.section.FeaturePanel;
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
+import javax.swing.text.*;
 import java.awt.*;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,7 @@ public class MainFrameView {
     private MainFrame mainFrame;
     private List<FileSetting> fileSettings;
     private boolean isInitialized = false;
+    private static final Logger logger = LoggerFactory.getLogger(MainFrameView.class);
 
     public MainFrameView(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
@@ -254,7 +256,7 @@ public class MainFrameView {
             tabbedPane.setSelectedIndex(fileIndex);
         }
         else {
-            System.err.println("Error, got -1 file index for " + chosenFile.getAbsolutePath());
+            logger.error("Error, got -1 file index for {}", chosenFile.getAbsolutePath());
         }
     }
 
@@ -270,19 +272,51 @@ public class MainFrameView {
             private StringBuilder stringBuilder = new StringBuilder();
 
             @Override
-            public void updateFile(Path observedPath, String modificationString) {
+            public void updateFile(Path observedPath, final String modificationString) {
+                // TODO fix the real issue
+                if (Strings.isNullOrEmpty(modificationString)) {
+                    return;
+                }
+                logger.debug("Updating {} with {} bytes of data", observedPath.toFile().getAbsolutePath(),
+                        modificationString.length());
                 String absolutePath = observedPath.toFile().getAbsolutePath();
 
                 JTextComponent textComponent = stringTextComponentMap.get(absolutePath);
 
-                stringBuilder.append(modificationString);
-                textComponent.setText(stringBuilder.toString());
+                if (textComponent instanceof JTextPane) {
+                    JTextPane textPane = (JTextPane) textComponent;
+                    final StyledDocument styledDocument = textPane.getStyledDocument();
 
-                doHighlights();
+                    logger.info("Manipulating the document directly");
+
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    styledDocument.insertString(styledDocument.getLength(), modificationString, null);
+                                } catch (BadLocationException e) {
+                                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                                }
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
+
+                }
+                else {
+                    stringBuilder.append(modificationString);
+                    textComponent.setText(stringBuilder.toString());
+                }
+
+                doHighlightFor(observedPath.toFile());
 
                 int fileIndex = watchedFileNames.indexOf(absolutePath);
                 if (fileIndex != getFocusedTabIndex()) {
-                    showModificationHint(fileIndex, observedPath.toFile().getName());
+                    showModificationHint(fileIndex, observedPath.toFile());
                 }
             }
 
@@ -295,7 +329,7 @@ public class MainFrameView {
                 stringBuilder.append(modificationString);
                 textComponent.setText(stringBuilder.toString());
 
-                doHighlights();
+                doHighlightFor(observedPath.toFile());
             }
 
             @Override
@@ -326,9 +360,10 @@ public class MainFrameView {
         }
     }
 
-    private void showModificationHint(int index, String name) {
+    private void showModificationHint(int index, File name) {
         if (isInitialized) {
-            tabbedPane.setTitleAt(index, "* " + name);
+            logger.info("Showing modification hint for {}", name.getAbsolutePath());
+            tabbedPane.setTitleAt(index, "* " + name.getName());
         }
     }
 
@@ -341,17 +376,33 @@ public class MainFrameView {
 
     public void addAndDoHighlight(FileSetting fileSetting) {
         fileSettings.add(fileSetting);
-        doHighlights();
+        doHighlightFor(new File(fileSetting.getAssociatedFile()));
     }
 
-    private synchronized void doHighlights() {
+    private synchronized void doHighlightFor(File file) {
         if (isInitialized) {
-            for (String filePaths : stringTextComponentMap.keySet()) {
-                JTextComponent textComponent = stringTextComponentMap.get(filePaths);
+            JTextComponent textComponent = stringTextComponentMap.get(file.getAbsolutePath());
 
+            boolean fileShouldBeHighlighted = false;
+            for (FileSetting fileSetting : fileSettings) {
+                if (fileSetting.getAssociatedFile().equals(file.getAbsolutePath())) {
+                    fileShouldBeHighlighted = true;
+                    break;
+                }
+            }
+            if (fileShouldBeHighlighted) {
+                logger.info("Starting highlight thread for {}", file.getAbsolutePath());
                 Thread highlightThread = new Thread(new HighlightThread(textComponent, fileSettings));
                 highlightThread.start();
             }
+        }
+    }
+
+
+    private synchronized void doHighlights() {
+        logger.info("Making all the watched files perform the highlights");
+        for (String filePaths : stringTextComponentMap.keySet()) {
+            doHighlightFor(new File(filePaths));
         }
     }
 
@@ -426,5 +477,9 @@ public class MainFrameView {
         }
 
         return filterResults;
+    }
+
+    public boolean isAlwaysOnTop() {
+        return frame.isAlwaysOnTop();
     }
 }

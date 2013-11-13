@@ -2,8 +2,8 @@ tailer-swift
 ============
 
 tailer-swift is a cross-platform GUI specialization of the popular tail
-utility. Highlights include easy highlighting, filtering and
-regular-expression support.
+utility. Notable features include easy highlighting, filtering and regex
+search. Settings are stored globally and on a per-file basis.
 
 Installation
 ------------
@@ -26,7 +26,7 @@ wrapper. The following libraries are used:
 
 For testing, the following libraries are used:
 
-  * [FEST swing](https://code.google.com/p/fest/)
+  * [FEST Swing](https://code.google.com/p/fest/)
   * [JUnit](http://junit.org/)
 
 For releases, our fat jar is slimmed with [Proguard](http://proguard.sourceforge.net/).
@@ -44,8 +44,8 @@ See [here](TODO.md).
 Limitations
 -----------
 
-OS X `WatchService` implementation is currently polling-based and extremely
-slow. Support status can be found [here under "WatchService"](https://wiki.openjdk.java.net/display/MacOSXPort/Mac+OS+X+Port+Project+Status).
+OS X `WatchService` implementation is currently poll-based and can be
+noticeably slow. Support status can be found [here under "WatchService"](https://wiki.openjdk.java.net/display/MacOSXPort/Mac+OS+X+Port+Project+Status).
 
 License
 -------

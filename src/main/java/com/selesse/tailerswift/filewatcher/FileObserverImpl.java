@@ -9,7 +9,7 @@ public class FileObserverImpl implements FileObserver {
     private long bufferedFileSize;
     private File observedFile;
     private BufferedReader bufferedReader;
-    private final int CHUNK_SIZE = 1024;
+    private final int CHUNK_SIZE = 1024 * 5;
 
     public FileObserverImpl(File observedFile) {
         this.observedFile = observedFile;

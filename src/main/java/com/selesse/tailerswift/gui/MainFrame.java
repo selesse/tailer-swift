@@ -44,7 +44,7 @@ public class MainFrame {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                loadSettings(settings);
+                loadUISettings(settings);
                 mainFrameView.initializeGui();
             }
         });
@@ -61,6 +61,7 @@ public class MainFrame {
                     List<File> droppedFiles = (List<File>)
                             event.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
                     for (File file : droppedFiles) {
+                        logger.info("File " + file.getAbsolutePath() + " was drag and dropped into the app");
                         startWatching(file);
                     }
                 } catch (Exception e) {
@@ -71,8 +72,8 @@ public class MainFrame {
         };
     }
 
-    private void loadSettings(Settings settings) {
-        logger.info("Settings: Loading from settings");
+    private void loadUISettings(Settings settings) {
+        logger.debug("Settings: Loading from settings");
 
         mainFrameView.getTabbedPane().setVisible(false);
         mainFrameView.setAlwaysOnTop(settings.isAlwaysOnTop());
@@ -90,7 +91,7 @@ public class MainFrame {
         mainFrameView.getTabbedPane().setVisible(true);
 
         logger.info("Settings: Focusing on tab index {}", focusedFileIndex);
-        logger.info("Settings: Load complete");
+        logger.debug("Settings: Load complete");
     }
 
     public Collection<Thread> getAllThreads() {
@@ -106,8 +107,9 @@ public class MainFrame {
     }
 
     public void toggleAlwaysOnTop() {
+        logger.info("Setting always on top to " + !mainFrameView.isAlwaysOnTop());
         mainFrameView.toggleAlwaysOnTop();
-        Program.getInstance().getSettings().setAlwaysOnTop(mainFrameView.getFrame().isAlwaysOnTop());
+        Program.getInstance().getSettings().setAlwaysOnTop(mainFrameView.isAlwaysOnTop());
     }
 
     /**
@@ -116,6 +118,7 @@ public class MainFrame {
      */
     public void closeCurrentTab() {
         String focusedTabName = mainFrameView.getFocusedTabName();
+        logger.info("Closing file " + focusedTabName);
         if (!Strings.isNullOrEmpty(focusedTabName)) {
             File file = new File(focusedTabName);
             Thread associatedThread = fileThreadMap.get(file.getAbsolutePath());
@@ -131,9 +134,11 @@ public class MainFrame {
 
     public synchronized void startWatching(File file) {
         if (watchedFiles.contains(file)) {
+            logger.info("Focusing already open " + file.getAbsolutePath());
             mainFrameView.focusTabToAlreadyOpen(file);
             return;
         }
+        logger.info("Starting to watch " + file.getAbsolutePath());
         // create a new tab in the view for this file
         mainFrameView.addTab(file);
 
@@ -150,6 +155,7 @@ public class MainFrame {
     }
 
     public void setFont(Font font) {
+        logger.info("Setting font to " + font);
         Program.getInstance().getSettings().setDisplayFont(font);
         mainFrameView.setFont(font);
     }
@@ -164,5 +170,9 @@ public class MainFrame {
 
     public FilterResults filter(String text) {
         return mainFrameView.filter(text);
+    }
+
+    public String getFocusedFile() {
+        return watchedFiles.get(mainFrameView.getFocusedTabIndex()).getAbsolutePath();
     }
 }

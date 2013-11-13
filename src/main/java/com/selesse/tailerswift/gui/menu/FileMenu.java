@@ -3,6 +3,8 @@ package com.selesse.tailerswift.gui.menu;
 import com.selesse.tailerswift.gui.MainFrame;
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +16,7 @@ import java.io.File;
 public class FileMenu extends AbstractMenu {
     private JFileChooser fileChooser;
     private MainFrame mainFrame;
+    private static Logger logger = LoggerFactory.getLogger(FileMenu.class);
 
     public FileMenu(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
