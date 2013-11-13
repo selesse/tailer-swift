@@ -13,7 +13,6 @@ public class FileWatcher implements Runnable {
     private WatchService watcher;
     private Path observedDirectory;
     private Path observedFilePath;
-    private WatchKey key;
     private FileObserver fileObserver;
     private long lastObservedFileSize;
 
@@ -42,7 +41,7 @@ public class FileWatcher implements Runnable {
 
     private void registerFilesParentDirectory() {
         try {
-            key = observedDirectory.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+            observedDirectory.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
         } catch (IOException e) {
             System.out.println("Error registering directory '" + observedDirectory.toAbsolutePath() + "'");
             e.printStackTrace();
@@ -140,13 +139,5 @@ public class FileWatcher implements Runnable {
     @SuppressWarnings("unchecked")
     private static <T> WatchEvent<T> cast(WatchEvent<?> event) {
         return (WatchEvent<T>) event;
-    }
-
-    public Path getPath() {
-        return observedDirectory;
-    }
-
-    public WatchKey getKey() {
-        return key;
     }
 }

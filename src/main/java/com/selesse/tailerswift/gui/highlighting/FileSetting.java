@@ -5,13 +5,16 @@ public class FileSetting {
     private final boolean isIgnoreCase;
     private final boolean contains;
     private final HighlightSettings highlightSettings;
+    private final String associatedFile;
 
     // TODO make this static constructor builder pattern
-    public FileSetting(String string, boolean isIgnoreCase, boolean contains, HighlightSettings highlightSettings) {
+    public FileSetting(String string, boolean isIgnoreCase, boolean contains, HighlightSettings highlightSettings,
+                       String associatedFile) {
         this.string = string;
         this.isIgnoreCase = isIgnoreCase;
         this.contains = contains;
         this.highlightSettings = highlightSettings;
+        this.associatedFile = associatedFile;
     }
 
     public String getString() {
@@ -41,6 +44,13 @@ public class FileSetting {
         else if (isIgnoreCase()) {
             return matchString.toLowerCase().equals(string.toLowerCase());
         }
+        else if (isContains()) {
+            return matchString.contains(string);
+        }
         return matchString.equals(string);
+    }
+
+    public String getAssociatedFile() {
+        return associatedFile;
     }
 }

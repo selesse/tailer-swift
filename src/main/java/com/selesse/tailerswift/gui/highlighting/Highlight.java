@@ -21,4 +21,8 @@ public class Highlight extends AbstractFeature {
     public void addToHighlights(FileSetting fileSetting) {
         mainFrame.addHighlight(fileSetting);
     }
+
+    public String getFocusedFile() {
+        return mainFrame.getFocusedFile();
+    }
 }

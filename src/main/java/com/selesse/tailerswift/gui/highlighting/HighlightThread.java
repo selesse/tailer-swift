@@ -24,17 +24,18 @@ public class HighlightThread implements Runnable {
         // \r?\n is important: it makes this program line-ending agnostic
         Iterable<String> strings = Splitter.onPattern("\r?\n").split(currentText);
 
-        int offset = 0;
+        int offset = 0, numberOfMatches = 0;
         for (String string : strings) {
             for (FileSetting fileSetting : fileSettingList) {
                 if (fileSetting.matchesHighlight(string)) {
                     doHighlight(offset, string.length(), fileSetting.getHighlightSettings());
+                    numberOfMatches++;
                 }
             }
             offset += string.length() + 1; // Assume "\n", which is length 1
         }
 
-        logger.info("Finished highlighting, file was {} bytes long", offset);
+        logger.info("Finished highlighting, found {} matches, file was {} bytes long", numberOfMatches, offset);
     }
 
     private void doHighlight(int offset, int highlightLength, HighlightSettings highlightSettings) {
