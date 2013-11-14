@@ -1,5 +1,6 @@
 package com.selesse.tailerswift.gui;
 
+import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.settings.Settings;
 import org.fest.swing.edt.GuiActionRunner;
 import org.fest.swing.edt.GuiQuery;
@@ -16,6 +17,9 @@ public class AbstractMainFrameTester {
     }
 
     protected void startFrameWithSettings(final Settings settings) {
+        settings.setTest(true);
+        Program.getInstance().setSettings(settings);
+
         MainFrame testFrame = GuiActionRunner.execute(new GuiQuery<MainFrame>() {
             @Override
             protected MainFrame executeInEDT() throws Throwable {

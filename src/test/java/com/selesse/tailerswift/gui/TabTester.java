@@ -2,14 +2,34 @@ package com.selesse.tailerswift.gui;
 
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
+import org.fest.swing.data.Index;
 import org.fest.util.Files;
 import org.junit.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Arrays;
 
 import static org.junit.Assume.assumeTrue;
 
 public class TabTester extends AbstractMainFrameTester {
+    private File tempDirectory;
+    private File tempFile;
+    private File tempFile2;
+    private File tempFile3;
+
+    private void createThreeTempFiles() {
+        tempDirectory = Files.newTemporaryFolder();
+        tempFile = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "foo");
+        tempFile2 = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "foo2");
+        tempFile3 = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "foo3");
+        tempDirectory.deleteOnExit();
+        tempFile.deleteOnExit();
+        tempFile2.deleteOnExit();
+        tempFile3.deleteOnExit();
+    }
+
     @Test
     public void testOpeningAFileCreatesProperTabTitle() {
         // For some reason, on OS X, "approve"ing the file below throws an exception
@@ -18,11 +38,11 @@ public class TabTester extends AbstractMainFrameTester {
         // set up the temp directory and file for the test
         File tempDirectory = Files.newTemporaryFolder();
         File tempFile = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "temp.txt");
-        tempDirectory.deleteOnExit();
         tempFile.deleteOnExit();
+        tempDirectory.deleteOnExit();
 
         window.menuItem("Open/watch file...").click();
-        window.fileChooser("File chooser").setCurrentDirectory(Files.newTemporaryFolder());
+        window.fileChooser("File chooser").setCurrentDirectory(tempDirectory);
         window.fileChooser("File chooser").selectFile(tempFile);
         window.fileChooser("File chooser").approve();
 
@@ -35,21 +55,149 @@ public class TabTester extends AbstractMainFrameTester {
         // For some reason, on OS X, "approve"ing the files below throws an exception
         assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
 
-        File tempDirectory = Files.newTemporaryFolder();
-        File tempFile = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "foo");
-        File tempFile2 = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "foo2");
-        File tempFile3 = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "foo3");
-        tempDirectory.deleteOnExit();
-        tempFile.deleteOnExit();
-        tempFile2.deleteOnExit();
-        tempFile3.deleteOnExit();
-
-        window.menuItem("Open/watch file...").click();
-        window.fileChooser("File chooser").setCurrentDirectory(Files.newTemporaryFolder());
-        window.fileChooser("File chooser").selectFiles(tempFile, tempFile2, tempFile3);
-        window.fileChooser("File chooser").approve();
+        createThreeTempFiles();
+        simulateChoosingThreeTempFiles();
 
         window.tabbedPane("Tabbed pane").requireVisible();
         window.tabbedPane("Tabbed pane").requireTabTitles(tempFile.getName(), tempFile2.getName(), tempFile3.getName());
+    }
+
+    @Test
+    public void testClosingMiddleTabPreservesTitleHistory() {
+        // For some reason, on OS X, "approve"ing the files below throws an exception
+        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
+
+        createThreeTempFiles();
+        simulateChoosingThreeTempFiles();
+
+        String[] assumedTabTitles = new String[] { tempFile.getName(), tempFile2.getName(), tempFile3.getName() };
+        assumeTrue(Arrays.deepEquals(window.tabbedPane("Tabbed pane").tabTitles(), assumedTabTitles));
+
+        window.tabbedPane("Tabbed pane").selectTab(1);
+        window.menuItem("Close current file").click();
+
+        window.tabbedPane("Tabbed pane").requireTabTitles(tempFile.getName(), tempFile3.getName());
+    }
+
+    @Test
+    public void testClosingLastTabPreservesTitleHistory() {
+        // For some reason, on OS X, "approve"ing the files below throws an exception
+        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
+
+        createThreeTempFiles();
+
+        simulateChoosingThreeTempFiles();
+
+        String[] assumedTabTitles = new String[] { tempFile.getName(), tempFile2.getName(), tempFile3.getName() };
+        assumeTrue(Arrays.deepEquals(window.tabbedPane("Tabbed pane").tabTitles(), assumedTabTitles));
+
+        window.tabbedPane("Tabbed pane").selectTab(2);
+        window.menuItem("Close current file").click();
+
+        window.tabbedPane("Tabbed pane").requireTabTitles(tempFile.getName(), tempFile2.getName());
+    }
+
+    @Test
+    public void testClosingFirstTabPreservesTitleHistory() {
+        // For some reason, on OS X, "approve"ing the files below throws an exception
+        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
+
+        createThreeTempFiles();
+
+        simulateChoosingThreeTempFiles();
+
+        String[] assumedTabTitles = new String[] { tempFile.getName(), tempFile2.getName(), tempFile3.getName() };
+        assumeTrue(Arrays.deepEquals(window.tabbedPane("Tabbed pane").tabTitles(), assumedTabTitles));
+
+        window.tabbedPane("Tabbed pane").selectTab(0);
+        window.menuItem("Close current file").click();
+
+        window.tabbedPane("Tabbed pane").requireTabTitles(tempFile2.getName(), tempFile3.getName());
+    }
+
+    @Test
+    public void testTitleChangesWhenContentIsAdded() throws FileNotFoundException, InterruptedException {
+        // For some reason, on OS X, "approve"ing the files below throws an exception
+        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
+
+        File tempWriteDirectory = Files.newTemporaryFolder();
+        File tempWriteFile = Files.newFile(tempWriteDirectory.getAbsolutePath() + File.separator + "zzz");
+
+        createThreeTempFiles();
+
+        simulateChoosingThreeTempFiles();
+        simulateChoosingThreeTempFiles();
+
+        window.menuItem("Open/watch file...").click();
+        window.fileChooser("File chooser").setCurrentDirectory(tempWriteDirectory);
+        window.fileChooser("File chooser").selectFile(tempWriteFile);
+        window.fileChooser("File chooser").approve();
+
+        window.tabbedPane("Tabbed pane").requireTabTitles(tempFile.getName(), tempFile2.getName(), tempFile3.getName(),
+                tempWriteFile.getName());
+
+        window.tabbedPane("Tabbed pane").selectTab(3);
+        Thread.sleep(100);
+        window.tabbedPane("Tabbed pane").selectTab(0);
+
+        PrintWriter printWriter = new PrintWriter(tempWriteFile);
+        printWriter.println("Hello, world!");
+        printWriter.flush();
+        printWriter.close();
+
+        threadSleepBasedOnOperatingSystem();
+
+        window.tabbedPane("Tabbed pane").requireTabTitles(tempFile.getName(), tempFile2.getName(), tempFile3.getName(),
+                "* " + tempWriteFile.getName());
+    }
+
+    private void simulateChoosingThreeTempFiles() {
+        window.menuItem("Open/watch file...").click();
+        window.fileChooser("File chooser").setCurrentDirectory(tempDirectory);
+        window.fileChooser("File chooser").selectFiles(tempFile, tempFile2, tempFile3);
+        window.fileChooser("File chooser").approve();
+    }
+
+    @Test
+    public void testModificationHintDisappearsProperly() throws FileNotFoundException, InterruptedException {
+        // We choose 3 (empty) temp files
+        createThreeTempFiles();
+        simulateChoosingThreeTempFiles();
+
+        window.tabbedPane("Tabbed pane").selectTab(0);
+
+        // While we write to the first tab, we don't expect the title to change
+        PrintWriter printWriter = new PrintWriter(tempFile);
+        printWriter.println("hello, world!");
+        printWriter.flush();
+
+        window.tabbedPane("Tabbed pane").selectTab(0);
+        window.tabbedPane("Tabbed pane").requireTitle(tempFile.getName(), Index.atIndex(0));
+
+        // Move to another tab, write to the first tab
+        window.tabbedPane("Tabbed pane").selectTab(1);
+        threadSleepBasedOnOperatingSystem();
+        printWriter.println("Give me attention");
+        printWriter.flush();
+        printWriter.close();
+
+        threadSleepBasedOnOperatingSystem();
+
+        // The first tab should now have the modification hint
+        window.tabbedPane("Tabbed pane").requireTitle("* " + tempFile.getName(), Index.atIndex(0));
+
+        // And once we focus it, it should go away
+        window.tabbedPane("Tabbed pane").selectTab(0);
+        threadSleepBasedOnOperatingSystem();
+        window.tabbedPane("Tabbed pane").requireTitle(tempFile.getName(), Index.atIndex(0));
+    }
+
+    private void threadSleepBasedOnOperatingSystem() throws InterruptedException {
+        if (Program.getInstance().getOperatingSystem() == OperatingSystem.MAC) {
+            Thread.sleep(2000);
+        }
+        else {
+            Thread.sleep(250);
+        }
     }
 }

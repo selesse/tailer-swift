@@ -70,6 +70,10 @@ public class Program {
         return "Tailer Swift";
     }
 
+    public void setSettings(Settings settings) {
+        this.settings = settings;
+    }
+
     public Settings getSettings() {
         return settings;
     }

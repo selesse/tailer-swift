@@ -80,8 +80,10 @@ public class MainFrameView {
             @Override
             public void run() {
                 Program program = Program.getInstance();
-                program.getSettings().setFocusedFileIndex(getFocusedTabIndex());
-                program.saveSettings();
+                if (!program.getSettings().isTest()) {
+                    program.getSettings().setFocusedFileIndex(getFocusedTabIndex());
+                    program.saveSettings();
+                }
             }
         });
     }
@@ -104,12 +106,6 @@ public class MainFrameView {
                 if (selectedIndex != -1) {
                     absoluteFilePathLabel.setText(watchedFileNames.get(selectedIndex));
                 }
-            }
-        });
-        tabbedPane.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent e) {
                 normalizeTabTitle();
             }
         });
@@ -348,7 +344,7 @@ public class MainFrameView {
      */
     private void normalizeTabTitle() {
         int index = tabbedPane.getSelectedIndex();
-        if (index > 0) {
+        if (index >= 0) {
             File file = new File(watchedFileNames.get(index));
 
             String currentTitle = tabbedPane.getTitleAt(index);

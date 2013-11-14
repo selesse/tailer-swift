@@ -11,10 +11,14 @@ public class Settings implements Serializable {
     private boolean isAlwaysOnTop;
     private List<String> absoluteFilePaths;
     private Font displayFont;
-    private int focusedFileIndex = -1;
+    private int focusedFileIndex;
+
+    private transient boolean isTest;
 
     public Settings() {
         this.isAlwaysOnTop = false;
+        this.focusedFileIndex = -1;
+        this.isTest = false;
         absoluteFilePaths = Lists.newArrayList();
     }
 
@@ -55,4 +59,13 @@ public class Settings implements Serializable {
     public void setFocusedFileIndex(int focusedFileIndex) {
         this.focusedFileIndex = focusedFileIndex;
     }
+
+    public boolean isTest() {
+        return isTest;
+    }
+
+    public void setTest(boolean test) {
+        isTest = test;
+    }
+
 }

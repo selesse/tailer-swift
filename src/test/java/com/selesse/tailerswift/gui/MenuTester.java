@@ -71,8 +71,7 @@ public class MenuTester extends AbstractMainFrameTester {
         KeyPressInfo keyPressInfo = KeyPressInfo.keyCode(KeyEvent.VK_F1);
         window.pressAndReleaseKey(keyPressInfo);
 
-        Robot robot = BasicRobot.robotWithCurrentAwtHierarchy();
-        FrameFixture aboutFrame = WindowFinder.findFrame("About").using(robot);
+        FrameFixture aboutFrame = WindowFinder.findFrame("About").using(window.robot);
         aboutFrame.requireVisible();
     }
 
@@ -80,15 +79,13 @@ public class MenuTester extends AbstractMainFrameTester {
     public void testClickingOnAboutBringsUpAbout() {
         window.menuItem("About").click();
 
-        Robot robot = BasicRobot.robotWithCurrentAwtHierarchy();
-        FrameFixture aboutFrame = WindowFinder.findFrame("About").using(robot);
+        FrameFixture aboutFrame = WindowFinder.findFrame("About").using(window.robot);
         aboutFrame.requireVisible();
     }
 
     @Test
     public void testClickingOnAlwaysOnTopTogglesIt() {
         boolean isSetToAlwaysOnTop = Program.getInstance().getSettings().isAlwaysOnTop();
-        System.err.println("right now, always on top is " + isSetToAlwaysOnTop);
 
         window.menuItem(new GenericTypeMatcher<JMenuItem>(JMenuItem.class) {
             @Override
@@ -97,7 +94,6 @@ public class MenuTester extends AbstractMainFrameTester {
             }
         }).click();
 
-        System.err.println("now, always on top is " + Program.getInstance().getSettings().isAlwaysOnTop());
         assertTrue(isSetToAlwaysOnTop != Program.getInstance().getSettings().isAlwaysOnTop());
     }
 
