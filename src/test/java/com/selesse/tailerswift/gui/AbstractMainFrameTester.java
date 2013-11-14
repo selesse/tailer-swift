@@ -1,5 +1,6 @@
 package com.selesse.tailerswift.gui;
 
+import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.settings.Settings;
 import org.fest.swing.edt.GuiActionRunner;
@@ -8,11 +9,14 @@ import org.fest.swing.fixture.FrameFixture;
 import org.junit.After;
 import org.junit.Before;
 
+import static org.junit.Assume.assumeTrue;
+
 public class AbstractMainFrameTester {
     protected FrameFixture window;
 
     @Before
     public void setup() {
+        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
         startFrameWithSettings(new Settings());
     }
 

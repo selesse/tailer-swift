@@ -1,16 +1,20 @@
 package com.selesse.tailerswift.gui;
 
+import com.selesse.tailerswift.settings.OperatingSystem;
+import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.settings.Settings;
 import org.junit.Test;
 
 import javax.swing.*;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 public class MainFrameTester extends AbstractMainFrameTester {
     @Override
     public void setup() {
         // do nothing to prevent default behavior
+        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
     }
 
     @Test
