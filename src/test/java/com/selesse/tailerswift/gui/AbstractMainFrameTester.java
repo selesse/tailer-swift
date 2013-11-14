@@ -37,7 +37,9 @@ public class AbstractMainFrameTester {
 
     @After
     public void tearDown() {
-        window.cleanUp();
+        if (window != null) {
+            window.cleanUp();
+        }
     }
 
 }
