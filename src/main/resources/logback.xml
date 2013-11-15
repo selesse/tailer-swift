@@ -10,7 +10,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.selesse.tailerswift" level="INFO" additivity="false">
+    <logger name="com.selesse.tailerswift" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
