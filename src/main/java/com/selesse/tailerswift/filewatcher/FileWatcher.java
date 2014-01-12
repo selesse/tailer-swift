@@ -128,7 +128,6 @@ public class FileWatcher implements Runnable {
         updateFile(ui);
     }
 
-
     public void updateFile(UserInterface ui) {
         String modification;
         while ((modification = fileObserver.onModify()) != null) {
