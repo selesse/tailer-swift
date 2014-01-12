@@ -7,7 +7,6 @@ import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -16,6 +15,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 
 public class FileWatcherTester {
     private File testDirectory;
@@ -49,9 +49,9 @@ public class FileWatcherTester {
         assertEquals("This is a stupid file", testUi.getBufferContents());
     }
 
-    @Ignore("This fails when run via command line/Gradle, but passes when run through IntelliJ's test runner")
     @Test
     public void testCanWatchNonExistentFile() {
+        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
         String filename = "" + System.currentTimeMillis();
         File tempFile = new File(testDirectory.getAbsolutePath() + File.separator + filename);
         tempFile.deleteOnExit();
