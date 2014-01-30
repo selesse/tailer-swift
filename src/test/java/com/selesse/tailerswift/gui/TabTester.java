@@ -4,7 +4,7 @@ import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
 import org.fest.swing.data.Index;
 import org.fest.util.Files;
-import org.junit.*;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
