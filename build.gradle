@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-  compile 'com.google.guava:guava:15.0'
+  compile 'com.google.guava:guava:16.0'
   compile 'org.slf4j:slf4j-api:1.7.5'
   compile 'ch.qos.logback:logback-classic:1.0.13'
   compile 'ch.qos.logback:logback-core:1.0.13'
@@ -28,7 +28,7 @@ dependencies {
   testCompile 'org.easytesting:fest-swing-junit-4.5:1.2.1'
   testCompile 'junit:junit:4.11'
 
-  proguard 'net.sf.proguard:proguard-base:4.10'
+  proguard 'net.sf.proguard:proguard-base:4.11'
 }
 
 clean.doLast {
