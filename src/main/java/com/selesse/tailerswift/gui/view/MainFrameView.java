@@ -515,9 +515,13 @@ public class MainFrameView {
     }
 
     private class AboutListener implements InvocationHandler {
+        private JFrame aboutFrame;
+
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            AboutFrame aboutFrame = new AboutFrame();
+            if (aboutFrame == null) {
+                aboutFrame = new AboutFrame();
+            }
             aboutFrame.setVisible(true);
 
             return null;
