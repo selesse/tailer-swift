@@ -39,7 +39,10 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.*;
 import java.awt.*;
 import java.io.File;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +77,9 @@ public class MainFrameView {
         // if we setIconImage in OS X, it throws some command line errors, so let's not try this on a Mac
         if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
             frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Resources.getResource("icon.png")));
+        }
+        else {
+            doAppleSpecificUiCustomizations();
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -296,10 +302,8 @@ public class MainFrameView {
                                 }
                             }
                         });
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    } catch (InterruptedException | InvocationTargetException e) {
+                        e.printStackTrace();
                     }
 
                 }
@@ -477,5 +481,46 @@ public class MainFrameView {
 
     public boolean isAlwaysOnTop() {
         return frame.isAlwaysOnTop();
+    }
+
+    private void doAppleSpecificUiCustomizations() {
+        // Use reflection because we want to compile under 1 source. :(
+        Image image = Toolkit.getDefaultToolkit().createImage(Resources.getResource("icon.png"));
+
+        // The following code uses reflection to perform the following equivalent code:
+        //
+        // Application application = com.apple.eawt.Application.getApplication();
+        // application.setDockImage(image);
+        // application.setAboutHandler(new AboutHandler());
+        try {
+            Class appleApplicationClass = Class.forName("com.apple.eawt.Application");
+            @SuppressWarnings("unchecked") Method method = appleApplicationClass.getMethod("getApplication");
+            Object applicationInstance = method.invoke(null);
+            method = applicationInstance.getClass().getMethod("setDockIconImage", java.awt.Image.class);
+
+            // Application application = com.apple.eawt.Application.getApplication();
+            // application.setDockImage(image);
+            method.invoke(applicationInstance, image);
+
+            // application.setAboutHandler(new AboutHandler());
+            Class<?> aboutHandlerClass = Class.forName("com.apple.eawt.AboutHandler");
+            Object proxyInstance = Proxy.newProxyInstance(aboutHandlerClass.getClassLoader(),
+                    new Class[]{aboutHandlerClass}, new AboutListener());
+            applicationInstance.getClass().getMethod("setAboutHandler",
+                    new Class[]{aboutHandlerClass}).invoke(applicationInstance, proxyInstance);
+        } catch (ReflectiveOperationException e) {
+            logger.error("Reflection failed for OS X: {}", e);
+        }
+
+    }
+
+    private class AboutListener implements InvocationHandler {
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            AboutFrame aboutFrame = new AboutFrame();
+            aboutFrame.setVisible(true);
+
+            return null;
+        }
     }
 }

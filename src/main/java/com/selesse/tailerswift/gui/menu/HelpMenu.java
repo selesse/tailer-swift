@@ -1,6 +1,8 @@
 package com.selesse.tailerswift.gui.menu;
 
 import com.selesse.tailerswift.gui.view.AboutFrame;
+import com.selesse.tailerswift.settings.OperatingSystem;
+import com.selesse.tailerswift.settings.Program;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -12,7 +14,9 @@ public class HelpMenu extends AbstractMenu {
 
     public HelpMenu() {
         menu = new JMenu("Help");
-        menu.add(createAboutMenuItem());
+        if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
+            menu.add(createAboutMenuItem());
+        }
         aboutFrame = new AboutFrame();
     }
 
