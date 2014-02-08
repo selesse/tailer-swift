@@ -43,6 +43,7 @@ public class AboutFrame extends JFrame {
         licenseTextArea.setText(getOpenSourceLicenseText());
         JScrollPane scrollPane = new JScrollPane(licenseTextArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        licenseTextArea.setCaretPosition(0);
 
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridy = 0;
