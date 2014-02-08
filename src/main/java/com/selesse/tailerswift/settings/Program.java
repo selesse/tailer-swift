@@ -1,11 +1,14 @@
 package com.selesse.tailerswift.settings;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.List;
 
 public class Program {
+    private static final transient Logger logger = LoggerFactory.getLogger(Program.class);
     private final String settingsName = ".tswift-settings";
     private final String homeDirectory = System.getProperty("user.home");
     private final File settingsFile = new File(homeDirectory + File.separator + settingsName);
@@ -42,8 +45,8 @@ public class Program {
                 ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(settingsFile));
                 settings = (Settings) objectInputStream.readObject();
                 objectInputStream.close();
-            } catch (Exception e) {
-                // it's okay if we screw up
+            } catch (ClassNotFoundException | IOException e) {
+                logger.error("Error loading settings: {}", e);
             }
         }
 
@@ -57,8 +60,7 @@ public class Program {
             objectOutputStream.flush();
             objectOutputStream.close();
         } catch (IOException e) {
-            // TODO figure out best course of action
-            e.printStackTrace();
+            logger.error("Error saving settings: {}", e);
         }
     }
 

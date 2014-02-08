@@ -298,12 +298,12 @@ public class MainFrameView {
                                 try {
                                     styledDocument.insertString(styledDocument.getLength(), modificationString, null);
                                 } catch (BadLocationException e) {
-                                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                                    logger.error("Error inserting string into doc: {}", e);
                                 }
                             }
                         });
                     } catch (InterruptedException | InvocationTargetException e) {
-                        e.printStackTrace();
+                        logger.error("Error waiting for swing: {}", e);
                     }
 
                 }
@@ -509,7 +509,7 @@ public class MainFrameView {
             applicationInstance.getClass().getMethod("setAboutHandler",
                     new Class[]{aboutHandlerClass}).invoke(applicationInstance, proxyInstance);
         } catch (ReflectiveOperationException e) {
-            logger.error("Reflection failed for OS X: {}", e);
+            logger.error("UI reflection failed for OS X: {}", e);
         }
 
     }

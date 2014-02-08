@@ -15,10 +15,12 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +41,7 @@ public class MainFrame {
         mainFrameView = new MainFrameView(this);
         fileThreadMap = Maps.newHashMap();
         watchedFiles = Lists.newArrayList();
-        logger.info("Main frame turn on");
+        logger.info("MainFrame turn on");
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -64,9 +66,8 @@ public class MainFrame {
                         logger.info("File " + file.getAbsolutePath() + " was drag and dropped into the app");
                         startWatching(file);
                     }
-                } catch (Exception e) {
-                    // if we get any sort of exception, it's no big deal...
-                    e.printStackTrace();
+                } catch (UnsupportedFlavorException | IOException e) {
+                    logger.error("Exception thrown while files were dropped: {}", e);
                 }
             }
         };
@@ -88,9 +89,15 @@ public class MainFrame {
         if (focusedFileIndex >= 0 && focusedFileIndex < watchedFiles.size()) {
             mainFrameView.focusTabToAlreadyOpen(watchedFiles.get(focusedFileIndex));
         }
+        else {
+            // There are no watched files, tell the user to drag and drop a file!
+            // TODO
+        }
         mainFrameView.getTabbedPane().setVisible(true);
 
-        logger.info("Settings: Focusing on tab index {}", focusedFileIndex);
+        if (focusedFileIndex != -1) {
+            logger.info("Settings: Focusing on tab index {}", focusedFileIndex);
+        }
         logger.debug("Settings: Load complete");
     }
 
