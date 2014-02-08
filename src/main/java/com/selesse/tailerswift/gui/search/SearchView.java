@@ -13,6 +13,7 @@ public class SearchView extends FeatureView {
 
     public SearchView(final Search search) {
         this.panel = new JPanel();
+        this.panel.setName("SearchView");
         this.textArea = new JTextArea();
         JScrollPane scrollPane = new JScrollPane(textArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);

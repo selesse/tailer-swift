@@ -13,6 +13,7 @@ public class FilterView extends FeatureView {
 
     public FilterView(final Filter filter) {
         this.panel = new JPanel();
+        this.panel.setName("FilterView");
         this.textArea = new JTextArea();
         JScrollPane scrollPane = new JScrollPane(textArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);

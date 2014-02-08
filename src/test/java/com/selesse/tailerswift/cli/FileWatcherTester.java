@@ -1,6 +1,7 @@
 package com.selesse.tailerswift.cli;
 
 import com.google.common.io.Files;
+import com.selesse.tailerswift.TestUtil;
 import com.selesse.tailerswift.filewatcher.FileWatcher;
 import com.selesse.tailerswift.gui.TestUi;
 import com.selesse.tailerswift.settings.OperatingSystem;
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import static org.junit.Assert.*;
-import static org.junit.Assume.assumeTrue;
 
 public class FileWatcherTester {
     private File testDirectory;
@@ -47,14 +47,14 @@ public class FileWatcherTester {
         }
 
         assertEquals("This is a stupid file", testUi.getBufferContents());
+
+        TestUtil.deleteInOrder(tempFile);
     }
 
     @Test
     public void testCanWatchNonExistentFile() {
-        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
         String filename = "" + System.currentTimeMillis();
         File tempFile = new File(testDirectory.getAbsolutePath() + File.separator + filename);
-        tempFile.deleteOnExit();
 
         assertFalse(tempFile.exists());
 
@@ -82,11 +82,12 @@ public class FileWatcherTester {
         }
 
         assertEquals("some text to buffer", testUi.getBufferContents());
+
+        TestUtil.deleteInOrder(tempFile);
     }
 
     private File createFileWithContents(String filename, String contents) {
         File file = new File(testDirectory + File.separator + filename);
-        file.deleteOnExit();
 
         try {
             PrintWriter printWriter = new PrintWriter(file);
@@ -102,9 +103,10 @@ public class FileWatcherTester {
 
     private long getSleepTime() {
         if (Program.getInstance().getOperatingSystem() == OperatingSystem.MAC) {
-            return 5000;
+            // Yes.. it's THAT slow... :(
+            return 10000;
         }
 
-        return 1000;
+        return 1500;
     }
 }

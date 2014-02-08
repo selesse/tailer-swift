@@ -51,6 +51,7 @@ import java.util.Map;
  * All the nitty-gritty GUI-related functions for the {@link MainFrame}.
  */
 public class MainFrameView {
+    private static final Logger logger = LoggerFactory.getLogger(MainFrameView.class);
     private JFrame frame;
     private JTabbedPane tabbedPane;
     private JLabel absoluteFilePathLabel;
@@ -59,7 +60,6 @@ public class MainFrameView {
     private MainFrame mainFrame;
     private List<FileSetting> fileSettings;
     private boolean isInitialized = false;
-    private static final Logger logger = LoggerFactory.getLogger(MainFrameView.class);
 
     public MainFrameView(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
@@ -74,12 +74,12 @@ public class MainFrameView {
         watchedFileNames = Lists.newArrayList();
         fileSettings = Lists.newArrayList();
 
-        // if we setIconImage in OS X, it throws some command line errors, so let's not try this on a Mac
-        if (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC) {
-            frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Resources.getResource("icon.png")));
+        // Apple has incompatible UI-specific customizations: "About", and icon handling
+        if (Program.getInstance().getOperatingSystem() == OperatingSystem.MAC) {
+            doAppleSpecificUiCustomizations();
         }
         else {
-            doAppleSpecificUiCustomizations();
+            frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Resources.getResource("icon.png")));
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -144,6 +144,9 @@ public class MainFrameView {
         JButton searchButton = new JButton("Search");
         JButton filterButton = new JButton("Filter");
         JButton highlightButton = new JButton("Highlight");
+        searchButton.setName("Search");
+        filterButton.setName("Filter");
+        highlightButton.setName("Highlight");
 
         searchButton.addActionListener(new ButtonActionListener(featurePanel, searchFeature));
         filterButton.addActionListener(new ButtonActionListener(featurePanel, filterFeature));
@@ -162,10 +165,6 @@ public class MainFrameView {
         doHighlights();
     }
 
-    /****************************************************************************************************************
-     *  Component creation section.                                                                                 *
-     ****************************************************************************************************************
-     */
     private JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
@@ -200,19 +199,10 @@ public class MainFrameView {
         textPane.setParagraphAttributes(mutableAttributeSet, false);
     }
 
-
-    /****************************************************************************************************************
-     *  Getters and setters.                                                                                        *
-     ****************************************************************************************************************
-     */
     public Frame getFrame() {
         return frame;
     }
 
-    /****************************************************************************************************************
-     *  View functionality.                                                                                         *
-     ****************************************************************************************************************
-     */
     public void toggleAlwaysOnTop() {
         frame.setAlwaysOnTop(!frame.isAlwaysOnTop());
     }
@@ -288,8 +278,6 @@ public class MainFrameView {
                 if (textComponent instanceof JTextPane) {
                     JTextPane textPane = (JTextPane) textComponent;
                     final StyledDocument styledDocument = textPane.getStyledDocument();
-
-                    logger.info("Manipulating the document directly");
 
                     try {
                         SwingUtilities.invokeAndWait(new Runnable() {
@@ -400,9 +388,11 @@ public class MainFrameView {
 
 
     private synchronized void doHighlights() {
-        logger.info("Making all the watched files perform the highlights");
-        for (String filePaths : stringTextComponentMap.keySet()) {
-            doHighlightFor(new File(filePaths));
+        if (stringTextComponentMap.keySet().size() > 0) {
+            logger.info("Making all the watched files perform the highlights");
+            for (String filePaths : stringTextComponentMap.keySet()) {
+                doHighlightFor(new File(filePaths));
+            }
         }
     }
 
@@ -483,6 +473,9 @@ public class MainFrameView {
         return frame.isAlwaysOnTop();
     }
 
+    /**
+     * Set the AboutHandler and dock image.
+     */
     private void doAppleSpecificUiCustomizations() {
         // Use reflection because we want to compile under 1 source. :(
         Image image = Toolkit.getDefaultToolkit().createImage(Resources.getResource("icon.png"));

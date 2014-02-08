@@ -14,7 +14,12 @@ public class ButtonActionListener implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        featurePanel.setFeature(feature);
-        feature.changeVisibility();
+        if (featurePanel.getFeature() == feature && feature.getVisibility()) {
+            feature.setVisible(false);
+        }
+        else {
+            featurePanel.setFeature(feature);
+            feature.setVisible(true);
+        }
     }
 }

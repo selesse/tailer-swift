@@ -25,8 +25,7 @@ public class TestUi extends CliTailerSwift implements UserInterface {
     public void newFile(Path observedPath, String modificationString) {
         super.newFile(observedPath, modificationString);
 
-        stringBuilder = new StringBuilder();
-        stringBuilder.append(modificationString);
+        stringBuilder = new StringBuilder(modificationString);
     }
 
     @Override

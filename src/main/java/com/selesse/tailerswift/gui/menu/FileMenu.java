@@ -16,7 +16,6 @@ import java.io.File;
 public class FileMenu extends AbstractMenu {
     private JFileChooser fileChooser;
     private MainFrame mainFrame;
-    private static Logger logger = LoggerFactory.getLogger(FileMenu.class);
 
     public FileMenu(MainFrame mainFrame) {
         this.mainFrame = mainFrame;

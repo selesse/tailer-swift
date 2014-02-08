@@ -14,6 +14,7 @@ public class HighlightView extends FeatureView {
 
     public HighlightView(final Highlight highlight) {
         this.panel = new JPanel();
+        panel.setName("HighlightView");
 
         JLabel textFieldLabel = new JLabel("String to highlight");
         final JTextField textField = new JTextField(30);

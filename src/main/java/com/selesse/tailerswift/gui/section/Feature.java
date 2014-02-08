@@ -12,15 +12,18 @@ public class Feature {
         this.content = content;
         this.mainPanel = new JPanel();
         this.mainPanel.add(content.getViewComponent());
-        this.isVisible = false;
      }
-
-    public void changeVisibility() {
-        isVisible = !isVisible;
-        mainPanel.setVisible(isVisible);
-    }
 
     public Component getComponent() {
         return mainPanel;
+    }
+
+    public void setVisible(boolean isVisible) {
+        this.isVisible = isVisible;
+        mainPanel.setVisible(isVisible);
+    }
+
+    public boolean getVisibility() {
+        return isVisible;
     }
 }

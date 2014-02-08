@@ -19,7 +19,6 @@ Bugs
 ====
 - Line number makes it seem like there's an n+1th line when there isn't. In
   other words, if your file is 10 lines long, it'll show 11 lines long.
-- Fix the "feature" buttons (press Search, then Filter, then Highlight).
 - Fix smart scrolling when loading a long/large file.
 
 Done
@@ -48,3 +47,5 @@ Done
       we do a release, our jar will be skinny and pass all the tests.
       (Nov 10 2013)
 - [x] Mac: Figure out why shortcuts aren't being displayed in menus (Nov 2013).
+- [x] Fix the "feature" buttons (press Search, then Filter, then Highlight).
+      (Feb 2014)

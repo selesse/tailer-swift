@@ -8,10 +8,10 @@ import javax.swing.text.*;
 import java.util.List;
 
 public class HighlightThread implements Runnable {
+    private static final Logger logger = LoggerFactory.getLogger(HighlightThread.class);
     private String currentText;
     private JTextComponent textComponent;
     private List<FileSetting> fileSettingList;
-    private static final Logger logger = LoggerFactory.getLogger(HighlightThread.class);
 
     public HighlightThread(JTextComponent textComponent, List<FileSetting> fileSettingsList) {
         this.currentText = textComponent.getText();

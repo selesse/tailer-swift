@@ -1,5 +1,6 @@
 package com.selesse.tailerswift.gui;
 
+import com.selesse.tailerswift.TestUtil;
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
 import org.fest.swing.data.Index;
@@ -24,10 +25,6 @@ public class TabTester extends AbstractMainFrameTester {
         tempFile = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "foo");
         tempFile2 = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "foo2");
         tempFile3 = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "foo3");
-        tempDirectory.deleteOnExit();
-        tempFile.deleteOnExit();
-        tempFile2.deleteOnExit();
-        tempFile3.deleteOnExit();
     }
 
     @Test
@@ -38,8 +35,6 @@ public class TabTester extends AbstractMainFrameTester {
         // set up the temp directory and file for the test
         File tempDirectory = Files.newTemporaryFolder();
         File tempFile = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "temp.txt");
-        tempFile.deleteOnExit();
-        tempDirectory.deleteOnExit();
 
         window.menuItem("Open/watch file...").click();
         window.fileChooser("File chooser").setCurrentDirectory(tempDirectory);
@@ -48,6 +43,8 @@ public class TabTester extends AbstractMainFrameTester {
 
         window.tabbedPane("Tabbed pane").requireVisible();
         window.tabbedPane("Tabbed pane").requireTabTitles(tempFile.getName());
+
+        TestUtil.deleteInOrder(tempFile, tempDirectory);
     }
 
     @Test
@@ -60,6 +57,8 @@ public class TabTester extends AbstractMainFrameTester {
 
         window.tabbedPane("Tabbed pane").requireVisible();
         window.tabbedPane("Tabbed pane").requireTabTitles(tempFile.getName(), tempFile2.getName(), tempFile3.getName());
+
+        TestUtil.deleteInOrder(tempFile, tempFile2, tempFile3, tempDirectory);
     }
 
     @Test
@@ -77,6 +76,8 @@ public class TabTester extends AbstractMainFrameTester {
         window.menuItem("Close current file").click();
 
         window.tabbedPane("Tabbed pane").requireTabTitles(tempFile.getName(), tempFile3.getName());
+
+        TestUtil.deleteInOrder(tempFile, tempFile2, tempFile3, tempDirectory);
     }
 
     @Test
@@ -95,6 +96,8 @@ public class TabTester extends AbstractMainFrameTester {
         window.menuItem("Close current file").click();
 
         window.tabbedPane("Tabbed pane").requireTabTitles(tempFile.getName(), tempFile2.getName());
+
+        TestUtil.deleteInOrder(tempFile, tempFile2, tempFile3, tempDirectory);
     }
 
     @Test
@@ -113,6 +116,8 @@ public class TabTester extends AbstractMainFrameTester {
         window.menuItem("Close current file").click();
 
         window.tabbedPane("Tabbed pane").requireTabTitles(tempFile2.getName(), tempFile3.getName());
+
+        TestUtil.deleteInOrder(tempFile, tempFile2, tempFile3, tempDirectory);
     }
 
     @Test
@@ -149,6 +154,8 @@ public class TabTester extends AbstractMainFrameTester {
 
         window.tabbedPane("Tabbed pane").requireTabTitles(tempFile.getName(), tempFile2.getName(), tempFile3.getName(),
                 "* " + tempWriteFile.getName());
+
+        TestUtil.deleteInOrder(tempFile, tempFile2, tempFile3, tempDirectory, tempWriteFile, tempWriteDirectory);
     }
 
     private void simulateChoosingThreeTempFiles() {
@@ -190,6 +197,8 @@ public class TabTester extends AbstractMainFrameTester {
         window.tabbedPane("Tabbed pane").selectTab(0);
         threadSleepBasedOnOperatingSystem();
         window.tabbedPane("Tabbed pane").requireTitle(tempFile.getName(), Index.atIndex(0));
+
+        TestUtil.deleteInOrder(tempFile, tempFile2, tempFile3, tempDirectory);
     }
 
     private void threadSleepBasedOnOperatingSystem() throws InterruptedException {
@@ -197,7 +206,7 @@ public class TabTester extends AbstractMainFrameTester {
             Thread.sleep(2000);
         }
         else {
-            Thread.sleep(250);
+            Thread.sleep(500);
         }
     }
 }

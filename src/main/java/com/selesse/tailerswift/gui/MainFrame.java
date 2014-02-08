@@ -114,7 +114,7 @@ public class MainFrame {
     }
 
     public void toggleAlwaysOnTop() {
-        logger.info("Setting always on top to " + !mainFrameView.isAlwaysOnTop());
+        logger.debug("Setting always on top to " + !mainFrameView.isAlwaysOnTop());
         mainFrameView.toggleAlwaysOnTop();
         Program.getInstance().getSettings().setAlwaysOnTop(mainFrameView.isAlwaysOnTop());
     }

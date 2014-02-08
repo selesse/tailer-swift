@@ -8,7 +8,7 @@ import java.io.*;
 import java.util.List;
 
 public class Program {
-    private static final transient Logger logger = LoggerFactory.getLogger(Program.class);
+    private static final Logger logger = LoggerFactory.getLogger(Program.class);
     private final String settingsName = ".tswift-settings";
     private final String homeDirectory = System.getProperty("user.home");
     private final File settingsFile = new File(homeDirectory + File.separator + settingsName);
