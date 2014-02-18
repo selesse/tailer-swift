@@ -10,6 +10,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 import static org.junit.Assume.assumeTrue;
@@ -86,7 +87,6 @@ public class TabTester extends AbstractMainFrameTester {
         assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
 
         createThreeTempFiles();
-
         simulateChoosingThreeTempFiles();
 
         String[] assumedTabTitles = new String[] { tempFile.getName(), tempFile2.getName(), tempFile3.getName() };
@@ -106,7 +106,6 @@ public class TabTester extends AbstractMainFrameTester {
         assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
 
         createThreeTempFiles();
-
         simulateChoosingThreeTempFiles();
 
         String[] assumedTabTitles = new String[] { tempFile.getName(), tempFile2.getName(), tempFile3.getName() };
@@ -121,7 +120,7 @@ public class TabTester extends AbstractMainFrameTester {
     }
 
     @Test
-    public void testTitleChangesWhenContentIsAdded() throws FileNotFoundException, InterruptedException {
+    public void testTitleChangesWhenContentIsAdded() throws FileNotFoundException, InterruptedException, UnsupportedEncodingException {
         // For some reason, on OS X, "approve"ing the files below throws an exception
         assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
 
@@ -145,7 +144,7 @@ public class TabTester extends AbstractMainFrameTester {
         Thread.sleep(100);
         window.tabbedPane("Tabbed pane").selectTab(0);
 
-        PrintWriter printWriter = new PrintWriter(tempWriteFile);
+        PrintWriter printWriter = new PrintWriter(tempWriteFile, "UTF-8");
         printWriter.println("Hello, world!");
         printWriter.flush();
         printWriter.close();
@@ -166,7 +165,7 @@ public class TabTester extends AbstractMainFrameTester {
     }
 
     @Test
-    public void testModificationHintDisappearsProperly() throws FileNotFoundException, InterruptedException {
+    public void testModificationHintDisappearsProperly() throws FileNotFoundException, InterruptedException, UnsupportedEncodingException {
         // We choose 3 (empty) temp files
         createThreeTempFiles();
         simulateChoosingThreeTempFiles();
@@ -174,7 +173,7 @@ public class TabTester extends AbstractMainFrameTester {
         window.tabbedPane("Tabbed pane").selectTab(0);
 
         // While we write to the first tab, we don't expect the title to change
-        PrintWriter printWriter = new PrintWriter(tempFile);
+        PrintWriter printWriter = new PrintWriter(tempFile, "UTF-8");
         printWriter.println("hello, world!");
         printWriter.flush();
 

@@ -10,10 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 
 import static org.junit.Assert.*;
 
@@ -27,7 +24,9 @@ public class FileWatcherTester {
 
     @After
     public void tearDown() {
-        testDirectory.delete();
+        if (!testDirectory.delete()) {
+            System.err.println("Was not able to delete " + testDirectory);
+        }
     }
 
     @Test
@@ -64,10 +63,12 @@ public class FileWatcherTester {
         thread.start();
 
         try {
-            tempFile.createNewFile();
+            if (!tempFile.createNewFile()) {
+                fail("Was not able to create a new file");
+            }
             assertTrue(tempFile.exists());
 
-            PrintWriter printWriter = new PrintWriter(tempFile);
+            PrintWriter printWriter = new PrintWriter(tempFile, "UTF-8");
             printWriter.print("some text to buffer");
             printWriter.flush();
             printWriter.close();
@@ -90,11 +91,11 @@ public class FileWatcherTester {
         File file = new File(testDirectory + File.separator + filename);
 
         try {
-            PrintWriter printWriter = new PrintWriter(file);
+            PrintWriter printWriter = new PrintWriter(file, "UTF-8");
             printWriter.print(contents);
             printWriter.flush();
             printWriter.close();
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 

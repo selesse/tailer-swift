@@ -5,8 +5,9 @@ import java.io.File;
 public class TestUtil {
     public static void deleteInOrder(File... files) {
         for (File file : files) {
-            //noinspection ResultOfMethodCallIgnored
-            file.delete();
+            if (!file.delete()) {
+                System.err.println("Failed to delete " + file);
+            }
         }
     }
 }

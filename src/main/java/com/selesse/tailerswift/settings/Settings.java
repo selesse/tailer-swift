@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Settings implements Serializable {
+    private static final long serialVersionUID = 7411267043852906226L;
     private boolean isAlwaysOnTop;
     private List<String> absoluteFilePaths;
     private Font displayFont;

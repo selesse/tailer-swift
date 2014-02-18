@@ -35,10 +35,9 @@ public class SearchView extends FeatureView {
 
                 textArea.append("Results for searching for \"" + textField.getText() + "\"\n");
 
-                for (String file : stringSearchMatchesMap.keySet()) {
-                    SearchMatches searchMatches = stringSearchMatchesMap.get(file);
-
-                    textArea.append(searchMatches.getAllMatches().size() + " matches in file " + file + "\n");
+                for (Map.Entry<String, SearchMatches> entry : stringSearchMatchesMap.entrySet()) {
+                    SearchMatches searchMatches = entry.getValue();
+                    textArea.append(searchMatches.getAllMatches().size() + " matches in file " + entry.getKey() + "\n");
 
                     for (int lineNumber : searchMatches.getAllMatches().keySet()) {
                         textArea.append("  line " + lineNumber + " : " + searchMatches.getMatch(lineNumber) + "\n");

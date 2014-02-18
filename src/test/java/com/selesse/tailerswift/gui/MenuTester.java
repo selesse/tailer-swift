@@ -20,6 +20,7 @@ import java.awt.event.KeyEvent;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"})
 public class MenuTester extends AbstractMainFrameTester {
     private static NoExitSecurityManagerInstaller noExitSecurityManagerInstaller;
     private static boolean exitedCleanly;

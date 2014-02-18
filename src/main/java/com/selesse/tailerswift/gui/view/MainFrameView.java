@@ -507,7 +507,7 @@ public class MainFrameView {
 
     }
 
-    private class AboutListener implements InvocationHandler {
+    private static class AboutListener implements InvocationHandler {
         private JFrame aboutFrame;
 
         @Override

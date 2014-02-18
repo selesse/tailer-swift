@@ -35,10 +35,10 @@ public class FilterView extends FeatureView {
 
                 textArea.append("Results for filtering for \"" + textField.getText() + "\"\n");
 
-                for (String file : stringFilterMatchesMap.keySet()) {
-                    FilterMatches filterMatches = stringFilterMatchesMap.get(file);
+                for (Map.Entry<String, FilterMatches> entry : stringFilterMatchesMap.entrySet()) {
+                    FilterMatches filterMatches = entry.getValue();
 
-                    textArea.append(filterMatches.getAllMatches().size() + " matches in file " + file + "\n");
+                    textArea.append(filterMatches.getAllMatches().size() + " matches in file " + entry.getKey() + "\n");
 
                     for (int lineNumber : filterMatches.getAllMatches().keySet()) {
                         textArea.append("  line " + lineNumber + " : " + filterMatches.getMatch(lineNumber) + "\n");

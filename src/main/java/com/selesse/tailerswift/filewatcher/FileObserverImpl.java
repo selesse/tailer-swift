@@ -1,15 +1,19 @@
 package com.selesse.tailerswift.filewatcher;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 
 public class FileObserverImpl implements FileObserver {
+    private static final Logger logger = LoggerFactory.getLogger(FileObserverImpl.class);
     private long bufferedFileSize;
     private File observedFile;
     private BufferedReader bufferedReader;
-    private final int CHUNK_SIZE = 1024 * 5;
+    private static final int CHUNK_SIZE = 1024 * 5;
 
     public FileObserverImpl(File observedFile) {
         this.observedFile = observedFile;
@@ -29,8 +33,12 @@ public class FileObserverImpl implements FileObserver {
                 return null;
             }
 
-            bufferedReader = new BufferedReader(new FileReader(observedFile));
-            bufferedReader.skip(bufferedFileSize);
+            bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(observedFile), "UTF-8"));
+            long skippedBytes = bufferedReader.skip(bufferedFileSize);
+            if (skippedBytes < bufferedFileSize) {
+                logger.info("Didn't skip the entire file, only skipped {} bytes: {}", skippedBytes,
+                        observedFile.getAbsolutePath());
+            }
 
             char[] buffer = new char[CHUNK_SIZE];
             int bytesRead = 0;
@@ -62,9 +70,9 @@ public class FileObserverImpl implements FileObserver {
     public void onCreate() {
         bufferedFileSize = 0;
         try {
-            bufferedReader = new BufferedReader(new FileReader(observedFile));
-        } catch (FileNotFoundException e) {
-            // do nothing
+            bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(observedFile), "UTF-8"));
+        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+            logger.error("Error onCreate for {}: {}", observedFile.getAbsolutePath(), e);
         }
     }
 

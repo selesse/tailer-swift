@@ -384,7 +384,7 @@ public class JFontChooser extends JComponent {
         }
     }
 
-    protected class TextFieldKeyHandlerForListSelectionUpDown extends KeyAdapter {
+    private static class TextFieldKeyHandlerForListSelectionUpDown extends KeyAdapter {
         private JList targetList;
 
         public TextFieldKeyHandlerForListSelectionUpDown(JList list) {
@@ -415,7 +415,7 @@ public class JFontChooser extends JComponent {
         }
     }
 
-    protected class ListSearchTextFieldDocumentHandler implements DocumentListener {
+    private static class ListSearchTextFieldDocumentHandler implements DocumentListener {
         JList targetList;
 
         public ListSearchTextFieldDocumentHandler(JList targetList) {
