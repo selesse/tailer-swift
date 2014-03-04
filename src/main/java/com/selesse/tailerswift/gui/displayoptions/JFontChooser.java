@@ -10,10 +10,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.Position;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
@@ -77,7 +74,7 @@ public class JFontChooser extends JComponent {
     private JPanel fontStylePanel;
     private JPanel fontSizePanel;
     private JPanel samplePanel;
-    private JTextArea sampleText;
+    private JTextPane sampleText;
 
     /**
      * Constructs a <code>JFontChooser</code> object.
@@ -656,7 +653,12 @@ public class JFontChooser extends JComponent {
             List<String> sampleTextList = Lists.newArrayList("the quick brown fox jumps over the lazy dog.",
             "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG.", "1234567890!@#$%^&*()_+{}[]");
 
-            sampleText = new JTextArea(Joiner.on("\n").join(sampleTextList));
+            StyledDocument document = new DefaultStyledDocument();
+            Style defaultStyle = document.getStyle(StyleContext.DEFAULT_STYLE);
+            StyleConstants.setAlignment(defaultStyle, StyleConstants.ALIGN_CENTER);
+
+            sampleText = new JTextPane(document);
+            sampleText.setText(Joiner.on("\n").join(sampleTextList));
             sampleText.setBorder(lowered);
             sampleText.setPreferredSize(new Dimension(300, 100));
         }
