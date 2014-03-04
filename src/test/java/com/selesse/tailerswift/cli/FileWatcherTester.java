@@ -1,11 +1,11 @@
 package com.selesse.tailerswift.cli;
 
 import com.google.common.io.Files;
-import com.selesse.tailerswift.TestUtil;
 import com.selesse.tailerswift.filewatcher.FileWatcher;
 import com.selesse.tailerswift.gui.TestUi;
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,8 +24,10 @@ public class FileWatcherTester {
 
     @After
     public void tearDown() {
-        if (!testDirectory.delete()) {
-            System.err.println("Was not able to delete " + testDirectory);
+        try {
+            FileUtils.deleteDirectory(testDirectory);
+        } catch (IOException ignored) {
+            System.err.println("Failed to delete " + testDirectory.getAbsolutePath());
         }
     }
 
@@ -47,7 +49,9 @@ public class FileWatcherTester {
 
         assertEquals("This is a stupid file", testUi.getBufferContents());
 
-        TestUtil.deleteInOrder(tempFile);
+        if (!tempFile.delete()) {
+            System.err.println("Failed to delete " + tempFile.getAbsolutePath());
+        }
     }
 
     @Test
@@ -84,7 +88,9 @@ public class FileWatcherTester {
 
         assertEquals("some text to buffer", testUi.getBufferContents());
 
-        TestUtil.deleteInOrder(tempFile);
+        if (!tempFile.delete()) {
+            System.err.println("Failed to delete " + tempFile.getAbsolutePath());
+        }
     }
 
     private File createFileWithContents(String filename, String contents) {

@@ -26,6 +26,7 @@ wrapper. The following libraries are used:
 
 For testing, the following libraries are used:
 
+  * [Commons IO](http://commons.apache.org/proper/commons-io/)
   * [FEST Swing](https://code.google.com/p/fest/)
   * [JUnit](http://junit.org/)
 
