@@ -13,7 +13,7 @@ import java.io.File;
 
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"DM_EXIT"})
 public class FileMenu extends AbstractMenu {
-    private JFileChooser fileChooser;
+    private CrossPlatformFileChooser fileChooser;
     private MainFrame mainFrame;
 
     public FileMenu(MainFrame mainFrame) {
@@ -21,10 +21,9 @@ public class FileMenu extends AbstractMenu {
         menu = new JMenu("File");
         menu.setName("Menu");
 
-        fileChooser = new JFileChooser();
+        fileChooser = new CrossPlatformFileChooser(mainFrame.getFrame());
         fileChooser.setName("File chooser");
         fileChooser.setMultiSelectionEnabled(true);
-        fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
 
         menu.add(createAddWatchedFileMenuItem());
         menu.add(createCloseCurrentFileMenuItem());
@@ -44,9 +43,8 @@ public class FileMenu extends AbstractMenu {
         addWatchedFileMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int returnStatus = fileChooser.showOpenDialog(mainFrame.getFrame());
-
-                if (returnStatus == JFileChooser.APPROVE_OPTION) {
+                fileChooser.setVisible(true);
+                if (fileChooser.hasSelectedFile()) {
                     for (File file : fileChooser.getSelectedFiles()) {
                         mainFrame.startWatching(file);
                     }

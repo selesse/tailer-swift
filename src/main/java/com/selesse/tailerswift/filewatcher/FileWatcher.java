@@ -1,6 +1,6 @@
 package com.selesse.tailerswift.filewatcher;
 
-import com.selesse.tailerswift.UserInterface;
+import com.selesse.tailerswift.TailUserInterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,14 +9,14 @@ import java.nio.file.*;
 import static java.nio.file.StandardWatchEventKinds.*;
 
 public class FileWatcher implements Runnable {
-    private UserInterface ui;
+    private TailUserInterface ui;
     private WatchService watcher;
     private Path observedDirectory;
     private Path observedFilePath;
     private FileObserver fileObserver;
     private long lastObservedFileSize;
 
-    public FileWatcher(UserInterface ui, String filePath) {
+    public FileWatcher(TailUserInterface ui, String filePath) {
         try {
             watcher = FileSystems.getDefault().newWatchService();
         } catch (IOException e) {
@@ -128,7 +128,7 @@ public class FileWatcher implements Runnable {
         updateFile(ui);
     }
 
-    public void updateFile(UserInterface ui) {
+    public void updateFile(TailUserInterface ui) {
         String modification;
         while ((modification = fileObserver.onModify()) != null) {
             ui.updateFile(observedFilePath, modification);

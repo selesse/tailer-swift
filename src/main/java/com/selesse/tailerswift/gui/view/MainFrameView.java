@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
-import com.selesse.tailerswift.UserInterface;
+import com.selesse.tailerswift.TailUserInterface;
 import com.selesse.tailerswift.filewatcher.FileWatcher;
 import com.selesse.tailerswift.gui.MainFrame;
 import com.selesse.tailerswift.gui.SmartScroller;
@@ -260,7 +260,7 @@ public class MainFrameView {
     }
 
     public FileWatcher createFileWatcherFor(File chosenFile) {
-        return new FileWatcher(new UserInterface() {
+        return new FileWatcher(new TailUserInterface() {
             private StringBuilder stringBuilder = new StringBuilder();
 
             @Override

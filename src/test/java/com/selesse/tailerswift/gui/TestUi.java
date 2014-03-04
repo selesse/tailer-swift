@@ -1,11 +1,11 @@
 package com.selesse.tailerswift.gui;
 
-import com.selesse.tailerswift.UserInterface;
+import com.selesse.tailerswift.TailUserInterface;
 import com.selesse.tailerswift.cli.CliTailerSwift;
 
 import java.nio.file.Path;
 
-public class TestUi extends CliTailerSwift implements UserInterface {
+public class TestUi extends CliTailerSwift implements TailUserInterface {
     private StringBuilder stringBuilder;
 
     public TestUi(int numberOfTails) {

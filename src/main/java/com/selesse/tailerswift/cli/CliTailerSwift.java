@@ -1,11 +1,11 @@
 package com.selesse.tailerswift.cli;
 
-import com.selesse.tailerswift.UserInterface;
+import com.selesse.tailerswift.TailUserInterface;
 
 import java.nio.file.Path;
 import java.util.Date;
 
-public class CliTailerSwift implements UserInterface {
+public class CliTailerSwift implements TailUserInterface {
     /**
      * The number of tails we'll be following. This is important for the UI to know because if
      * there's more than 1, we should be printing out the filename as well.
