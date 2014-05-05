@@ -1,12 +1,12 @@
 apply plugin: 'java'
 apply plugin: 'findbugs'
+apply plugin: 'application'
 
 defaultTasks 'clean', 'check', 'assemble'
 
+mainClassName = "com.selesse.tailerswift.Main"
+version = '0.1.0'
 sourceCompatibility = 1.7
-version = '1.0.0'
-
-buildDir = "out"
 
 configurations {
   proguard
@@ -23,9 +23,7 @@ repositories {
 dependencies {
   compile 'com.google.guava:guava:16.0'
   compile 'com.google.code.findbugs:annotations:2.0.3'
-  compile 'org.slf4j:slf4j-api:1.7.5'
   compile 'ch.qos.logback:logback-classic:1.0.13'
-  compile 'ch.qos.logback:logback-core:1.0.13'
 
   testCompile 'commons-io:commons-io:2.4'
   testCompile 'org.easytesting:fest-swing-junit-4.5:1.2.1'
@@ -38,27 +36,20 @@ clean.doLast {
   ant.delete(dir: releaseDir)
 }
 
-task release(dependsOn: 'assemble') << {
-  out.println "Releasing $version"
-}
-
-gradle.taskGraph.whenReady {taskGraph ->
-  if (!taskGraph.hasTask(release)) {
-    version += "-SNAPSHOT"
-  }
-}
-
 jar {
   destinationDir = file(releaseDir)
   manifest {
-    attributes 'Manifest-Version': version, 'Main-Class': 'com.selesse.tailerswift.Main'
+    attributes 'Manifest-Version': version, 'Main-Class': mainClassName
   }
-
-  from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
 }
 
-task getVersion << {
-  out.println version
+gradle.taskGraph.whenReady { graph ->
+    // Make a fat JAR, unless we're doing `distTar` or `distZip`
+    if (graph.hasTask(jar) && !graph.hasTask(startScripts)) {
+        jar {
+            from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+        }
+    }
 }
 
 task proguard(type: JavaExec, dependsOn: jar) {
@@ -83,4 +74,11 @@ task proguard(type: JavaExec, dependsOn: jar) {
     args '-dontnote ch.qos.**'
 }
 
-tasks.getByPath(':release').dependsOn(proguard, "check")
+tasks.withType(FindBugs) {
+  reports {
+      xml.enabled = false
+      html.enabled = true
+  }
+}
+
+assemble.dependsOn(proguard, "check")
