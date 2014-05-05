@@ -41,7 +41,7 @@ public class TabTester extends AbstractMainFrameTester {
     @Test
     public void testOpeningAFileCreatesProperTabTitle() {
         // For some reason, on OS X, "approve"ing the file below throws an exception
-        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
+        assumeTrue(weShouldRunUiTests());
 
         // set up the temp directory and file for the test
         File tempDirectory = Files.newTemporaryFolder();
@@ -59,7 +59,7 @@ public class TabTester extends AbstractMainFrameTester {
     @Test
     public void testCanOpenMultipleFiles() {
         // For some reason, on OS X, "approve"ing the files below throws an exception
-        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
+        assumeTrue(weShouldRunUiTests());
 
         createThreeTempFiles();
         simulateChoosingThreeTempFiles();
@@ -71,7 +71,7 @@ public class TabTester extends AbstractMainFrameTester {
     @Test
     public void testClosingMiddleTabPreservesTitleHistory() {
         // For some reason, on OS X, "approve"ing the files below throws an exception
-        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
+        assumeTrue(weShouldRunUiTests());
 
         createThreeTempFiles();
         simulateChoosingThreeTempFiles();
@@ -88,7 +88,7 @@ public class TabTester extends AbstractMainFrameTester {
     @Test
     public void testClosingLastTabPreservesTitleHistory() {
         // For some reason, on OS X, "approve"ing the files below throws an exception
-        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
+        assumeTrue(weShouldRunUiTests());
 
         createThreeTempFiles();
         simulateChoosingThreeTempFiles();
@@ -105,7 +105,7 @@ public class TabTester extends AbstractMainFrameTester {
     @Test
     public void testClosingFirstTabPreservesTitleHistory() {
         // For some reason, on OS X, "approve"ing the files below throws an exception
-        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
+        assumeTrue(weShouldRunUiTests());
 
         createThreeTempFiles();
         simulateChoosingThreeTempFiles();
@@ -122,7 +122,7 @@ public class TabTester extends AbstractMainFrameTester {
     @Test
     public void testTitleChangesWhenContentIsAdded() throws FileNotFoundException, InterruptedException, UnsupportedEncodingException {
         // For some reason, on OS X, "approve"ing the files below throws an exception
-        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
+        assumeTrue(weShouldRunUiTests());
 
         File tempWriteDirectory = Files.newTemporaryFolder();
         File tempWriteFile = Files.newFile(tempWriteDirectory.getAbsolutePath() + File.separator + "zzz");

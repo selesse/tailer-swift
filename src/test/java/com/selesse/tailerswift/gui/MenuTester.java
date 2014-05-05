@@ -60,7 +60,7 @@ public class MenuTester extends AbstractMainFrameTester {
     @Test
     public void testClickingFileThenQuitExits() {
         // we don't have an "Exit" option on OS X
-        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
+        assumeTrue(weShouldRunUiTests());
         window.menuItem("Exit").click();
         assertTrue(exitedCleanly);
     }

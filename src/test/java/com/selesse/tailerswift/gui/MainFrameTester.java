@@ -14,7 +14,7 @@ public class MainFrameTester extends AbstractMainFrameTester {
     @Override
     public void setup() {
         // do nothing to prevent default behavior
-        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
+        assumeTrue(weShouldRunUiTests());
     }
 
     @Test

@@ -9,6 +9,8 @@ import org.fest.swing.fixture.FrameFixture;
 import org.junit.After;
 import org.junit.Before;
 
+import java.awt.GraphicsEnvironment;
+
 import static org.junit.Assume.assumeTrue;
 
 public class AbstractMainFrameTester {
@@ -16,8 +18,12 @@ public class AbstractMainFrameTester {
 
     @Before
     public void setup() {
-        assumeTrue(Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
+        assumeTrue(weShouldRunUiTests());
         startFrameWithSettings(new Settings());
+    }
+
+    protected boolean weShouldRunUiTests() {
+        return !GraphicsEnvironment.isHeadless() && (Program.getInstance().getOperatingSystem() != OperatingSystem.MAC);
     }
 
     protected void startFrameWithSettings(final Settings settings) {
