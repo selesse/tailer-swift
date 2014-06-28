@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'findbugs'
 apply plugin: 'application'
 
-defaultTasks 'clean', 'check', 'assemble'
+defaultTasks 'clean', 'build'
 
 mainClassName = "com.selesse.tailerswift.Main"
 version = '0.1.0'
@@ -81,4 +81,4 @@ tasks.withType(FindBugs) {
   }
 }
 
-assemble.dependsOn(proguard, "check")
+build.dependsOn(proguard)
