@@ -9,15 +9,11 @@ version = '0.1.0'
 sourceCompatibility = 1.7
 
 configurations {
-  proguard
-}
-
-ext {
-  releaseDir = "release"
+    proguard
 }
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
@@ -32,15 +28,10 @@ dependencies {
   proguard 'net.sf.proguard:proguard-base:4.11'
 }
 
-clean.doLast {
-  ant.delete(dir: releaseDir)
-}
-
 jar {
-  destinationDir = file(releaseDir)
-  manifest {
-    attributes 'Manifest-Version': version, 'Main-Class': mainClassName
-  }
+    manifest {
+        attributes 'Manifest-Version': version, 'Main-Class': mainClassName
+    }
 }
 
 gradle.taskGraph.whenReady { graph ->
@@ -54,6 +45,7 @@ gradle.taskGraph.whenReady { graph ->
 
 task proguard(type: JavaExec, dependsOn: jar) {
     def outFile = jar.destinationDir.getPath() + '/' + jar.baseName + '-' + jar.version + '-small' + '.' + jar.extension
+
     inputs.file jar.archivePath
     outputs.file outFile
 
@@ -75,10 +67,10 @@ task proguard(type: JavaExec, dependsOn: jar) {
 }
 
 tasks.withType(FindBugs) {
-  reports {
-      xml.enabled = false
-      html.enabled = true
-  }
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
 }
 
 build.dependsOn(proguard)
