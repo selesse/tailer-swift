@@ -204,10 +204,10 @@ public class TabTester extends AbstractMainFrameTester {
 
     private void threadSleepBasedOnOperatingSystem() throws InterruptedException {
         if (Program.getInstance().getOperatingSystem() == OperatingSystem.MAC) {
-            Thread.sleep(2000);
+            Thread.sleep(4000);
         }
         else {
-            Thread.sleep(500);
+            Thread.sleep(2000);
         }
     }
 }
