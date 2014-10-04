@@ -8,7 +8,7 @@ import java.io.*;
 import java.util.List;
 
 public class Program {
-    private static final Logger logger = LoggerFactory.getLogger(Program.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Program.class);
     private final String settingsName = ".tswift-settings";
     private final String homeDirectory = System.getProperty("user.home");
     private final File settingsFile = new File(homeDirectory + File.separator + settingsName);
@@ -46,7 +46,7 @@ public class Program {
                 settings = (Settings) objectInputStream.readObject();
                 objectInputStream.close();
             } catch (ClassNotFoundException | IOException e) {
-                logger.error("Error loading settings: {}", e);
+                LOGGER.error("Error loading settings", e);
             }
         }
 
@@ -60,7 +60,7 @@ public class Program {
             objectOutputStream.flush();
             objectOutputStream.close();
         } catch (IOException e) {
-            logger.error("Error saving settings: {}", e);
+            LOGGER.error("Error saving settings", e);
         }
     }
 

@@ -14,7 +14,7 @@ import java.net.URI;
 import java.net.URL;
 
 public class AboutFrame extends JFrame {
-    private static Logger logger = LoggerFactory.getLogger(AboutFrame.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(AboutFrame.class);
 
     public AboutFrame() {
         super("About");
@@ -29,7 +29,7 @@ public class AboutFrame extends JFrame {
                 if (Desktop.isDesktopSupported()) {
                     try {
                         Desktop.getDesktop().browse(URI.create(urlButton.getText()));
-                        logger.debug("User clicked on the Github link");
+                        LOGGER.debug("User clicked on the GitHub link");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -78,7 +78,7 @@ public class AboutFrame extends JFrame {
 
             licenseText = guavaContents + "\n\n" + slf4jContents;
         } catch (IOException e) {
-            logger.error("Could not open license: {}", e);
+            LOGGER.error("Could not open license", e);
         }
 
         return licenseText;

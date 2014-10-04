@@ -1,6 +1,8 @@
 package com.selesse.tailerswift.filewatcher;
 
 import com.selesse.tailerswift.TailUserInterface;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +11,8 @@ import java.nio.file.*;
 import static java.nio.file.StandardWatchEventKinds.*;
 
 public class FileWatcher implements Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileWatcher.class);
+
     private TailUserInterface ui;
     private WatchService watcher;
     private Path observedDirectory;
@@ -20,8 +24,7 @@ public class FileWatcher implements Runnable {
         try {
             watcher = FileSystems.getDefault().newWatchService();
         } catch (IOException e) {
-            System.out.println("According to the Javadoc, this is impossible! Why would the Javadoc lie?");
-            e.printStackTrace();
+            LOGGER.error("Error creating new watch service instance", e);
         }
 
         this.ui = ui;
@@ -32,19 +35,23 @@ public class FileWatcher implements Runnable {
         } catch (IOException e) {
             lastObservedFileSize = 0;
         }
-        // need to do "getAbsoluteFile" to support CLI relative paths
-        this.observedDirectory = observedFile.getAbsoluteFile().getParentFile().toPath();
-        registerFilesParentDirectory();
+        File parentFile = observedFile.getAbsoluteFile().getParentFile();
+        if (parentFile != null) {
+            this.observedDirectory = parentFile.toPath();
+            register(observedDirectory);
 
-        this.fileObserver = new FileObserverImpl(observedFile);
+            this.fileObserver = new FileObserverImpl(observedFile);
+        }
+        else {
+            LOGGER.error("[{}] : Error registering parent", observedFile.getAbsolutePath());
+        }
     }
 
-    private void registerFilesParentDirectory() {
+    private void register(Path observedDirectory) {
         try {
             observedDirectory.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
         } catch (IOException e) {
-            System.out.println("Error registering directory '" + observedDirectory.toAbsolutePath() + "'");
-            e.printStackTrace();
+            LOGGER.error("[{}] : Error registering directory",  observedDirectory.toAbsolutePath());
         }
     }
 
@@ -69,21 +76,22 @@ public class FileWatcher implements Runnable {
                 WatchEvent.Kind kind = event.kind();
 
                 if (kind == OVERFLOW) {
-                    System.out.println("Kind was overflow?");
+                    LOGGER.warn("Kind was overflow?");
                     continue;
                 }
 
                 WatchEvent<Path> ev = cast(event);
 
-                // if this is actually the file we're looking at, do something
+                // If this is actually the file we're looking at, do something.
                 if (ev.context().getFileName().equals(observedFilePath.getFileName())) {
+                    LOGGER.debug("[{}] : Activity of kind {}", observedFilePath, ev.kind().name());
                     performKindBasedAction(ev.kind());
                 }
             }
 
             boolean valid = key.reset();
             if (!valid) {
-                System.out.println("Error: WatchKey broke.");
+                LOGGER.error("Error: WatchKey broke.");
                 break;
             }
         }
@@ -110,6 +118,7 @@ public class FileWatcher implements Runnable {
         try {
             currentFileSize = Files.size(observedFilePath);
         } catch (IOException e) {
+            LOGGER.error("[{}] : Error determining size", observedFilePath);
             return false;
         }
         return currentFileSize < lastObservedFileSize;
@@ -120,7 +129,7 @@ public class FileWatcher implements Runnable {
         try {
             currentFileSize = Files.size(observedFilePath);
         } catch (IOException e) {
-            // do nothing
+            LOGGER.error("[{}] : Error determining size", observedFilePath);
         }
         lastObservedFileSize = currentFileSize;
         ui.deleteFile(observedFilePath);

@@ -51,7 +51,8 @@ import java.util.Map;
  * All the nitty-gritty GUI-related functions for the {@link MainFrame}.
  */
 public class MainFrameView {
-    private static final Logger logger = LoggerFactory.getLogger(MainFrameView.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainFrameView.class);
+
     private JFrame frame;
     private JTabbedPane tabbedPane;
     private JLabel absoluteFilePathLabel;
@@ -248,7 +249,7 @@ public class MainFrameView {
             tabbedPane.setSelectedIndex(fileIndex);
         }
         else {
-            logger.error("Error, got -1 file index for {}", chosenFile.getAbsolutePath());
+            LOGGER.error("[{}] : Error, got -1 file index", chosenFile.getAbsolutePath());
         }
     }
 
@@ -259,7 +260,7 @@ public class MainFrameView {
         return watchedFileNames.get(tabbedPane.getSelectedIndex());
     }
 
-    public FileWatcher createFileWatcherFor(File chosenFile) {
+    public FileWatcher createFileWatcherFor(final File chosenFile) {
         return new FileWatcher(new TailUserInterface() {
             private StringBuilder stringBuilder = new StringBuilder();
 
@@ -269,7 +270,7 @@ public class MainFrameView {
                 if (Strings.isNullOrEmpty(modificationString)) {
                     return;
                 }
-                logger.debug("Updating {} with {} bytes of data", observedPath.toFile().getAbsolutePath(),
+                LOGGER.debug("[{}] : Updating with {} bytes of data", observedPath.toFile().getAbsolutePath(),
                         modificationString.length());
                 String absolutePath = observedPath.toFile().getAbsolutePath();
 
@@ -286,12 +287,13 @@ public class MainFrameView {
                                 try {
                                     styledDocument.insertString(styledDocument.getLength(), modificationString, null);
                                 } catch (BadLocationException e) {
-                                    logger.error("Error inserting string into doc: {}", e);
+                                    LOGGER.error("[{}] : Error inserting string into doc", chosenFile.getAbsolutePath(),
+                                            e);
                                 }
                             }
                         });
                     } catch (InterruptedException | InvocationTargetException e) {
-                        logger.error("Error waiting for swing: {}", e);
+                        LOGGER.error("[{}] : Error waiting for swing", chosenFile.getAbsolutePath(), e);
                     }
 
                 }
@@ -350,7 +352,7 @@ public class MainFrameView {
 
     private void showModificationHint(int index, File name) {
         if (isInitialized) {
-            logger.info("Showing modification hint for {}", name.getAbsolutePath());
+            LOGGER.info("[{}] : Showing modification hint", name.getAbsolutePath());
             tabbedPane.setTitleAt(index, "* " + name.getName());
         }
     }
@@ -379,7 +381,7 @@ public class MainFrameView {
                 }
             }
             if (fileShouldBeHighlighted) {
-                logger.info("Starting highlight thread for {}", file.getAbsolutePath());
+                LOGGER.info("Starting highlight thread for {}", file.getAbsolutePath());
                 Thread highlightThread = new Thread(new HighlightThread(textComponent, fileSettings));
                 highlightThread.start();
             }
@@ -389,7 +391,7 @@ public class MainFrameView {
 
     private synchronized void doHighlights() {
         if (stringTextComponentMap.keySet().size() > 0) {
-            logger.info("Making all the watched files perform the highlights");
+            LOGGER.info("Making all the watched files perform the highlights");
             for (String filePaths : stringTextComponentMap.keySet()) {
                 doHighlightFor(new File(filePaths));
             }
@@ -502,7 +504,7 @@ public class MainFrameView {
             applicationInstance.getClass().getMethod("setAboutHandler",
                     new Class[]{aboutHandlerClass}).invoke(applicationInstance, proxyInstance);
         } catch (ReflectiveOperationException e) {
-            logger.error("UI reflection failed for OS X: {}", e);
+            LOGGER.error("UI reflection failed for OS X", e);
         }
 
     }

@@ -8,7 +8,7 @@ import javax.swing.text.*;
 import java.util.List;
 
 public class HighlightThread implements Runnable {
-    private static final Logger logger = LoggerFactory.getLogger(HighlightThread.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HighlightThread.class);
     private String currentText;
     private JTextComponent textComponent;
     private List<FileSetting> fileSettingList;
@@ -35,7 +35,7 @@ public class HighlightThread implements Runnable {
             offset += string.length() + 1; // Assume "\n", which is length 1
         }
 
-        logger.info("Finished highlighting, found {} matches, file was {} bytes long", numberOfMatches, offset);
+        LOGGER.info("Finished highlighting, found {} matches, file was {} bytes long", numberOfMatches, offset);
     }
 
     private void doHighlight(int offset, int highlightLength, HighlightSettings highlightSettings) {

@@ -31,7 +31,7 @@ import java.util.Map;
  * implementation also delegates appropriate methods to the view.
  */
 public class MainFrame {
-    private static Logger logger = LoggerFactory.getLogger(MainFrame.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(MainFrame.class);
 
     private MainFrameView mainFrameView;
     private Map<String, Thread> fileThreadMap;
@@ -41,7 +41,7 @@ public class MainFrame {
         mainFrameView = new MainFrameView(this);
         fileThreadMap = Maps.newHashMap();
         watchedFiles = Lists.newArrayList();
-        logger.info("MainFrame turn on");
+        LOGGER.info("MainFrame turn on");
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -63,18 +63,18 @@ public class MainFrame {
                     List<File> droppedFiles = (List<File>)
                             event.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
                     for (File file : droppedFiles) {
-                        logger.info("File " + file.getAbsolutePath() + " was drag and dropped into the app");
+                        LOGGER.info("[{}] : Just got drag & dropped into the app", file.getAbsolutePath());
                         startWatching(file);
                     }
                 } catch (UnsupportedFlavorException | IOException e) {
-                    logger.error("Exception thrown while files were dropped: {}", e);
+                    LOGGER.error("Exception thrown while files were dropped", e);
                 }
             }
         };
     }
 
     private void loadUISettings(Settings settings) {
-        logger.debug("Settings: Loading from settings");
+        LOGGER.debug("Settings: Loading from settings");
 
         mainFrameView.getTabbedPane().setVisible(false);
         mainFrameView.setAlwaysOnTop(settings.isAlwaysOnTop());
@@ -82,7 +82,7 @@ public class MainFrame {
         for (String filePath : settings.getAbsoluteFilePaths()) {
             File file = new File(filePath);
             startWatching(file);
-            logger.info("Settings: Resuming watch of {}", file.getAbsolutePath());
+            LOGGER.info("Settings: Resuming watch of [{}]", file.getAbsolutePath());
         }
 
         int focusedFileIndex = settings.getFocusedFileIndex();
@@ -96,9 +96,9 @@ public class MainFrame {
         mainFrameView.getTabbedPane().setVisible(true);
 
         if (focusedFileIndex != -1) {
-            logger.info("Settings: Focusing on tab index {}", focusedFileIndex);
+            LOGGER.info("Settings: Focusing on tab index {}", focusedFileIndex);
         }
-        logger.debug("Settings: Load complete");
+        LOGGER.debug("Settings: Load complete");
     }
 
     public Collection<Thread> getAllThreads() {
@@ -114,8 +114,8 @@ public class MainFrame {
     }
 
     public void toggleAlwaysOnTop() {
-        logger.debug("Setting always on top to " + !mainFrameView.isAlwaysOnTop());
         mainFrameView.toggleAlwaysOnTop();
+        LOGGER.debug("Setting always on top to {}", mainFrameView.isAlwaysOnTop());
         Program.getInstance().getSettings().setAlwaysOnTop(mainFrameView.isAlwaysOnTop());
     }
 
@@ -125,7 +125,7 @@ public class MainFrame {
      */
     public void closeCurrentTab() {
         String focusedTabName = mainFrameView.getFocusedTabName();
-        logger.info("Closing file " + focusedTabName);
+        LOGGER.info("[{}] : Closing file", focusedTabName);
         if (!Strings.isNullOrEmpty(focusedTabName)) {
             File file = new File(focusedTabName);
             Thread associatedThread = fileThreadMap.get(file.getAbsolutePath());
@@ -141,11 +141,11 @@ public class MainFrame {
 
     public synchronized void startWatching(File file) {
         if (watchedFiles.contains(file)) {
-            logger.info("Focusing already open " + file.getAbsolutePath());
+            LOGGER.info("[{}] : Focusing, it's already open", file.getAbsolutePath());
             mainFrameView.focusTabToAlreadyOpen(file);
             return;
         }
-        logger.info("Starting to watch " + file.getAbsolutePath());
+        LOGGER.info("[{}] : Starting to watch", file.getAbsolutePath());
         // create a new tab in the view for this file
         mainFrameView.addTab(file);
 
@@ -162,7 +162,7 @@ public class MainFrame {
     }
 
     public void setFont(Font font) {
-        logger.info("Setting font to " + font);
+        LOGGER.info("Setting font to " + font);
         Program.getInstance().getSettings().setDisplayFont(font);
         mainFrameView.setFont(font);
     }

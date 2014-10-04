@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class HighlightView extends FeatureView {
-    private static final Logger logger = LoggerFactory.getLogger(HighlightView.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HighlightView.class);
 
     public HighlightView(final Highlight highlight) {
         this.panel = new JPanel();
@@ -75,7 +75,7 @@ public class HighlightView extends FeatureView {
                 Color backgroundColor = backgroundColorChooser.getColor();
                 String highlightString = textField.getText();
 
-                logger.info("Starting a new highlight of the word \"{}\" in {}", highlightString, highlight.getFocusedFile());
+                LOGGER.info("Starting a new highlight of the word \"{}\" in {}", highlightString, highlight.getFocusedFile());
                 FileSetting fileSetting = new FileSetting(highlightString, false, true,
                         new HighlightSettings(foregroundColor, backgroundColor, false, false, false),
                         highlight.getFocusedFile());

@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 
 public class FileObserverImpl implements FileObserver {
-    private static final Logger logger = LoggerFactory.getLogger(FileObserverImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileObserverImpl.class);
     private long bufferedFileSize;
     private File observedFile;
     private BufferedReader bufferedReader;
@@ -36,8 +36,8 @@ public class FileObserverImpl implements FileObserver {
             bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(observedFile), "UTF-8"));
             long skippedBytes = bufferedReader.skip(bufferedFileSize);
             if (skippedBytes < bufferedFileSize) {
-                logger.info("Didn't skip the entire file, only skipped {} bytes: {}", skippedBytes,
-                        observedFile.getAbsolutePath());
+                LOGGER.info("[{}] : Didn't skip the entire file, only skipped {} bytes",
+                        observedFile.getAbsolutePath(), skippedBytes);
             }
 
             char[] buffer = new char[CHUNK_SIZE];
@@ -72,7 +72,7 @@ public class FileObserverImpl implements FileObserver {
         try {
             bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(observedFile), "UTF-8"));
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            logger.error("Error onCreate for {}: {}", observedFile.getAbsolutePath(), e);
+            LOGGER.error("[{}] : Error onCreate", observedFile.getAbsolutePath(), e);
         }
     }
 
