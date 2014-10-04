@@ -32,7 +32,8 @@ public class HighlightThread implements Runnable {
                     numberOfMatches++;
                 }
             }
-            offset += string.length() + 1; // Assume "\n", which is length 1
+            // Assume "\n", which is length 1
+            offset += string.length() + 1;
         }
 
         LOGGER.info("Finished highlighting, found {} matches, file was {} bytes long", numberOfMatches, offset);

@@ -51,14 +51,14 @@ public class FileWatcher implements Runnable {
         try {
             observedDirectory.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
         } catch (IOException e) {
-            LOGGER.error("[{}] : Error registering directory",  observedDirectory.toAbsolutePath());
+            LOGGER.error("[{}] : Error registering directory", observedDirectory.toAbsolutePath());
         }
     }
 
     @Override
     public void run() {
         if (observedFilePath.toFile().exists()) {
-            performKindBasedAction(ENTRY_CREATE);
+            performKindBasedAction(ENTRY_CREATE, observedFilePath.toFile());
         }
         while (true) {
             WatchKey key;
@@ -85,7 +85,7 @@ public class FileWatcher implements Runnable {
                 // If this is actually the file we're looking at, do something.
                 if (ev.context().getFileName().equals(observedFilePath.getFileName())) {
                     LOGGER.debug("[{}] : Activity of kind {}", observedFilePath, ev.kind().name());
-                    performKindBasedAction(ev.kind());
+                    performKindBasedAction(ev.kind(), observedFilePath.toFile());
                 }
             }
 
@@ -97,8 +97,9 @@ public class FileWatcher implements Runnable {
         }
     }
 
-    private void performKindBasedAction(WatchEvent.Kind<Path> kind) {
+    private void performKindBasedAction(WatchEvent.Kind<Path> kind, File file) {
         if (fileHasBeenDeletedAndRecreated()) {
+            LOGGER.info("[{}] : File has been recreated, restarting the watch", file.getAbsolutePath());
             handleFileRecreation();
             return;
         }
@@ -114,20 +115,24 @@ public class FileWatcher implements Runnable {
     }
 
     private boolean fileHasBeenDeletedAndRecreated() {
-        long currentFileSize;
-        try {
-            currentFileSize = Files.size(observedFilePath);
-        } catch (IOException e) {
-            LOGGER.error("[{}] : Error determining size", observedFilePath);
+        if (!observedFilePath.toFile().exists()) {
             return false;
         }
-        return currentFileSize < lastObservedFileSize;
+
+        try {
+            return Files.size(observedFilePath) < lastObservedFileSize;
+        } catch (IOException e) {
+            LOGGER.error("[{}] : Error determining file size", e);
+            return true;
+        }
     }
 
     private void handleFileRecreation() {
         long currentFileSize = 0;
         try {
-            currentFileSize = Files.size(observedFilePath);
+            if (observedFilePath.toFile().exists()) {
+                currentFileSize = Files.size(observedFilePath);
+            }
         } catch (IOException e) {
             LOGGER.error("[{}] : Error determining size", observedFilePath);
         }

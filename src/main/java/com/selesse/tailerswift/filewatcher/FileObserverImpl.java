@@ -1,6 +1,7 @@
 package com.selesse.tailerswift.filewatcher;
 
 
+import com.google.common.base.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,8 +71,8 @@ public class FileObserverImpl implements FileObserver {
     public void onCreate() {
         bufferedFileSize = 0;
         try {
-            bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(observedFile), "UTF-8"));
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+            bufferedReader = Files.newBufferedReader(observedFile.toPath(), Charsets.UTF_8);
+        } catch (IOException e) {
             LOGGER.error("[{}] : Error onCreate", observedFile.getAbsolutePath(), e);
         }
     }
