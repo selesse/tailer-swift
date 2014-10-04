@@ -5,6 +5,12 @@ tailer-swift is a cross-platform GUI specialization of the popular tail
 utility. Notable features include easy highlighting, filtering and regex
 search. Settings are stored globally and on a per-file basis.
 
+Current Status
+--------------
+
+tailer-swift does not yet tail well, nor is it swift. The functionality is
+limited and it is not being actively developed.
+
 Installation
 ------------
 
