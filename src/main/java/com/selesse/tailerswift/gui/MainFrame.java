@@ -2,13 +2,13 @@ package com.selesse.tailerswift.gui;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.selesse.tailerswift.gui.filter.FilterResults;
 import com.selesse.tailerswift.gui.highlighting.FileSetting;
 import com.selesse.tailerswift.gui.search.SearchResults;
 import com.selesse.tailerswift.gui.view.MainFrameView;
 import com.selesse.tailerswift.settings.Program;
 import com.selesse.tailerswift.settings.Settings;
+import com.selesse.tailerswift.threads.WorkerThreads;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +21,7 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Controller for {@link MainFrameView}. Thin shell that handles all the actions that are non-trivial or not related
@@ -34,12 +32,10 @@ public class MainFrame {
     private static Logger LOGGER = LoggerFactory.getLogger(MainFrame.class);
 
     private MainFrameView mainFrameView;
-    private Map<String, Thread> fileThreadMap;
     private List<File> watchedFiles;
 
     public MainFrame(final Settings settings) {
         mainFrameView = new MainFrameView(this);
-        fileThreadMap = Maps.newHashMap();
         watchedFiles = Lists.newArrayList();
         LOGGER.info("MainFrame turn on");
 
@@ -101,10 +97,6 @@ public class MainFrame {
         LOGGER.debug("Settings: Load complete");
     }
 
-    public Collection<Thread> getAllThreads() {
-        return fileThreadMap.values();
-    }
-
     private void updateSettings() {
         Program.getInstance().setWatchedFiles(watchedFiles);
     }
@@ -128,8 +120,8 @@ public class MainFrame {
         LOGGER.info("[{}] : Closing file", focusedTabName);
         if (!Strings.isNullOrEmpty(focusedTabName)) {
             File file = new File(focusedTabName);
-            Thread associatedThread = fileThreadMap.get(file.getAbsolutePath());
-            associatedThread.interrupt();
+
+            WorkerThreads.stopWatching(file);
 
             watchedFiles.remove(file);
 
@@ -149,10 +141,12 @@ public class MainFrame {
         // create a new tab in the view for this file
         mainFrameView.addTab(file);
 
-        // initialize and start a thread to watch the file, add it to our thread map
-        Thread fileWatcherThread = new Thread(mainFrameView.createFileWatcherFor(file));
-        fileWatcherThread.start();
-        fileThreadMap.put(file.getAbsolutePath(), fileWatcherThread);
+        try {
+            WorkerThreads.execute(mainFrameView.createFileWatcher(file));
+        }
+        catch (InterruptedException e) {
+            LOGGER.error("Error running thread", e);
+        }
 
         // master list of watched files
         watchedFiles.add(file);

@@ -3,8 +3,13 @@ package com.selesse.tailerswift;
 import com.selesse.tailerswift.cli.CliTailerSwift;
 import com.selesse.tailerswift.filewatcher.FileWatcher;
 import com.selesse.tailerswift.gui.GuiTailerSwift;
+import com.selesse.tailerswift.threads.WorkerThreads;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Main {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
     public static void main(String[] args) {
         // if there are args, command line version. otherwise, GUI
         if (args.length == 0) {
@@ -15,9 +20,13 @@ public class Main {
 
             for (String filePath : args) {
                 FileWatcher fileWatcher = new FileWatcher(cliTailerSwift, filePath);
-                Thread fileWatcherThread = new Thread(fileWatcher);
 
-                fileWatcherThread.start();
+                try {
+                    WorkerThreads.execute(fileWatcher);
+                }
+                catch (InterruptedException e) {
+                    LOGGER.error("Thread interrupted", e);
+                }
             }
         }
     }

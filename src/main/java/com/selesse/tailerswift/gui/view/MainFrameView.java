@@ -29,6 +29,7 @@ import com.selesse.tailerswift.gui.section.Feature;
 import com.selesse.tailerswift.gui.section.FeaturePanel;
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
+import com.selesse.tailerswift.threads.WorkerThreads;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -260,7 +261,7 @@ public class MainFrameView {
         return watchedFileNames.get(tabbedPane.getSelectedIndex());
     }
 
-    public FileWatcher createFileWatcherFor(final File chosenFile) {
+    public FileWatcher createFileWatcher(final File chosenFile) {
         return new FileWatcher(new TailUserInterface() {
             private StringBuilder stringBuilder = new StringBuilder();
 
@@ -302,7 +303,7 @@ public class MainFrameView {
                     textComponent.setText(stringBuilder.toString());
                 }
 
-                doHighlightFor(observedPath.toFile());
+                doHighlight(observedPath.toFile());
 
                 int fileIndex = watchedFileNames.indexOf(absolutePath);
                 if (fileIndex != getFocusedTabIndex()) {
@@ -319,7 +320,7 @@ public class MainFrameView {
                 stringBuilder.append(modificationString);
                 textComponent.setText(stringBuilder.toString());
 
-                doHighlightFor(observedPath.toFile());
+                doHighlight(observedPath.toFile());
             }
 
             @Override
@@ -329,6 +330,10 @@ public class MainFrameView {
                 JTextComponent textComponent = stringTextComponentMap.get(absolutePath);
                 stringBuilder = new StringBuilder();
                 textComponent.setText(stringBuilder.toString());
+
+                String absoluteFilePathLabelText = absoluteFilePathLabel.getText();
+                absoluteFilePathLabel.setText(absoluteFilePathLabelText);
+                absoluteFilePathLabel.setForeground(Colors.DARK_RED.toColor());
             }
         }, chosenFile.getAbsolutePath());
     }
@@ -366,10 +371,10 @@ public class MainFrameView {
 
     public void addAndDoHighlight(FileSetting fileSetting) {
         fileSettings.add(fileSetting);
-        doHighlightFor(new File(fileSetting.getAssociatedFile()));
+        doHighlight(new File(fileSetting.getAssociatedFile()));
     }
 
-    private synchronized void doHighlightFor(File file) {
+    private synchronized void doHighlight(File file) {
         if (isInitialized) {
             JTextComponent textComponent = stringTextComponentMap.get(file.getAbsolutePath());
 
@@ -382,8 +387,12 @@ public class MainFrameView {
             }
             if (fileShouldBeHighlighted) {
                 LOGGER.info("Starting highlight thread for {}", file.getAbsolutePath());
-                Thread highlightThread = new Thread(new HighlightThread(textComponent, fileSettings));
-                highlightThread.start();
+                try {
+                    WorkerThreads.execute(new HighlightThread(textComponent, fileSettings));
+                }
+                catch (InterruptedException e) {
+                    LOGGER.error("Error interrupting thread", e);
+                }
             }
         }
     }
@@ -393,7 +402,7 @@ public class MainFrameView {
         if (stringTextComponentMap.keySet().size() > 0) {
             LOGGER.info("Making all the watched files perform the highlights");
             for (String filePaths : stringTextComponentMap.keySet()) {
-                doHighlightFor(new File(filePaths));
+                doHighlight(new File(filePaths));
             }
         }
     }

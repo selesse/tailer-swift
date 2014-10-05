@@ -47,6 +47,10 @@ public class FileWatcher implements Runnable {
         }
     }
 
+    public File getObservedFile() {
+        return observedFilePath.toFile();
+    }
+
     private void register(Path observedDirectory) {
         try {
             observedDirectory.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
@@ -76,7 +80,7 @@ public class FileWatcher implements Runnable {
                 WatchEvent.Kind kind = event.kind();
 
                 if (kind == OVERFLOW) {
-                    LOGGER.warn("Kind was overflow?");
+                    LOGGER.error("[{}] : Overflow event!", observedFilePath);
                     continue;
                 }
 

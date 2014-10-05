@@ -2,6 +2,7 @@ package com.selesse.tailerswift.gui;
 
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
+import com.selesse.tailerswift.threads.WorkerThreads;
 
 import javax.swing.*;
 
@@ -26,9 +27,7 @@ public class GuiTailerSwift {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                for (Thread thread : mainFrame.getAllThreads()) {
-                    thread.interrupt();
-                }
+                WorkerThreads.shutdown();
             }
         });
     }

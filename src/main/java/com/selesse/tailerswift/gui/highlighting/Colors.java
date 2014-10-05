@@ -6,7 +6,9 @@ import java.awt.*;
  * Custom list of non-standard {@link Color}s.
  */
 public enum Colors {
-    DARK_GREEN(0, 100, 0);
+    DARK_GREEN(0, 100, 0),
+    DARK_RED(100, 0, 0),
+    ;
 
     private Color color;
 
