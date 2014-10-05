@@ -146,7 +146,7 @@ public class FileWatcher implements Runnable {
         updateFile(ui);
     }
 
-    public void updateFile(TailUserInterface ui) {
+    public synchronized void updateFile(TailUserInterface ui) {
         String modification;
         while ((modification = fileObserver.onModify()) != null) {
             ui.updateFile(observedFilePath, modification);
