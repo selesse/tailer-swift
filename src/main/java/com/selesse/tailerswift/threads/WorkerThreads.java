@@ -32,6 +32,7 @@ public class WorkerThreads {
         return instance;
     }
 
+    @SuppressWarnings("unchecked")
     public static void execute(Callable<?> callable) throws InterruptedException {
         getInstance().executorService.invokeAll(Lists.newArrayList(callable));
     }

@@ -4,7 +4,7 @@ import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
 import org.apache.commons.io.FileUtils;
 import org.fest.swing.data.Index;
-import org.fest.util.Files;
+import com.google.common.io.Files;
 import org.junit.After;
 import org.junit.Test;
 
@@ -32,10 +32,10 @@ public class TabTester extends AbstractMainFrameTester {
     }
 
     private void createThreeTempFiles() {
-        tempDirectory = Files.newTemporaryFolder();
-        tempFile = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "foo");
-        tempFile2 = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "foo2");
-        tempFile3 = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "foo3");
+        tempDirectory = Files.createTempDir();
+        tempFile = new File(tempDirectory, "foo");
+        tempFile2 = new File(tempDirectory, "foo2");
+        tempFile3 = new File(tempDirectory, "foo3");
     }
 
     @Test
@@ -44,8 +44,8 @@ public class TabTester extends AbstractMainFrameTester {
         assumeTrue(weShouldRunUiTests());
 
         // set up the temp directory and file for the test
-        File tempDirectory = Files.newTemporaryFolder();
-        File tempFile = Files.newFile(tempDirectory.getAbsolutePath() + File.separator + "temp.txt");
+        File tempDirectory = Files.createTempDir();
+        File tempFile = new File(tempDirectory, "temp.txt");
 
         window.menuItem("Open/watch file...").click();
         window.fileChooser("File chooser").setCurrentDirectory(tempDirectory);
@@ -124,8 +124,8 @@ public class TabTester extends AbstractMainFrameTester {
         // For some reason, on OS X, "approve"ing the files below throws an exception
         assumeTrue(weShouldRunUiTests());
 
-        File tempWriteDirectory = Files.newTemporaryFolder();
-        File tempWriteFile = Files.newFile(tempWriteDirectory.getAbsolutePath() + File.separator + "zzz");
+        File tempWriteDirectory = Files.createTempDir();
+        File tempWriteFile = new File(tempWriteDirectory, "zzz");
 
         createThreeTempFiles();
 
