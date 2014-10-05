@@ -86,7 +86,7 @@ public class FileWatcherTester {
             e.printStackTrace();
         }
 
-        assertEquals("some text to buffer", testUi.getBufferContents());
+        assertTrue(testUi.getBufferContents().contains("some text to buffer"));
 
         if (!tempFile.delete()) {
             System.err.println("Failed to delete " + tempFile.getAbsolutePath());
