@@ -1,10 +1,8 @@
 package com.selesse.tailerswift.gui;
 
-import com.selesse.tailerswift.settings.OperatingSystem;
-import com.selesse.tailerswift.settings.Program;
+import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
 import org.fest.swing.data.Index;
-import com.google.common.io.Files;
 import org.junit.After;
 import org.junit.Test;
 
@@ -203,11 +201,6 @@ public class TabTester extends AbstractMainFrameTester {
     }
 
     private void threadSleepBasedOnOperatingSystem() throws InterruptedException {
-        if (Program.getInstance().getOperatingSystem() == OperatingSystem.MAC) {
-            Thread.sleep(4000);
-        }
-        else {
-            Thread.sleep(2000);
-        }
+        Thread.sleep(4000);
     }
 }
