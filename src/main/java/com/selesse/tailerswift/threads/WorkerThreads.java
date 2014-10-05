@@ -16,7 +16,7 @@ import java.util.concurrent.Future;
 public class WorkerThreads {
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkerThreads.class);
 
-    private static WorkerThreads instance;
+    private static volatile WorkerThreads instance;
     private final ExecutorService executorService;
     private final Map<File, Future<?>> fileWatcherMap;
 

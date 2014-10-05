@@ -57,7 +57,7 @@ public class FileWatcherTester {
     @Test
     public void testCanWatchNonExistentFile() {
         String filename = "" + System.currentTimeMillis();
-        File tempFile = new File(testDirectory.getAbsolutePath() + File.separator + filename);
+        File tempFile = new File(testDirectory, filename);
 
         assertFalse(tempFile.exists());
 
@@ -94,7 +94,7 @@ public class FileWatcherTester {
     }
 
     private File createFileWithContents(String filename, String contents) {
-        File file = new File(testDirectory + File.separator + filename);
+        File file = new File(testDirectory, filename);
 
         try {
             PrintWriter printWriter = new PrintWriter(file, "UTF-8");

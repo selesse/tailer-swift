@@ -21,7 +21,7 @@ public class GuiTailerSwift {
             e.printStackTrace();
         }
 
-        final MainFrame mainFrame = new MainFrame(Program.getInstance().getSettings());
+        new MainFrame(Program.getInstance().getSettings());
 
         // stop watching all the files
         Runtime.getRuntime().addShutdownHook(new Thread() {
