@@ -11,7 +11,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 
-@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"DM_EXIT"})
 public class FileMenu extends AbstractMenu {
     private CrossPlatformFileChooser fileChooser;
     private MainFrame mainFrame;
