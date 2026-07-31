@@ -1,21 +1,28 @@
 package com.selesse.tailerswift.filewatcher;
 
-
 import com.google.common.base.Charsets;
+import com.google.common.io.CountingInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.nio.channels.ClosedChannelException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 
 public class FileObserverImpl implements FileObserver {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileObserverImpl.class);
+    private static final int CHUNK_SIZE = 1024 * 64; // 64KB chunks for fewer, larger updates
+
+    private final File observedFile;
     private long bufferedFileSize;
-    private File observedFile;
-    private BufferedReader bufferedReader;
-    private static final int CHUNK_SIZE = 1024 * 5;
+    private CountingInputStream countingInputStream;
+    private Reader reader;
 
     public FileObserverImpl(File observedFile) {
         this.observedFile = observedFile;
@@ -23,51 +30,38 @@ public class FileObserverImpl implements FileObserver {
 
     @Override
     public String onModify() {
-        StringBuilder modificationBuffered = new StringBuilder(CHUNK_SIZE);
-
         try {
             long currentFileSize = Files.size(observedFile.toPath());
+
             if (currentFileSize < bufferedFileSize) {
-                bufferedFileSize = 0;
+                LOGGER.info("[{}] : File shrank ({} > {}), reopening from the start", observedFile.getAbsolutePath(),
+                        bufferedFileSize, currentFileSize);
+                reopen(0);
             }
 
             if (bufferedFileSize == currentFileSize) {
                 return null;
             }
-            if (bufferedFileSize > currentFileSize) {
-                LOGGER.error("[{}] : bufferedFileSize is greater than current file size: {} > {}", observedFile,
-                        bufferedFileSize, currentFileSize);
+
+            if (reader == null) {
+                reopen(bufferedFileSize);
+            }
+
+            char[] buffer = new char[CHUNK_SIZE];
+            int totalCharsRead = 0;
+            int charsRead;
+            while (totalCharsRead < CHUNK_SIZE
+                    && (charsRead = reader.read(buffer, totalCharsRead, CHUNK_SIZE - totalCharsRead)) != -1) {
+                totalCharsRead += charsRead;
+            }
+
+            bufferedFileSize = countingInputStream.getCount();
+
+            if (totalCharsRead == 0) {
                 return null;
             }
 
-            bufferedReader = Files.newBufferedReader(observedFile.toPath(), Charsets.UTF_8);
-            try {
-                long skippedBytes = bufferedReader.skip(bufferedFileSize);
-                if (skippedBytes < bufferedFileSize) {
-                    LOGGER.info("[{}] : Didn't skip the entire file, only skipped {} bytes",
-                            observedFile.getAbsolutePath(), skippedBytes);
-                }
-
-                char[] buffer = new char[CHUNK_SIZE];
-                int bytesRead = 0;
-
-                while (bytesRead < CHUNK_SIZE && bytesRead != -1) {
-                    bytesRead = bufferedReader.read(buffer);
-                    for (int i = 0; i < bytesRead; i++) {
-                        modificationBuffered.append(buffer[i]);
-                    }
-                }
-
-                if (bytesRead == -1) {
-                    bufferedFileSize += modificationBuffered.toString().length();
-                }
-                else {
-                    bufferedFileSize += bytesRead;
-                }
-                bufferedReader.close();
-            } catch (ClosedChannelException e) {
-                return null;
-            }
+            return new String(buffer, 0, totalCharsRead);
         }
         catch (NoSuchFileException | FileNotFoundException ignored) {
             // we like this, do nothing
@@ -76,14 +70,13 @@ public class FileObserverImpl implements FileObserver {
             LOGGER.error("[{}] : Error updating during onModify", observedFile.toPath(), e);
         }
 
-        return modificationBuffered.toString();
+        return null;
     }
 
     @Override
     public void onCreate() {
-        bufferedFileSize = 0;
         try {
-            bufferedReader = Files.newBufferedReader(observedFile.toPath(), Charsets.UTF_8);
+            reopen(0);
         } catch (IOException e) {
             LOGGER.error("[{}] : Error onCreate", observedFile.getAbsolutePath(), e);
         }
@@ -91,5 +84,39 @@ public class FileObserverImpl implements FileObserver {
 
     @Override
     public void onDelete() {
+        closeQuietly();
+    }
+
+    /**
+     * (Re)opens the file for reading starting at {@code byteOffset}, using a raw byte-level
+     * skip (an O(1) file seek) rather than decoding-and-discarding characters. The resulting
+     * reader is kept open and read forward incrementally by {@link #onModify()} - unlike the
+     * old implementation, we never reopen and re-skip from scratch on every call, which was
+     * O(bytes already read) per call and made tailing a long-running file quadratically slow.
+     */
+    private void reopen(long byteOffset) throws IOException {
+        closeQuietly();
+
+        FileInputStream fileInputStream = new FileInputStream(observedFile);
+        long skipped = fileInputStream.skip(byteOffset);
+        if (skipped < byteOffset) {
+            LOGGER.info("[{}] : Didn't skip the entire requested offset, only skipped {} of {} bytes",
+                    observedFile.getAbsolutePath(), skipped, byteOffset);
+        }
+
+        countingInputStream = new CountingInputStream(fileInputStream);
+        reader = new BufferedReader(new InputStreamReader(countingInputStream, Charsets.UTF_8));
+        bufferedFileSize = byteOffset;
+    }
+
+    private void closeQuietly() {
+        if (reader != null) {
+            try {
+                reader.close();
+            } catch (IOException ignored) {
+                // nothing sensible to do
+            }
+            reader = null;
+        }
     }
 }
