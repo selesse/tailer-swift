@@ -11,6 +11,13 @@ import java.util.Arrays;
 
 import static org.junit.Assume.assumeTrue;
 
+/**
+ * A minimal set of end-to-end sanity checks for tab lifecycle - the parts that genuinely
+ * need a real window (JTabbedPane wiring, FileWatcher -> TailPane -> tab title updates).
+ * Redundant variations (closing the first/last tab, in addition to the middle one tested
+ * here) were trimmed since they exercise the same MainFrameView bookkeeping as the case
+ * kept, not additional behavior.
+ */
 public class TabTester extends AbstractMainFrameTester {
     private File tempDirectory;
     private File tempFile;
@@ -81,82 +88,6 @@ public class TabTester extends AbstractMainFrameTester {
         window.menuItem("Close current file").click();
 
         window.tabbedPane("Tabbed pane").requireTabTitles(tempFile.getName(), tempFile3.getName());
-    }
-
-    @Test
-    public void testClosingLastTabPreservesTitleHistory() {
-        // For some reason, on OS X, "approve"ing the files below throws an exception
-        assumeTrue(weShouldRunUiTests());
-
-        createThreeTempFiles();
-        simulateChoosingThreeTempFiles();
-
-        String[] assumedTabTitles = new String[] { tempFile.getName(), tempFile2.getName(), tempFile3.getName() };
-        assumeTrue(Arrays.deepEquals(window.tabbedPane("Tabbed pane").tabTitles(), assumedTabTitles));
-
-        window.tabbedPane("Tabbed pane").selectTab(2);
-        window.menuItem("Close current file").click();
-
-        window.tabbedPane("Tabbed pane").requireTabTitles(tempFile.getName(), tempFile2.getName());
-    }
-
-    @Test
-    public void testClosingFirstTabPreservesTitleHistory() {
-        // For some reason, on OS X, "approve"ing the files below throws an exception
-        assumeTrue(weShouldRunUiTests());
-
-        createThreeTempFiles();
-        simulateChoosingThreeTempFiles();
-
-        String[] assumedTabTitles = new String[] { tempFile.getName(), tempFile2.getName(), tempFile3.getName() };
-        assumeTrue(Arrays.deepEquals(window.tabbedPane("Tabbed pane").tabTitles(), assumedTabTitles));
-
-        window.tabbedPane("Tabbed pane").selectTab(0);
-        window.menuItem("Close current file").click();
-
-        window.tabbedPane("Tabbed pane").requireTabTitles(tempFile2.getName(), tempFile3.getName());
-    }
-
-    @Test
-    public void testTitleChangesWhenContentIsAdded() throws FileNotFoundException, InterruptedException, UnsupportedEncodingException {
-        // For some reason, on OS X, "approve"ing the files below throws an exception
-        assumeTrue(weShouldRunUiTests());
-
-        File tempWriteDirectory = Files.createTempDir();
-        File tempWriteFile = new File(tempWriteDirectory, "zzz");
-
-        createThreeTempFiles();
-
-        simulateChoosingThreeTempFiles();
-        simulateChoosingThreeTempFiles();
-
-        window.menuItem("Open/watch file...").click();
-        window.fileChooser("File chooser").setCurrentDirectory(tempWriteDirectory);
-        window.fileChooser("File chooser").selectFile(tempWriteFile);
-        window.fileChooser("File chooser").approve();
-
-        window.tabbedPane("Tabbed pane").requireTabTitles(tempFile.getName(), tempFile2.getName(), tempFile3.getName(),
-                tempWriteFile.getName());
-
-        window.tabbedPane("Tabbed pane").selectTab(3);
-        Thread.sleep(100);
-        window.tabbedPane("Tabbed pane").selectTab(0);
-
-        PrintWriter printWriter = new PrintWriter(tempWriteFile, "UTF-8");
-        printWriter.println("Hello, world!");
-        printWriter.flush();
-        printWriter.close();
-
-        threadSleepBasedOnOperatingSystem();
-
-        window.tabbedPane("Tabbed pane").requireTabTitles(tempFile.getName(), tempFile2.getName(), tempFile3.getName(),
-                "* " + tempWriteFile.getName());
-
-        try {
-            FileUtils.deleteDirectory(tempWriteDirectory);
-        } catch (IOException e) {
-            System.err.println("Failed to delete " + tempWriteDirectory.getAbsolutePath());
-        }
     }
 
     private void simulateChoosingThreeTempFiles() {

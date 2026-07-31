@@ -1,69 +1,26 @@
 package com.selesse.tailerswift.gui;
 
-import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.core.KeyPressInfo;
-import org.assertj.swing.edt.FailOnThreadViolationRepaintManager;
 import org.assertj.swing.finder.WindowFinder;
 import org.assertj.swing.fixture.FrameFixture;
-import org.assertj.swing.security.ExitCallHook;
-import org.assertj.swing.security.NoExitSecurityManagerInstaller;
-import org.assertj.swing.util.Platform;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
+/**
+ * Deliberately does not cover the "Exit"/Cmd+Q menu actions: verifying those actually call
+ * {@code System.exit()} requires trapping real JVM exit via a SecurityManager, which both
+ * FEST and AssertJ-Swing implement the same fragile way - and SecurityManager is being
+ * removed from the JDK entirely, so that mechanism was already broken on JDK 17+. The menu
+ * items themselves (existence, accelerators) aren't worth testing separately from what
+ * Swing itself guarantees once wired up.
+ */
 public class MenuTester extends AbstractMainFrameTester {
-    private static NoExitSecurityManagerInstaller noExitSecurityManagerInstaller;
-    private static boolean exitedCleanly;
-
-    @BeforeClass
-    public static void setUpOnce() {
-        FailOnThreadViolationRepaintManager.install();
-        noExitSecurityManagerInstaller = NoExitSecurityManagerInstaller.installNoExitSecurityManager(new ExitCallHook() {
-            @Override
-            public void exitCalled(int status) {
-                if (status == 0) {
-                    exitedCleanly = true;
-                }
-            }
-        });
-    }
-
-    @AfterClass
-    public static void tearDownOnce() {
-        noExitSecurityManagerInstaller.uninstall();
-    }
-
-    @Override
-    public void setup() {
-        super.setup();
-
-        exitedCleanly = false;
-    }
-
-    @Test
-    public void testPressingExitKeyboardShortcutExits() {
-        KeyPressInfo keyPressInfo = KeyPressInfo.keyCode(KeyEvent.VK_Q).modifiers(Platform.controlOrCommandMask());
-        window.pressAndReleaseKey(keyPressInfo);
-        assertTrue(exitedCleanly);
-    }
-
-    @Test
-    public void testClickingFileThenQuitExits() {
-        // we don't have an "Exit" option on OS X
-        assumeTrue(weShouldRunUiTests());
-        window.menuItem("Exit").click();
-        assertTrue(exitedCleanly);
-    }
-
     @Test
     public void testPressingF1BringsUpHelp() {
         KeyPressInfo keyPressInfo = KeyPressInfo.keyCode(KeyEvent.VK_F1);
@@ -100,5 +57,4 @@ public class MenuTester extends AbstractMainFrameTester {
         window.menuItem("Open/watch file...").click();
         window.fileChooser("File chooser").requireVisible();
     }
-
 }
