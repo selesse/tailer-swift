@@ -15,7 +15,7 @@ dependencies {
   implementation('ch.qos.logback:logback-classic:1.2.10')
 
   testImplementation 'commons-io:commons-io:2.4'
-  testImplementation 'org.easytesting:fest-swing-junit-4.5:1.2.1'
+  testImplementation 'org.assertj:assertj-swing-junit:3.17.1'
   testImplementation 'junit:junit:4.11'
 }
 

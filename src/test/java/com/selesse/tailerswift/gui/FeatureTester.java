@@ -1,6 +1,6 @@
 package com.selesse.tailerswift.gui;
 
-import org.fest.swing.exception.ComponentLookupException;
+import org.assertj.swing.exception.ComponentLookupException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;

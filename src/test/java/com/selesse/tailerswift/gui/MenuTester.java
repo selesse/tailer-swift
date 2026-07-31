@@ -2,14 +2,14 @@ package com.selesse.tailerswift.gui;
 
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
-import org.fest.swing.core.GenericTypeMatcher;
-import org.fest.swing.core.KeyPressInfo;
-import org.fest.swing.edt.FailOnThreadViolationRepaintManager;
-import org.fest.swing.finder.WindowFinder;
-import org.fest.swing.fixture.FrameFixture;
-import org.fest.swing.security.ExitCallHook;
-import org.fest.swing.security.NoExitSecurityManagerInstaller;
-import org.fest.swing.util.Platform;
+import org.assertj.swing.core.GenericTypeMatcher;
+import org.assertj.swing.core.KeyPressInfo;
+import org.assertj.swing.edt.FailOnThreadViolationRepaintManager;
+import org.assertj.swing.finder.WindowFinder;
+import org.assertj.swing.fixture.FrameFixture;
+import org.assertj.swing.security.ExitCallHook;
+import org.assertj.swing.security.NoExitSecurityManagerInstaller;
+import org.assertj.swing.util.Platform;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -69,7 +69,7 @@ public class MenuTester extends AbstractMainFrameTester {
         KeyPressInfo keyPressInfo = KeyPressInfo.keyCode(KeyEvent.VK_F1);
         window.pressAndReleaseKey(keyPressInfo);
 
-        FrameFixture aboutFrame = WindowFinder.findFrame("About").using(window.robot);
+        FrameFixture aboutFrame = WindowFinder.findFrame("About").using(window.robot());
         aboutFrame.requireVisible();
     }
 
@@ -77,7 +77,7 @@ public class MenuTester extends AbstractMainFrameTester {
     public void testClickingOnAboutBringsUpAbout() {
         window.menuItem("About").click();
 
-        FrameFixture aboutFrame = WindowFinder.findFrame("About").using(window.robot);
+        FrameFixture aboutFrame = WindowFinder.findFrame("About").using(window.robot());
         aboutFrame.requireVisible();
     }
 

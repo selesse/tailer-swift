@@ -2,7 +2,7 @@ package com.selesse.tailerswift.gui;
 
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
-import org.fest.swing.data.Index;
+import org.assertj.swing.data.Index;
 import org.junit.After;
 import org.junit.Test;
 
