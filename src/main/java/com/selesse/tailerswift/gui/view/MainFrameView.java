@@ -15,7 +15,7 @@ import com.selesse.tailerswift.gui.filter.FilterThread;
 import com.selesse.tailerswift.gui.highlighting.Colors;
 import com.selesse.tailerswift.gui.highlighting.FileSetting;
 import com.selesse.tailerswift.gui.highlighting.Highlight;
-import com.selesse.tailerswift.gui.highlighting.HighlightThread;
+import com.selesse.tailerswift.gui.lines.TailPane;
 import com.selesse.tailerswift.gui.menu.FileMenu;
 import com.selesse.tailerswift.gui.menu.HelpMenu;
 import com.selesse.tailerswift.gui.menu.SettingsMenu;
@@ -29,7 +29,6 @@ import com.selesse.tailerswift.gui.section.Feature;
 import com.selesse.tailerswift.gui.section.FeaturePanel;
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
-import com.selesse.tailerswift.threads.WorkerThreads;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.text.*;
 import java.awt.*;
 import java.io.File;
 import java.lang.reflect.InvocationHandler;
@@ -57,7 +55,7 @@ public class MainFrameView {
     private JFrame frame;
     private JTabbedPane tabbedPane;
     private JLabel absoluteFilePathLabel;
-    private Map<String, JTextComponent> stringTextComponentMap;
+    private Map<String, TailPane> tailPaneMap;
     private List<String> watchedFileNames;
     private MainFrame mainFrame;
     private List<FileSetting> fileSettings;
@@ -72,7 +70,7 @@ public class MainFrameView {
         tabbedPane.setName("Tabbed pane");
         absoluteFilePathLabel = new JLabel();
 
-        stringTextComponentMap = Maps.newHashMap();
+        tailPaneMap = Maps.newHashMap();
         watchedFileNames = Lists.newArrayList();
         fileSettings = Lists.newArrayList();
 
@@ -113,6 +111,10 @@ public class MainFrameView {
                 int selectedIndex = tabbedPane.getSelectedIndex();
                 if (selectedIndex != -1) {
                     absoluteFilePathLabel.setText(watchedFileNames.get(selectedIndex));
+                    TailPane tailPane = tailPaneMap.get(watchedFileNames.get(selectedIndex));
+                    if (tailPane != null) {
+                        tailPane.requestScrollFocus();
+                    }
                 }
                 normalizeTabTitle();
             }
@@ -164,7 +166,6 @@ public class MainFrameView {
         frame.setVisible(true);
 
         isInitialized = true;
-        doHighlights();
     }
 
     private JMenuBar createMenuBar() {
@@ -183,24 +184,6 @@ public class MainFrameView {
         return menuBar;
     }
 
-    private JTextComponent createWatcherTextComponent() {
-        JTextPane textPane = new JTextPane();
-        textPane.setEditable(false);
-        textPane.setDropTarget(mainFrame.createFileDropTarget());
-        textPane.setFont(Program.getInstance().getSettings().getDisplayFont());
-        textPane.setBorder(new EmptyBorder(0, 5, 0, 0));
-
-        return textPane;
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    private void setLineSpacing(JTextPane textPane, float modifier) {
-        MutableAttributeSet mutableAttributeSet = new SimpleAttributeSet();
-        StyleConstants.setLineSpacing(mutableAttributeSet, modifier);
-
-        textPane.setParagraphAttributes(mutableAttributeSet, false);
-    }
-
     public Frame getFrame() {
         return frame;
     }
@@ -214,17 +197,15 @@ public class MainFrameView {
     }
 
     public synchronized void addTab(File file) {
-        JTextComponent textComponent = createWatcherTextComponent();
+        TailPane tailPane = new TailPane(fileSettings, Program.getInstance().getSettings().getDisplayFont(),
+                mainFrame.createFileDropTarget());
 
-        stringTextComponentMap.put(file.getAbsolutePath(), textComponent);
+        tailPaneMap.put(file.getAbsolutePath(), tailPane);
         watchedFileNames.add(file.getAbsolutePath());
 
-        JScrollPane scrollPane = new JScrollPane(textComponent);
-        tabbedPane.addTab(file.getName(), scrollPane);
-        tabbedPane.setSelectedComponent(scrollPane);
-        scrollPane.getVerticalScrollBar().addAdjustmentListener(new SmartScroller(scrollPane));
-        TextLineNumber textLineNumber = new TextLineNumber(textComponent);
-        scrollPane.setRowHeaderView(textLineNumber);
+        tabbedPane.addTab(file.getName(), tailPane.getComponent());
+        tabbedPane.setSelectedComponent(tailPane.getComponent());
+        tailPane.requestScrollFocus();
 
         absoluteFilePathLabel.setText(file.getAbsolutePath());
     }
@@ -234,7 +215,7 @@ public class MainFrameView {
         if (currentlyFocusedFileIndex != -1) {
             tabbedPane.remove(currentlyFocusedFileIndex);
             String removeName = watchedFileNames.remove(currentlyFocusedFileIndex);
-            stringTextComponentMap.remove(removeName);
+            tailPaneMap.remove(removeName);
             if (watchedFileNames.isEmpty()) {
                 absoluteFilePathLabel.setText("");
             }
@@ -263,8 +244,6 @@ public class MainFrameView {
 
     public FileWatcher createFileWatcher(final File chosenFile) {
         return new FileWatcher(new TailUserInterface() {
-            private StringBuilder stringBuilder = new StringBuilder();
-
             @Override
             public void updateFile(Path observedPath, final String modificationString) {
                 // TODO fix the real issue
@@ -275,35 +254,7 @@ public class MainFrameView {
                         modificationString.length());
                 String absolutePath = observedPath.toFile().getAbsolutePath();
 
-                JTextComponent textComponent = stringTextComponentMap.get(absolutePath);
-
-                if (textComponent instanceof JTextPane) {
-                    JTextPane textPane = (JTextPane) textComponent;
-                    final StyledDocument styledDocument = textPane.getStyledDocument();
-
-                    try {
-                        SwingUtilities.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    styledDocument.insertString(styledDocument.getLength(), modificationString, null);
-                                } catch (BadLocationException e) {
-                                    LOGGER.error("[{}] : Error inserting string into doc", chosenFile.getAbsolutePath(),
-                                            e);
-                                }
-                            }
-                        });
-                    } catch (InterruptedException | InvocationTargetException e) {
-                        LOGGER.error("[{}] : Error waiting for swing", chosenFile.getAbsolutePath(), e);
-                    }
-
-                }
-                else {
-                    stringBuilder.append(modificationString);
-                    textComponent.setText(stringBuilder.toString());
-                }
-
-                doHighlight(observedPath.toFile());
+                tailPaneMap.get(absolutePath).appendChunk(modificationString);
 
                 int fileIndex = watchedFileNames.indexOf(absolutePath);
                 if (fileIndex != getFocusedTabIndex()) {
@@ -315,21 +266,14 @@ public class MainFrameView {
             public void newFile(Path observedPath, String modificationString) {
                 String absolutePath = observedPath.toFile().getAbsolutePath();
 
-                JTextComponent textComponent = stringTextComponentMap.get(absolutePath);
-                stringBuilder = new StringBuilder();
-                stringBuilder.append(modificationString);
-                textComponent.setText(stringBuilder.toString());
-
-                doHighlight(observedPath.toFile());
+                tailPaneMap.get(absolutePath).setText(modificationString);
             }
 
             @Override
             public void deleteFile(Path observedPath) {
                 String absolutePath = observedPath.toFile().getAbsolutePath();
 
-                JTextComponent textComponent = stringTextComponentMap.get(absolutePath);
-                stringBuilder = new StringBuilder();
-                textComponent.setText(stringBuilder.toString());
+                tailPaneMap.get(absolutePath).setText("");
 
                 String absoluteFilePathLabelText = absoluteFilePathLabel.getText();
                 absoluteFilePathLabel.setText(absoluteFilePathLabelText);
@@ -363,62 +307,33 @@ public class MainFrameView {
     }
 
     public void setFont(Font font) {
-        for (String filePath : stringTextComponentMap.keySet()) {
-            JTextComponent textComponent = stringTextComponentMap.get(filePath);
-            textComponent.setFont(font);
+        for (TailPane tailPane : tailPaneMap.values()) {
+            tailPane.setFont(font);
         }
     }
 
+    /**
+     * Highlighting is resolved per-line at paint time (see {@link com.selesse.tailerswift.gui.lines.LineHighlighter}),
+     * so adding a setting just needs to make it visible to future resolutions and repaint what's on screen now.
+     */
     public void addAndDoHighlight(FileSetting fileSetting) {
         fileSettings.add(fileSetting);
-        doHighlight(new File(fileSetting.getAssociatedFile()));
-    }
-
-    private synchronized void doHighlight(File file) {
-        if (isInitialized) {
-            JTextComponent textComponent = stringTextComponentMap.get(file.getAbsolutePath());
-
-            boolean fileShouldBeHighlighted = false;
-            for (FileSetting fileSetting : fileSettings) {
-                if (fileSetting.getAssociatedFile().equals(file.getAbsolutePath())) {
-                    fileShouldBeHighlighted = true;
-                    break;
-                }
-            }
-            if (fileShouldBeHighlighted) {
-                LOGGER.info("Starting highlight thread for {}", file.getAbsolutePath());
-                try {
-                    WorkerThreads.execute(new HighlightThread(textComponent, fileSettings));
-                }
-                catch (InterruptedException e) {
-                    LOGGER.error("Error interrupting thread", e);
-                }
-            }
+        for (TailPane tailPane : tailPaneMap.values()) {
+            tailPane.repaintHighlights();
         }
     }
-
-
-    private synchronized void doHighlights() {
-        if (stringTextComponentMap.keySet().size() > 0) {
-            LOGGER.info("Making all the watched files perform the highlights");
-            for (String filePaths : stringTextComponentMap.keySet()) {
-                doHighlight(new File(filePaths));
-            }
-        }
-    }
-
 
     public SearchResults runSearchQuery(final String text) {
         final SearchResults searchResults = new SearchResults();
-        for (final String filePaths : stringTextComponentMap.keySet()) {
-            final JTextComponent textComponent = stringTextComponentMap.get(filePaths);
+        for (final String filePaths : tailPaneMap.keySet()) {
+            final TailPane tailPane = tailPaneMap.get(filePaths);
 
             SwingWorker worker = new SwingWorker<SearchMatches, Void>() {
                 private SearchMatches searchMatches;
 
                 @Override
                 protected SearchMatches doInBackground() throws Exception {
-                    SearchThread searchingThread = new SearchThread(textComponent, text);
+                    SearchThread searchingThread = new SearchThread(tailPane::getText, text);
 
                     Thread searchThread = new Thread(searchingThread);
                     searchThread.start();
@@ -450,15 +365,15 @@ public class MainFrameView {
 
     public FilterResults filter(final String text) {
         final FilterResults filterResults = new FilterResults();
-        for (final String filePaths : stringTextComponentMap.keySet()) {
-            final JTextComponent textComponent = stringTextComponentMap.get(filePaths);
+        for (final String filePaths : tailPaneMap.keySet()) {
+            final TailPane tailPane = tailPaneMap.get(filePaths);
 
             SwingWorker worker = new SwingWorker<FilterMatches, Void>() {
                 private FilterMatches filterMatches;
 
                 @Override
                 protected FilterMatches doInBackground() throws Exception {
-                    FilterThread filteringThread = new FilterThread(textComponent, text);
+                    FilterThread filteringThread = new FilterThread(tailPane::getText, text);
 
                     Thread filterThread = new Thread(filteringThread);
                     filterThread.start();

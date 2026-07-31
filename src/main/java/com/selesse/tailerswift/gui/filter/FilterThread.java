@@ -2,15 +2,15 @@ package com.selesse.tailerswift.gui.filter;
 
 import com.google.common.base.Splitter;
 
-import javax.swing.text.JTextComponent;
+import java.util.function.Supplier;
 
 public class FilterThread implements Runnable {
     private final String fileContents;
     private final String queryString;
     private FilterMatches filterMatches;
 
-    public FilterThread(JTextComponent textComponent, String queryString) {
-        this.fileContents = textComponent.getText();
+    public FilterThread(Supplier<String> textSource, String queryString) {
+        this.fileContents = textSource.get();
         this.queryString = queryString;
 
         filterMatches = new FilterMatches();

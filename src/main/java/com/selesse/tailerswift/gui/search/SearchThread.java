@@ -2,15 +2,15 @@ package com.selesse.tailerswift.gui.search;
 
 import com.google.common.base.Splitter;
 
-import javax.swing.text.JTextComponent;
+import java.util.function.Supplier;
 
 public class SearchThread implements Runnable {
     private final String fileContents;
     private final String queryString;
     private SearchMatches searchMatches;
 
-    public SearchThread(JTextComponent textComponent, String queryString) {
-        this.fileContents = textComponent.getText();
+    public SearchThread(Supplier<String> textSource, String queryString) {
+        this.fileContents = textSource.get();
         this.queryString = queryString;
 
         searchMatches = new SearchMatches();
