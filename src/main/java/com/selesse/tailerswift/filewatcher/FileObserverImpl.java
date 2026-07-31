@@ -19,6 +19,12 @@ public class FileObserverImpl implements FileObserver {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileObserverImpl.class);
     private static final int CHUNK_SIZE = 1024 * 64; // 64KB chunks for fewer, larger updates
 
+    // How far back to seek when we first start watching a file, so opening a huge file
+    // costs about the same as opening a small one - this should stay in sync with
+    // TailPane's ring buffer capacity, since reading more than that just gets evicted
+    // immediately without ever being shown.
+    private static final int INITIAL_TAIL_LINES = 100_000;
+
     private final File observedFile;
     private long bufferedFileSize;
     private CountingInputStream countingInputStream;
@@ -76,7 +82,8 @@ public class FileObserverImpl implements FileObserver {
     @Override
     public void onCreate() {
         try {
-            reopen(0);
+            long startOffset = new TailStartLocator(observedFile).locate(INITIAL_TAIL_LINES);
+            reopen(startOffset);
         } catch (IOException e) {
             LOGGER.error("[{}] : Error onCreate", observedFile.getAbsolutePath(), e);
         }
