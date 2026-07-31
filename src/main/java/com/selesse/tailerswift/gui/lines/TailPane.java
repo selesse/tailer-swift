@@ -24,7 +24,10 @@ import java.util.List;
  * the bottleneck it used to be.
  */
 public class TailPane {
-    private static final int DEFAULT_CAPACITY_LINES = 100_000;
+    // How many lines this buffer holds, and (via TailStartLocator, used by both
+    // FileObserverImpl and MainFrameView) how far back a huge file is seeked on open -
+    // reading further back than this would just get evicted without ever being shown.
+    public static final int DEFAULT_CAPACITY_LINES = 100_000;
 
     private final RingLineBuffer lineBuffer;
     private final LineSplitter splitter;
@@ -97,6 +100,18 @@ public class TailPane {
     /** Repaints in place - used when the shared highlight settings change, since those are resolved at paint time. */
     public void repaintHighlights() {
         linePane.repaint();
+    }
+
+    /**
+     * Upgrades displayed line numbers from relative-to-buffer to absolute-to-file, once a
+     * background count of the lines skipped by the initial tail-seek has finished. Safe to
+     * call from any thread.
+     */
+    public void correctLineNumberBaseline(long linesSkippedBeforeTailStart) {
+        SwingUtilities.invokeLater(() -> {
+            lineBuffer.applyLineNumberOffset(linesSkippedBeforeTailStart);
+            gutter.repaint();
+        });
     }
 
     public JComponent getComponent() {

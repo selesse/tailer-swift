@@ -6,6 +6,8 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import com.selesse.tailerswift.TailUserInterface;
 import com.selesse.tailerswift.filewatcher.FileWatcher;
+import com.selesse.tailerswift.filewatcher.LineCounter;
+import com.selesse.tailerswift.filewatcher.TailStartLocator;
 import com.selesse.tailerswift.gui.MainFrame;
 import com.selesse.tailerswift.gui.SmartScroller;
 import com.selesse.tailerswift.gui.filter.Filter;
@@ -29,6 +31,7 @@ import com.selesse.tailerswift.gui.section.Feature;
 import com.selesse.tailerswift.gui.section.FeaturePanel;
 import com.selesse.tailerswift.settings.OperatingSystem;
 import com.selesse.tailerswift.settings.Program;
+import com.selesse.tailerswift.threads.WorkerThreads;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +41,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -208,6 +212,37 @@ public class MainFrameView {
         tailPane.requestScrollFocus();
 
         absoluteFilePathLabel.setText(file.getAbsolutePath());
+
+        scheduleLineNumberCorrection(file, tailPane);
+    }
+
+    /**
+     * Opening a huge file seeks straight to a tail window instead of reading from the
+     * start (see {@link com.selesse.tailerswift.filewatcher.TailStartLocator}), so the
+     * gutter initially numbers lines relative to that window, not the file. This counts
+     * the skipped lines in the background - a raw byte scan, same trick {@code wc -l}
+     * uses to be fast - and upgrades the gutter to real file line numbers once done.
+     */
+    private void scheduleLineNumberCorrection(File file, TailPane tailPane) {
+        try {
+            WorkerThreads.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        long tailStartOffset = new TailStartLocator(file).locate(TailPane.DEFAULT_CAPACITY_LINES);
+                        long linesSkipped = new LineCounter(file).countLinesBefore(tailStartOffset);
+                        tailPane.correctLineNumberBaseline(linesSkipped);
+                    }
+                    catch (IOException e) {
+                        LOGGER.error("[{}] : Error counting lines for line-number correction",
+                                file.getAbsolutePath(), e);
+                    }
+                }
+            });
+        }
+        catch (InterruptedException e) {
+            LOGGER.error("[{}] : Error scheduling line-number correction", file.getAbsolutePath(), e);
+        }
     }
 
     public void closeCurrentTab() {

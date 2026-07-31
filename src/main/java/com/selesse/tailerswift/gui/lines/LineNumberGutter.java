@@ -57,7 +57,7 @@ public class LineNumberGutter extends JComponent {
         if (fontMetrics == null) {
             return;
         }
-        int highestLineNumber = lineBuffer.getFirstLineNumber() + lineBuffer.size();
+        long highestLineNumber = lineBuffer.getFirstLineNumber() + lineBuffer.size();
         int digits = Math.max(String.valueOf(highestLineNumber).length(), MIN_DISPLAY_DIGITS);
 
         if (digits != lastDigits) {

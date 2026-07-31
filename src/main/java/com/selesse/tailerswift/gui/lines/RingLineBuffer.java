@@ -18,7 +18,7 @@ public class RingLineBuffer implements LineBuffer {
     private final int capacity;
     private int head;
     private int size;
-    private int firstLineNumber;
+    private long firstLineNumber;
 
     public RingLineBuffer(int capacity) {
         if (capacity <= 0) {
@@ -63,8 +63,13 @@ public class RingLineBuffer implements LineBuffer {
     }
 
     @Override
-    public int getFirstLineNumber() {
+    public long getFirstLineNumber() {
         return firstLineNumber;
+    }
+
+    @Override
+    public void applyLineNumberOffset(long offset) {
+        firstLineNumber += offset;
     }
 
     @Override

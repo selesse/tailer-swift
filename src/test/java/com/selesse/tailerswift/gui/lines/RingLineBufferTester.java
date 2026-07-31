@@ -99,4 +99,31 @@ public class RingLineBufferTester {
 
         assertEquals(java.util.Arrays.asList("b", "c"), buffer.asList());
     }
+
+    @Test
+    public void applyLineNumberOffsetShiftsTheBaseline() {
+        RingLineBuffer buffer = new RingLineBuffer(3);
+        buffer.append("a");
+        buffer.append("b");
+
+        buffer.applyLineNumberOffset(1_900_000);
+
+        assertEquals(1_900_001, buffer.getFirstLineNumber());
+    }
+
+    @Test
+    public void applyLineNumberOffsetAfterEvictionAccountsForLinesAlreadyDropped() {
+        RingLineBuffer buffer = new RingLineBuffer(2);
+        buffer.append("a");
+        buffer.append("b");
+        buffer.append("c"); // evicts "a", firstLineNumber becomes 2 (buffer-relative)
+
+        buffer.applyLineNumberOffset(1_900_000);
+
+        // The buffer's oldest line ("b") was already the 2nd line relative to its own
+        // start; correcting for 1,900,000 skipped-before-tail-start lines should land on
+        // 1,900,002, not 1,900,001 - the correction must compose with evictions that
+        // already happened, not just overwrite the baseline.
+        assertEquals(1_900_002, buffer.getFirstLineNumber());
+    }
 }

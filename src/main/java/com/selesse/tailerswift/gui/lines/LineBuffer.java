@@ -21,9 +21,20 @@ public interface LineBuffer {
 
     /**
      * 1-based line number of the oldest line still held (i.e. {@code get(0)}'s line number).
-     * Advances as lines are evicted.
+     * Advances as lines are evicted. Relative to whatever this buffer has been fed from -
+     * if it was seeded starting mid-file (see {@link #applyLineNumberOffset(long)}), this
+     * is relative to the buffer's start, not the file's, until corrected.
      */
-    int getFirstLineNumber();
+    long getFirstLineNumber();
+
+    /**
+     * One-time correction adding {@code offset} to the line-number baseline - used when a
+     * file was opened by seeking straight to a tail window (skipping the lines before it
+     * without counting them, to keep opening fast), and a background count of those
+     * skipped lines has since finished, so displayed numbers can be upgraded from
+     * relative-to-buffer to absolute-to-file.
+     */
+    void applyLineNumberOffset(long offset);
 
     List<String> asList();
 }
